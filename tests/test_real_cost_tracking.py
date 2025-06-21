@@ -17,9 +17,13 @@ Tests verify:
 import pytest
 import asyncio
 import os
+import sys
 from datetime import datetime, timezone, timedelta
 from decimal import Decimal
 from unittest.mock import patch
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.cost_tracker import (
     RealAWSCostTracker,

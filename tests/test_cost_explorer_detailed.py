@@ -5,12 +5,14 @@ This test verifies that AWS Cost Explorer is returning real, accurate data.
 """
 
 import sys
+import os
 import asyncio
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import boto3
 
-sys.path.append('src')
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.config import get_settings
 from src.cost_tracker import get_cost_tracker

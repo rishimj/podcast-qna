@@ -456,19 +456,34 @@ class RealAWSCostTracker:
         try:
             subject = f"🚨 {level.value.upper()} Cost Alert - Podcast Q&A System"
             
-            body = f"""COST ALERT: {message}
+            # Get current real spending for email context
+            real_daily = await self.get_real_daily_spend()
+            real_weekly = await self.get_real_weekly_spend()
+            real_monthly = await self.get_real_monthly_spend()
+            
+            body = f"""🚨 COST ALERT: {message}
 
-Current Spend: ${current_spend:.2f}
-Budget Limit: ${limit:.2f}
-Additional Cost: ${additional_cost:.2f}
-Projected Total: ${current_spend + additional_cost:.2f}
+📊 CURRENT REAL AWS SPENDING:
+   Today:     ${real_daily:.6f}
+   This Week: ${real_weekly:.6f}  
+   This Month: ${real_monthly:.6f}
 
-Alert Level: {level.value.upper()}
-Timestamp: {datetime.now(timezone.utc).isoformat()}
+🚦 BUDGET ANALYSIS:
+   Current Spend: ${current_spend:.6f}
+   Budget Limit:  ${limit:.2f}
+   Additional Cost: ${additional_cost:.6f}
+   Projected Total: ${current_spend + additional_cost:.6f}
 
-Please review your AWS usage and consider optimizing costs.
+⚠️  Alert Level: {level.value.upper()}
+🕒 Timestamp: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}
 
-This alert was sent via SMTP - much simpler than AWS SES!
+💡 RECOMMENDATION:
+   • Review your AWS usage patterns
+   • Consider optimizing expensive operations
+   • Monitor costs daily to avoid surprises
+
+📧 This alert sent via Gmail SMTP (free & reliable!)
+🎯 Podcast Q&A System - Real AWS Cost Protection
 """
             
             # Send email via SMTP (free!)
@@ -479,6 +494,9 @@ This alert was sent via SMTP - much simpler than AWS SES!
                     "📧 Sent cost alert email via SMTP",
                     level=level.value,
                     message=message,
+                    real_daily=str(real_daily),
+                    real_weekly=str(real_weekly),
+                    real_monthly=str(real_monthly),
                     current_spend=str(current_spend),
                     limit=str(limit),
                     to_email=self.settings.cost_alert_email

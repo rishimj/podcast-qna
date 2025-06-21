@@ -5,10 +5,16 @@ This tests the core system without requiring Cost Explorer permissions.
 """
 
 import asyncio
+import sys
+import os
 from decimal import Decimal
+import boto3
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from src.config import get_settings
 from src.cost_tracker import get_cost_tracker
-import boto3
 
 async def test_minimal_system():
     """Test the system with minimal AWS permissions."""

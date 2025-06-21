@@ -7,8 +7,14 @@ Run this after configuring your AWS credentials to see the full status.
 """
 
 import asyncio
+import sys
+import os
 import boto3
 from decimal import Decimal
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from src.config import get_settings
 from src.cost_tracker import get_cost_tracker
 from src.models import User, Episode, CostRecord
