@@ -15,7 +15,7 @@ from decimal import Decimal
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from src.config import get_settings
-from src.cost_tracker import get_cost_tracker
+from src.cost_aware_tracker import get_cost_aware_tracker
 from src.email_alerts import send_cost_alert_email
 
 async def generate_daily_cost_report():
@@ -24,7 +24,7 @@ async def generate_daily_cost_report():
     print(f"📊 Generating daily cost report at {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}")
     
     try:
-        tracker = get_cost_tracker()
+        tracker = get_cost_aware_tracker()
         settings = get_settings()
         
         # Get real AWS spending data
@@ -36,6 +36,9 @@ async def generate_daily_cost_report():
         # Get service breakdown
         service_costs = await tracker.get_cost_by_service(days=1)
         weekly_service_costs = await tracker.get_cost_by_service(days=7)
+        
+        # Get API cost summary
+        api_summary = tracker.get_api_cost_summary()
         
         # Calculate percentages of budget used
         daily_percentage = (real_daily / settings.daily_budget_limit * 100) if settings.daily_budget_limit > 0 else 0
@@ -104,14 +107,22 @@ async def generate_daily_cost_report():
         
         # Add recommendations
         body += f"""
+🔍 API USAGE TRACKING:
+   • Cost Explorer API calls today: {api_summary['todays_api_calls']}
+   • Estimated API costs: {api_summary['estimated_api_cost']}
+   • Remaining calls: {api_summary['remaining_calls']}/{api_summary['daily_limit']}
+   • Cache entries: {api_summary['cache_entries']}
+
 💡 RECOMMENDATIONS:
    • Monitor AWS console for unexpected spikes
    • Consider cost optimization for high-usage services
    • Review budget limits if consistently near thresholds
+   • API calls are cached for 6 hours to minimize costs
 
 🕒 Report Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}
 📧 Automated Daily Report - Podcast Q&A System
 🛡️  Cost Protection: ACTIVE (Emergency limit: ${settings.emergency_stop_budget:.2f})
+🔒 API Protection: ACTIVE (Max 10 calls/day = $0.10)
 """
         
         # Send the email

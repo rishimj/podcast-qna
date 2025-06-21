@@ -44,6 +44,7 @@ class TestRealAWSCostTracking:
         return RealAWSCostTracker()
     
     @pytest.mark.asyncio
+    @pytest.mark.integration
     async def test_real_aws_credentials_work(self, real_cost_tracker):
         """
         🔬 CRITICAL TEST: Verify real AWS credentials work

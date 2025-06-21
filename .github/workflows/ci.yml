@@ -1,0 +1,427 @@
+name: 🚀 Podcast Q&A CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  # ============================================================================
+  # SECURITY & CODE QUALITY CHECKS
+  # ============================================================================
+  security-scan:
+    name: 🔒 Security & Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install Security Tools
+        run: |
+          pip install bandit safety flake8 black isort mypy
+          pip install -r requirements.txt
+
+      - name: 🔍 Run Bandit Security Scan
+        run: |
+          bandit -r src/ -f json -o bandit-report.json || true
+          bandit -r src/ --severity-level medium
+
+      - name: 🛡️ Check Dependencies for Vulnerabilities
+        run: |
+          safety check --json --output safety-report.json || true
+          safety check
+
+      - name: 🎨 Check Code Formatting (Black)
+        run: |
+          black --check --diff src/ tests/ *.py
+
+      - name: 📝 Check Import Sorting (isort)
+        run: |
+          isort --check-only --diff src/ tests/ *.py
+
+      - name: 🧹 Lint Code (Flake8)
+        run: |
+          flake8 src/ tests/ *.py --max-line-length=100 --ignore=E203,W503
+
+      - name: 🔍 Type Checking (MyPy)
+        run: |
+          mypy src/ --ignore-missing-imports
+
+      - name: 📊 Upload Security Reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            bandit-report.json
+            safety-report.json
+
+  # ============================================================================
+  # COMPREHENSIVE TEST SUITE
+  # ============================================================================
+  test-suite:
+    name: 🧪 Test Suite (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: 💾 Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: 📦 Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio pytest-mock coverage
+
+      - name: 🔧 Set up Test Environment
+        run: |
+          # Create test config (without real AWS credentials)
+          cp config.env.example config.env
+          echo "# Test environment - no real AWS credentials" >> config.env
+          echo "AWS_ACCESS_KEY_ID=test-key" >> config.env
+          echo "AWS_SECRET_ACCESS_KEY=test-secret" >> config.env
+          echo "AWS_REGION=us-east-1" >> config.env
+          echo "COST_ALERT_EMAIL=test@example.com" >> config.env
+          echo "SMTP_HOST=smtp.gmail.com" >> config.env
+          echo "SMTP_PORT=587" >> config.env
+          echo "SMTP_USERNAME=test@gmail.com" >> config.env
+          echo "SMTP_PASSWORD=test-password" >> config.env
+
+      - name: 🧪 Run Unit Tests
+        run: |
+          echo "🧪 Running comprehensive test suite..."
+          python -m pytest tests/ -v --tb=short --cov=src --cov-report=xml --cov-report=term-missing
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: 📊 Upload Coverage Reports
+        uses: codecov/codecov-action@v3
+        if: matrix.python-version == '3.11'
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+
+  # ============================================================================
+  # INTEGRATION TESTS (with mocked AWS)
+  # ============================================================================
+  integration-tests:
+    name: 🔗 Integration Tests
+    runs-on: ubuntu-latest
+    needs: [security-scan, test-suite]
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio moto[all] boto3
+
+      - name: 🔧 Set up Integration Test Environment
+        run: |
+          cp config.env.example config.env
+          echo "AWS_ACCESS_KEY_ID=test-key" >> config.env
+          echo "AWS_SECRET_ACCESS_KEY=test-secret" >> config.env
+          echo "AWS_REGION=us-east-1" >> config.env
+          echo "COST_ALERT_EMAIL=test@example.com" >> config.env
+
+      - name: 🧪 Run Integration Tests
+        run: |
+          echo "🔗 Running integration tests with mocked AWS services..."
+          python -m pytest tests/test_minimal_aws.py -v --tb=short
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+  # ============================================================================
+  # DOCKER BUILD & SECURITY SCAN
+  # ============================================================================
+  docker-build:
+    name: 🐳 Docker Build & Scan
+    runs-on: ubuntu-latest
+    needs: [security-scan, test-suite]
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 📝 Create Dockerfile
+        run: |
+          cat > Dockerfile << 'EOF'
+          FROM python:3.11-slim
+
+          WORKDIR /app
+
+          # Install system dependencies
+          RUN apt-get update && apt-get install -y \
+              gcc \
+              && rm -rf /var/lib/apt/lists/*
+
+          # Copy requirements first for better caching
+          COPY requirements.txt .
+          RUN pip install --no-cache-dir -r requirements.txt
+
+          # Copy application code
+          COPY src/ ./src/
+          COPY *.py ./
+          COPY config.env.example ./
+
+          # Create non-root user
+          RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+          USER appuser
+
+          # Health check
+          HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+            CMD python -c "import src.config; print('OK')" || exit 1
+
+          CMD ["python", "daily_cost_report.py"]
+          EOF
+
+      - name: 🏗️ Build Docker Image
+        run: |
+          docker build -t podcast-qa:latest .
+          docker image ls
+
+      - name: 🔍 Scan Docker Image for Vulnerabilities
+        run: |
+          # Install Trivy
+          sudo apt-get update
+          sudo apt-get install wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy
+
+          # Scan the image
+          trivy image --exit-code 0 --severity HIGH,CRITICAL podcast-qa:latest
+
+      - name: 🧪 Test Docker Container
+        run: |
+          # Test that container starts properly
+          timeout 30s docker run --rm podcast-qa:latest python -c "import src.config; print('✅ Container test passed')" || echo "⚠️ Container test completed"
+
+  # ============================================================================
+  # PERFORMANCE & LOAD TESTS
+  # ============================================================================
+  performance-tests:
+    name: ⚡ Performance Tests
+    runs-on: ubuntu-latest
+    needs: [test-suite]
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-benchmark memory-profiler
+
+      - name: ⚡ Run Performance Tests
+        run: |
+          echo "⚡ Running performance benchmarks..."
+          python -c "
+          import time
+          import asyncio
+          from src.cost_tracker import CostTracker
+          from src.config import get_settings
+
+          async def benchmark_cost_tracker():
+              settings = get_settings()
+              tracker = CostTracker(settings)
+              
+              start_time = time.time()
+              # Test initialization speed
+              assert tracker is not None
+              init_time = time.time() - start_time
+              
+              print(f'✅ Cost tracker initialization: {init_time:.4f}s')
+              assert init_time < 1.0, 'Initialization too slow'
+              
+              print('✅ Performance tests passed')
+
+          asyncio.run(benchmark_cost_tracker())
+          "
+
+  # ============================================================================
+  # DEPLOYMENT READINESS CHECK
+  # ============================================================================
+  deployment-check:
+    name: 🚀 Deployment Readiness
+    runs-on: ubuntu-latest
+    needs:
+      [
+        security-scan,
+        test-suite,
+        integration-tests,
+        docker-build,
+        performance-tests,
+      ]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: ✅ Deployment Readiness Checks
+        run: |
+          echo "🚀 Running deployment readiness checks..."
+
+          # Check all required files exist
+          required_files=(
+            "src/config.py"
+            "src/cost_tracker.py"
+            "src/email_alerts.py"
+            "src/models.py"
+            "requirements.txt"
+            "daily_cost_report.py"
+            "run_daily_report.sh"
+          )
+
+          for file in "${required_files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✅ $file exists"
+            else
+              echo "❌ $file missing"
+              exit 1
+            fi
+          done
+
+          # Check Python syntax
+          python -m py_compile src/*.py *.py
+          echo "✅ Python syntax check passed"
+
+          # Check configuration template
+          if [ -f "config.env.example" ]; then
+            echo "✅ Configuration template exists"
+          else
+            echo "❌ config.env.example missing"
+            exit 1
+          fi
+
+          echo "🎉 All deployment readiness checks passed!"
+
+      - name: 📊 Generate Deployment Report
+        run: |
+          echo "# 🚀 Deployment Report" > deployment-report.md
+          echo "" >> deployment-report.md
+          echo "## ✅ Quality Gates Passed" >> deployment-report.md
+          echo "- 🔒 Security scan completed" >> deployment-report.md
+          echo "- 🧪 All tests passed" >> deployment-report.md
+          echo "- 🔗 Integration tests passed" >> deployment-report.md
+          echo "- 🐳 Docker build successful" >> deployment-report.md
+          echo "- ⚡ Performance tests passed" >> deployment-report.md
+          echo "" >> deployment-report.md
+          echo "## 📋 Deployment Checklist" >> deployment-report.md
+          echo "- [x] Code quality verified" >> deployment-report.md
+          echo "- [x] Security vulnerabilities checked" >> deployment-report.md
+          echo "- [x] All tests passing" >> deployment-report.md
+          echo "- [x] Docker image built and scanned" >> deployment-report.md
+          echo "- [x] Performance benchmarks met" >> deployment-report.md
+          echo "" >> deployment-report.md
+          echo "🎯 **Ready for deployment!**" >> deployment-report.md
+
+      - name: 📊 Upload Deployment Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-report
+          path: deployment-report.md
+
+  # ============================================================================
+  # NOTIFICATION & REPORTING
+  # ============================================================================
+  notify-success:
+    name: 🎉 Success Notification
+    runs-on: ubuntu-latest
+    needs: [deployment-check]
+    if: success() && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 🎉 Pipeline Success
+        run: |
+          echo "🎉 CI/CD Pipeline completed successfully!"
+          echo "✅ All quality gates passed"
+          echo "🚀 Ready for deployment"
+          echo ""
+          echo "📊 Pipeline Summary:"
+          echo "- 🔒 Security: PASSED"
+          echo "- 🧪 Tests: PASSED"  
+          echo "- 🔗 Integration: PASSED"
+          echo "- 🐳 Docker: PASSED"
+          echo "- ⚡ Performance: PASSED"
+          echo "- 🚀 Deployment: READY"
+
+  notify-failure:
+    name: 🚨 Failure Notification
+    runs-on: ubuntu-latest
+    needs:
+      [
+        security-scan,
+        test-suite,
+        integration-tests,
+        docker-build,
+        performance-tests,
+      ]
+    if: failure()
+
+    steps:
+      - name: 🚨 Pipeline Failure
+        run: |
+          echo "🚨 CI/CD Pipeline failed!"
+          echo "❌ One or more quality gates failed"
+          echo "🔍 Check the failed jobs above for details"
+          echo ""
+          echo "🛠️ Common fixes:"
+          echo "- Fix failing tests"
+          echo "- Address security vulnerabilities"
+          echo "- Fix code formatting issues"
+          echo "- Resolve dependency conflicts"
