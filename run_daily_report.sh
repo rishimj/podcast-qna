@@ -26,7 +26,7 @@ export PYTHONPATH="$SCRIPT_DIR:$PYTHONPATH"
 
 # Run the daily cost report
 echo "Running daily cost report from: $SCRIPT_DIR" >> "$LOG_FILE"
-python3 "$SCRIPT_DIR/daily_cost_report.py" >> "$LOG_FILE" 2>&1
+#python3 "$SCRIPT_DIR/daily_cost_report.py" >> "$LOG_FILE" 2>&1
 
 # Log the exit status
 EXIT_CODE=$?
