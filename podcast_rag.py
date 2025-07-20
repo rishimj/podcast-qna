@@ -1,59 +1,16 @@
 #!/usr/bin/env python3
 """
-Podcast RAG Chatbot using Llama 3
-For M1 Mac with Ollama
-
-Setup:
-1. brew install ollama
-2. ollama pull llama3
-3. ollama serve
-4. pip install langchain langchain-ollama
-5. Create 'transcripts' folder with .txt files
+Podcast RAG Chatbot with Two-Tiered Search
+Uses enhanced semantic search for better accuracy
 """
 
 import sys
 import os
-import glob
 from langchain_ollama import OllamaLLM
-
-def list_transcripts(folder="transcripts"):
-    """List available transcript files"""
-    try:
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-            print(f"Created {folder}/ directory. Add .txt transcript files there.")
-            return []
-        
-        files = glob.glob(os.path.join(folder, "*.txt"))
-        if not files:
-            print(f"No transcript files found in {folder}/")
-            return []
-        
-        transcripts = [os.path.basename(f) for f in files]
-        return sorted(transcripts)
-    
-    except Exception as e:
-        print(f"Error listing transcripts: {e}")
-        return []
-
-def load_transcript(filename, folder="transcripts"):
-    """Load a specific transcript file"""
-    try:
-        filepath = os.path.join(folder, filename)
-        if os.path.exists(filepath):
-            with open(filepath, 'r') as f:
-                content = f.read().strip()
-            print(f"\n✓ Loaded {len(content)} characters from {filename}")
-            return content
-        else:
-            print(f"Transcript {filename} not found")
-            return None
-    except Exception as e:
-        print(f"Error loading transcript: {e}")
-        return None
+from podcast_semantic_search_complete import PodcastTwoTierSearch
 
 def create_chatbot():
-    """Initialize the chatbot"""
+    """Initialize the Llama chatbot"""
     try:
         llm = OllamaLLM(
             model="llama3",
@@ -70,9 +27,9 @@ def create_chatbot():
         print("3. Ollama is running: ollama serve")
         sys.exit(1)
 
-def get_multiline_input():
-    """Get multi-line input from user"""
-    print("You: ", end="", flush=True)
+def get_user_input(prompt="You: "):
+    """Get single or multi-line input from user"""
+    print(prompt, end="", flush=True)
     lines = []
     
     try:
@@ -90,99 +47,191 @@ def get_multiline_input():
     
     return "\n".join(lines)
 
-def display_menu(current_transcript):
-    """Display status and commands"""
-    print("\n" + "="*50)
-    if current_transcript:
-        print(f"📎 Loaded: {current_transcript}")
-    else:
-        print("📎 No transcript loaded")
+def display_search_results(results, query):
+    """Display search results with score breakdown"""
+    print(f"\n🔍 Search results for: '{query}'\n")
     
-    print("\nCommands:")
-    print("- 'list' - Show available transcripts")
-    print("- 'load <filename>' - Load a transcript") 
-    print("- 'clear' - Clear loaded transcript")
-    print("- 'quit' - Exit")
-    print("="*50 + "\n")
+    for i, result in enumerate(results[:3], 1):
+        print(f"{i}. {result['title']} (confidence: {result['final_score']:.2%})")
+        print(f"   File: {result['filename']}")
+        
+        # Show what matched
+        if result['title_similarity'] > 0.7:
+            print(f"   ✓ Strong title match ({result['title_similarity']:.2%})")
+        elif result['intro_similarity'] > 0.7:
+            print(f"   ✓ Strong intro match ({result['intro_similarity']:.2%})")
+        elif result['chunks_similarity'] > 0.7:
+            print(f"   ✓ Strong content match ({result['chunks_similarity']:.2%})")
+        
+        print()
 
 def main():
-    """Main chat loop"""
-    print("🎙️  Podcast RAG Chatbot")
-    print("Ask questions about your podcast transcripts!\n")
+    """Main chat loop with two-tiered search"""
+    print("🎙️  Podcast RAG Chatbot with Enhanced Search")
+    print("="*50)
     
+    # Initialize systems
     llm = create_chatbot()
-    current_transcript = None
-    current_content = None
-    conversation_history = []
+    search_system = PodcastTwoTierSearch()
     
-    # Test connection
+    # Test connections
     try:
         test_response = llm.invoke("Hello")
-        print("✓ Chatbot ready!\n")
+        print("✓ Chatbot ready!")
     except Exception as e:
         print(f"Connection error: {e}")
         sys.exit(1)
     
-    # List transcripts
-    transcripts = list_transcripts()
-    if transcripts:
-        print(f"Found transcripts: {', '.join(transcripts)}")
+    # Check database stats
+    stats = search_system.get_stats()
+    if stats['podcasts'] == 0:
+        print("\n⚠️  No podcasts indexed yet!")
+        print("Run this first to index your podcasts:")
+        print("  python podcast_two_tier_search.py")
+        search_system.close()
+        sys.exit(1)
     
-    display_menu(current_transcript)
+    print(f"✓ Found {stats['podcasts']} indexed podcasts")
+    if stats['title_embeddings'] < stats['podcasts']:
+        print(f"⚠️  Only {stats['title_embeddings']} have enhanced embeddings")
+        print("   Run podcast_two_tier_search.py to add title embeddings")
+    
+    # Get podcast selection using two-tiered search
+    print("\nWhat podcast would you like to ask questions about?")
+    print("(You can use the title, topic, guest name, or describe the content)")
+    
+    podcast_query = get_user_input("🔍 ").strip()
+    
+    if not podcast_query:
+        print("No podcast specified. Exiting.")
+        search_system.close()
+        sys.exit(1)
+    
+    # Find matching podcasts using two-tiered search
+    print(f"\n🤔 Searching...")
+    
+    results = search_system.search_two_tier(podcast_query, top_k=3)
+    
+    if not results:
+        print(f"\n❌ No podcast found matching '{podcast_query}'")
+        search_system.close()
+        sys.exit(1)
+    
+    # Display results
+    display_search_results(results, podcast_query)
+    
+    # Select podcast
+    best_match = results[0]
+    
+    # If confidence is low or multiple good matches, let user choose
+    if best_match['final_score'] < 0.5 or (len(results) > 1 and results[1]['final_score'] > 0.4):
+        print("Multiple possible matches found.")
+        choice = input("Select podcast (1-3) or press Enter for best match: ").strip()
+        
+        if choice in ['1', '2', '3']:
+            idx = int(choice) - 1
+            if idx < len(results):
+                best_match = results[idx]
+    
+    # Get full podcast content
+    cursor = search_system.conn.cursor()
+    cursor.execute("SELECT content FROM podcasts WHERE id = ?", (best_match['podcast_id'],))
+    current_content = cursor.fetchone()[0]
+    
+    if not current_content:
+        print("Error loading podcast content. Exiting.")
+        search_system.close()
+        sys.exit(1)
+    
+    print(f"\n✅ Selected: {best_match['title']}")
+    print(f"📎 Ready to answer questions about this podcast!")
+    print("\nCommands: 'quit' to exit, 'search' for another podcast, 'debug' to see search details\n")
+    print("="*50 + "\n")
+    
+    # Main Q&A loop
+    conversation_history = []
     
     while True:
         try:
-            user_input = get_multiline_input().strip()
+            user_input = get_user_input().strip()
             
-            # Commands
             if user_input.lower() in ['quit', 'exit']:
-                print("Goodbye!")
+                print("\nGoodbye!")
                 break
             
-            elif user_input.lower() == 'list':
-                transcripts = list_transcripts()
-                if transcripts:
-                    print("\n📁 Available transcripts:")
-                    for t in transcripts:
-                        print(f"  - {t}")
+            elif user_input.lower() == 'search':
+                # Search for another podcast
+                print("\nWhat other podcast would you like to discuss?")
+                new_query = get_user_input("🔍 ").strip()
+                
+                if new_query:
+                    print(f"\n🤔 Searching...")
+                    new_results = search_system.search_two_tier(new_query, top_k=3)
+                    
+                    if new_results:
+                        display_search_results(new_results, new_query)
+                        
+                        # Select from results
+                        if len(new_results) > 1:
+                            choice = input("Select podcast (1-3) or press Enter for best match: ").strip()
+                            if choice in ['1', '2', '3'] and int(choice) <= len(new_results):
+                                new_match = new_results[int(choice)-1]
+                            else:
+                                new_match = new_results[0]
+                        else:
+                            new_match = new_results[0]
+                        
+                        # Load new content
+                        cursor.execute("SELECT content FROM podcasts WHERE id = ?", 
+                                     (new_match['podcast_id'],))
+                        current_content = cursor.fetchone()[0]
+                        
+                        if current_content:
+                            best_match = new_match
+                            conversation_history = []  # Reset conversation
+                            print(f"\n✅ Switched to: {best_match['title']}")
+                            print("="*50 + "\n")
+                        else:
+                            print("❌ Error loading podcast")
+                    else:
+                        print("❌ No matching podcast found")
                 continue
             
-            elif user_input.lower().startswith('load '):
-                filename = user_input[5:].strip()
-                content = load_transcript(filename)
-                if content:
-                    current_transcript = filename
-                    current_content = content
-                    print(f"Preview: {content[:300]}...")
-                    print(f"\n✓ Ready to answer questions about this podcast!")
-                    # Clear history when loading new transcript
-                    conversation_history = []
+            elif user_input.lower() == 'debug':
+                # Show detailed search breakdown
+                print(f"\n📊 Current podcast scoring breakdown:")
+                print(f"Title: {best_match['title']}")
+                print(f"Title match: {best_match['title_similarity']:.3f} (60% weight)")
+                print(f"Intro match: {best_match['intro_similarity']:.3f} (20% weight)")
+                print(f"Content match: {best_match['chunks_similarity']:.3f} (15% weight)")
+                print(f"Outro match: {best_match['outro_similarity']:.3f} (5% weight)")
+                print(f"Final score: {best_match['final_score']:.3f}")
                 continue
             
-            elif user_input.lower() == 'clear':
-                current_transcript = None
-                current_content = None
-                conversation_history = []
-                print("✓ Transcript cleared")
+            elif user_input.lower() == 'info':
+                # Show current podcast info
+                print(f"\n📎 Current Podcast: {best_match['title']}")
+                print(f"   File: {best_match['filename']}")
+                print(f"   Match confidence: {best_match['final_score']:.2%}")
+                print(f"   Content length: {len(current_content)} characters")
                 continue
             
             if not user_input:
                 continue
             
-            # Build prompt with system message, transcript, and conversation
-            if current_content:
-                # Build conversation history string
-                history_str = ""
-                for h in conversation_history[-5:]:  # Keep last 5 exchanges
-                    history_str += f"Human: {h['human']}\nAssistant: {h['assistant']}\n\n"
-                
-                prompt = f"""You are a helpful assistant for answering questions about podcasts based on their transcripts.
+            # Build prompt with conversation history
+            history_str = ""
+            for h in conversation_history[-5:]:  # Keep last 5 exchanges
+                history_str += f"Human: {h['human']}\nAssistant: {h['assistant']}\n\n"
+            
+            prompt = f"""You are a helpful assistant for answering questions about podcasts based on their transcripts.
 
 IMPORTANT INSTRUCTIONS:
 - Answer questions based ONLY on the podcast transcript provided below
 - If information is not in the transcript, say "I don't find that information in the transcript"
 - Quote relevant parts from the transcript when answering
 - Be specific and accurate
+- The podcast is titled: {best_match['title']}
 
 PODCAST TRANSCRIPT:
 {current_content}
@@ -193,31 +242,29 @@ CONVERSATION HISTORY:
 CURRENT QUESTION: {user_input}
 
 Please answer the question based on the podcast transcript above."""
-                
-                print(f"\n📤 Processing with {len(current_content)} chars of transcript...")
-            else:
-                prompt = f"No podcast transcript loaded. Please load a transcript first using 'load <filename>'. User said: {user_input}"
             
             # Get response
+            print("\n🤔 Thinking...")
             response = llm.invoke(prompt)
             
             # Save to history
-            if current_content:
-                conversation_history.append({
-                    'human': user_input,
-                    'assistant': response
-                })
+            conversation_history.append({
+                'human': user_input,
+                'assistant': response
+            })
             
-            print(f"\nChatbot: {response}\n")
+            print(f"\n💬 {response}\n")
             
         except KeyboardInterrupt:
             print("\n\nGoodbye!")
             break
         except Exception as e:
             print(f"Error: {e}")
-            import traceback
-            traceback.print_exc()
             print("Try again.\n")
+    
+    # Cleanup
+    search_system.close()
+
 
 if __name__ == "__main__":
     main()
