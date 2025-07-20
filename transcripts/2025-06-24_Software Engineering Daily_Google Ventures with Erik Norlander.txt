@@ -1,0 +1,1697 @@
+# Podcast Transcript
+# Show: Software Engineering Daily
+# Episode: Google Ventures with Erik Norlander
+# YouTube URL: https://www.youtube.com/watch?v=IbqJlnAmmqU
+# Downloaded: 2025-07-19 20:58:19
+
+GV or Google Ventures is an independent
+Venture Capital firm backed by alphabet
+Eric norlander is a general partner at
+GV and invests across enterprise
+software and Frontier technology
+focusing on developer tools Cloud
+infrastructure and machine learning he's
+backed companies like cockroach warp and
+neo4j prior to joining GV in 2010 and
+opening up the firm's New York City
+office Eric was at Google and led
+development of the company's nextg
+display and serving system and built
+statistical and machine learning models
+for Google's ad businesses Eric joins
+the podcast to talk about his work
+Gregor van is a security focused
+technologist and is the founder and CTO
+of mail pass previously Gregor was a CTO
+across cyber security cyber insurance
+and general software engineering
+companies he has been based in Asia
+Pacific for almost a decade and can be
+found via his profile at v.k
+[Music]
+hi Eric welcome to software engineering
+daily hi Gregor thanks for having me
+today so Eric it is great to have you
+here you are at Google Ventures so this
+is a pretty exciting one for us we don't
+often get to have Venture Capital people
+on the podcast and get to hear from sort
+of that side of the industry so thanks
+so much for making the time today
+we'd love to I think just sort of kick
+off with you know what was actually your
+path you know Google Ventures very well
+known I think probably to a lot of our
+listeners but I'm sure there's a lot
+that happened before that so what was
+your path to sort of becoming a VC you
+know I don't think a lot of people maybe
+sort of think actually VC's had a life
+before VC so yeah i' love to hear your
+story yeah absolutely I I think very few
+people kind of grow up thinking oh I'm
+going to be a VC one day and that was
+definitely not my path I was always more
+technical I loved math I kind of taught
+myself to program when I was relatively
+young and then I ended up going to
+school to study CS so I did an undergrad
+in CS and was really excited about
+becoming a software engineer I ended up
+sticking around for grad school and out
+of grad school I heard the call of the
+startup and in this case the startup was
+Google people forget that Google was a
+startup Once Upon a Time showing my age
+so I left Boston and moved out to the
+West Coast to join you know kind of late
+in Google's Evolution as a startup but
+worked on what was there at the time
+which was really kind of deeper
+infrastructure projects and that was
+first in Search and Gmail and then lower
+level stuff that touched a bunch of
+different systems and products and so
+after a little while in California I had
+the opportunity to move to Google's New
+York office where I still am today I'm
+still based in New York and just kind of
+continue expanding my career and this
+was this was a really exciting time for
+Google kind of the early 2000s the
+company was growing really quickly so I
+was leading you know kind of larger
+teams of Engineers and having a ton of
+fun kind of building and shipping and
+Google was also growing by Acquisitions
+so you know at that point they were
+buying lots of companies some of which
+are still core parts of the Google
+experience today things like YouTube and
+Android and others and then they were
+also just buying smaller companies just
+to ingest talent and Technology as
+quickly as possible and so I was kind of
+in this interesting position where you
+know there was a Corp Dev team that
+obviously was going through all these
+transactions but I was also helping kind
+of look at companies in terms of tech
+and talent while still working as an
+engineer and that was in some ways kind
+of a VC 101 because I was you know
+meeting all these startups and kind of
+seeing you know chapters 10 11 12 and
+the epilog and I was really excited
+about working with entrepreneurs and
+really pretty curious about what did
+chapters you know 1 2 and 3 look like
+and even before that so as luck would
+have it there was a group of people
+thinking about you know what is a
+venture fund inside of Google look like
+and you know starting to put that
+together and super super early in the
+fund's life I just got connected with
+some of the early partners and started
+spending time there and then at the end
+of 2010 I made the leap and I would say
+we had a few people on that early team
+that had worked in some sort of
+investing capacity before but many of us
+were coming in as operators you know
+builders Founders you know just
+different sorts of experience whether is
+building stuff inside or outside of
+Google and so we really kind of had to
+figure out you know how to be a VC and
+how to be a VC with Google as our backer
+so it was it was an exciting time and
+what I would say is after making that
+leap I've still remained an engineer I'm
+still a working engineer today and
+that's probably what brings me to this
+podcast yeah that's super interesting I
+think maybe a lot of people don't kind
+of think about VC being able to sort of
+work hand in hand with a company that
+actually still builds software you know
+VC maybe sometimes feels or looks a bit
+disconnected in that way so I think
+Google Ventures specifically is is a
+super interesting one where as you say
+you are still a very much a working
+engineer but also part of Google
+Ventures so if I was to say you know
+there's probably some myths and stories
+about sort of VC culture or just VCS in
+general like what's maybe something
+you'd sort of want to debunk from the
+outset you know if someone's listening
+to us thinking oh I I think I know what
+VC is about like is there anything you
+could say that sort of maybe changes
+someone's mind yeah I mean what I would
+say about VC's is just it's one of the
+few jobs where there's not a single path
+to getting into it or being successful
+inside of it I mean if you want to be a
+doctor there's kind of one way that you
+can become a doctor and maybe that's a
+good thing like we don't want people
+kind of figuring that out on their own
+but even if I look at the GB team or
+like other really successful VCS I mean
+there are people who have been Founders
+journalists you know software Engineers
+you name it people who have been
+investing their whole career right
+that's all they've ever done and there's
+no you know one background or one set of
+experiences that predicts whether you're
+going to be great at it or terrible or
+somewhere in between and so I think that
+you know maybe if you're looking at the
+industry from the outside it can feel
+very homogeneous but I would say you
+know it's a really interesting group of
+individuals and so especially for
+Founders as you're thinking about hey
+who do I want to partner with with you
+know it's worth learning a bit more
+about how people got to where they were
+and that may be a really good signal in
+terms of whether that's someone that is
+going to work well with you or or work
+against you and what that means and I
+think especially as the industry has
+expanded we're seeing even more
+backgrounds and I think that's great
+because you know the types of
+backgrounds that we're great discovering
+companies today may or may not be the
+right people to back the best and the
+brightest of the kind of next class of
+exciting startups yeah I think you kind
+of hit the nail in the head there I not
+of any relation to the date we were
+recording I happen to have finished the
+book The Power law which goes into the
+whole history of the VC industry highly
+recommend it to anybody who just wants
+to maybe learn about kind of the I know
+the history of I would say the valley or
+just how a lot of Ventures have taken
+off but I think one of the big things
+that came out of reading that was just
+every VC outfit has a very different
+personality very different way of
+looking at things and that's fantastic
+like you should if you're a software
+engineer or you know you're just or a
+company looking for any kind of venture
+backing as you said Eric like go and
+meet people and get to understand them
+it's it's very much a two-way street
+which is maybe not reported sort of as
+much so yeah so given this is software
+engineering daily most of our listeners
+are software developers and you know I
+think a lot of listeners out there
+either sort of in the thick of creating
+their their startup or maybe just sort
+of thinking about making the leap to
+doing their own thing so you know you've
+seen it from kind of both sides as being
+an engineer and then very much also
+looking from the other side and saying
+what are we going to back as Google
+Ventures as well so what would you say
+are maybe some of the most common sort
+of mistakes or pitfalls you maybe see
+sort of the very early stage software
+startups make and I think software is
+maybe the key here where we could talk
+about all kind of Ventures but maybe
+let's talk about software yeah it's a
+really good question by the way power
+lot is a wonderful book so two thumbs up
+on that recommendation you know a lot of
+times I'm working with Founders they're
+often very technical you know there's
+maybe multiple technical Founders and
+you know sometimes I think people
+believe that if they just build the
+right kind of software and put it out
+into the world like people will come
+right and that this is independent of
+whether it's for consumers or
+Enterprises or something in between and
+so the mistake that I see a lot of these
+companies make very early on is not
+thinking at all about any of the kind of
+marketing or sales aspect or like how
+that's going to fit in and certainly as
+you're kind of Designing you know you're
+kind of riding a design doc or you're
+putting pen to paper on the early sort
+of builds that's not going to be top of
+mind but there's just a lot of you know
+it's it's a very crowded space for
+software right there's all kinds of
+opportunities and there's all kinds of
+competition and so understanding from a
+fairly early stage how you're going to
+promote it how you're going to
+distribute it how you're going to get
+people excited about it it matters
+because it's going to influence Your
+Design it's going to influence the team
+that you build around it and so all of
+these things can obviously be added on
+later on and many times that's the
+journey that we go on is that we build
+the product and then we we kind of along
+the way figure out what's the best way
+to distribute it but the earlier that
+you can think about that and you can get
+feedback in terms of you know who the
+right customer is or who the right set
+of initial users are going to be it's
+just going to make your life that much
+easier because then you can start
+building that flywheel of feedback early
+in the company's life and that's I feel
+like for most software companies at
+least in that kind of like seed stage
+that is really the most valuable thing
+is making sure that you're building the
+right product you have the right
+technology you're solving the right
+problems if you do that too much in
+isolation you know one of the pit balls
+is going off the wrong path and losing
+track of where you need to be yeah very
+much and can you just confirm again in
+terms of Google Ventures what kind of
+stages does Google Ventures tend to kind
+of come in at and and what kind of
+opportunities do you tend to evaluate
+like what kind of stage yeah so GV is
+definitely a multi-stage firm so we can
+write a c check you know we can lead a
+traditional you know Venture around like
+a series A and B and we can even write a
+growth check I would say the bread and
+butter is kind of seed to B so these are
+checks that are start at at a few
+million dollars up to maybe 25 or 30 but
+we have a lot of capital to deploy and
+so we'll often double down on portfolio
+companies I mean we've I have a company
+I invested in almost 10 years ago and
+we've been in every single round since
+they're you know first financing and
+sometimes we'll miss something you know
+we'll miss the A or B and we'll just
+jump in a little bit later so there's a
+lot of flexibility and I mean I think
+that's one of the great things about
+having this single LP being alphabet is
+they give us a lot of trust and
+flexibility in terms of how we get the
+capital out there and I to say for
+myself personally I mean my joke is I'll
+go as early as the let me so that can
+often be at Inception but typically like
+a bigger seed round where people are
+raising you know several million dollars
+like if it's under a million the math
+doesn't make sense for our fund given
+its size these days yeah and you know I
+think one of the especially again to
+kind of The Listener base we have
+probably one of the I would say most
+under reported parts of maybe this sort
+of evaluation is is actually the
+technical kind of due diligence or DD as
+might be said so how do you evaluate the
+strength of an opportunity or maybe
+let's just back up for a second at what
+point would you actually get to the
+point saying okay actually we're going
+to do some technical DD on on this
+company and then maybe just talk through
+what might be some differences between
+say stage like if you're looking at a
+seed versus say a series a are there
+kind of differences in terms of the
+level of detail that you'd go into in
+those and and what would you actually be
+doing it's a good point because it does
+change as things move along so normally
+you know we're going to start our
+engagement with a company probably like
+everyone else you know we're going to
+hear the pitch we're going to go through
+the materials we'll ask a bunch of
+questions and then kind of step two will
+be us double clicking on you know all
+the different areas and obviously Tech
+is definitely going to be one of them
+you know I feel super comfortable
+personally just sitting down with the
+CTO or technical co-founder whoever it
+might be and just getting into it I mean
+part of it is just evaluating that
+individual right and their ability to
+grow and lead a team and how they think
+about the technology and the road map
+you know one of the nice things about
+being at those early days of Google is I
+was a person that had to do lot of
+interviews I mean I've probably
+interviewed hundreds if not thousands of
+software engineers at this point and so
+certainly I don't make anybody code on a
+whiteboard you know that's not part of
+it but just understanding how they think
+about Building Technology it's a really
+important part of the process what I
+would say is you know early on in my
+time at GV I maybe was a little bit too
+concerned in terms of like what the
+stack was and like how the individual
+technology choices would impact what
+they were able to do but you know you
+quickly learn that a startup is about
+solving problems and some sometimes the
+tools are just in a means to an end and
+things can change very quickly and I'll
+just give you one one fun example here
+in New York we backed a company the
+e-commerce space and I went to you know
+start the kind of tech DD and this thing
+was like a complete net shop right they
+were using all Microsoft all day long
+and I was kind of like hey you know
+you're a startup like do you really want
+to be paying all this money to Microsoft
+like this seems really like here's all
+the stuff going on in open source like
+he's like oh yeah no no no I get that
+I'm I'm aware of all that stuff we're
+just we're going with m Microsoft I was
+a little surprised cuz I'll be honest
+it's not something you see a lot in
+early stage company and very quickly I
+learned it was actually a recruiting
+hack so he was here in New York pulling
+people out of the kind of financial
+service industry who you know there are
+a ton of people who had just grown up
+with Microsoft that's all they' done
+they would love to go to a startup but
+nobody wanted their skill set so he kind
+of had full Reign Over pulling and all
+these people he'd go to all the sort of
+like net meetups would be the only
+startup there and everyone was like
+please give me a job get me out of this
+you know corporate corporate hierarchy
+or whatever they're in and so yeah
+sometimes the actual stack can be
+valuable in ways that have nothing to do
+with product building or anything else
+it was just a a great way for him to
+recruit and so I'm very open-minded
+about the individual technology choices
+it just has to make sense and I think
+that as long as you have a founder or
+CTO or whoever that can kind of
+communicate it in a great way and we
+don't think that they're putting on like
+crazy amounts of tech debt or doing
+stuff that that's going to bite them
+down the road you know that's generally
+how we get to a point about being
+excited about the tech and obviously the
+vision there matters a lot in terms of
+us being aligned that this is technology
+that's going to be exciting in several
+years cuz when we're investing in these
+companies especially at seed or a that
+could be a 10e relationship you know and
+we're totally fine being patient
+investors continuing to invest into
+technology as long as the promise is
+there you know and often if you're
+building something really complicated it
+can take several years before you even
+get a of Revenue or have lots of users
+or anything else so yeah we need to be
+pretty confident that the technology and
+product is going to be valuable once you
+kind of Finish the build that was a
+great anecdote about why why net for
+that specific company certainly as you
+know in a past life as a CTO at a larger
+outfit than I am now and having to sort
+of defend why we were picking certain
+stacks and actually saying this is a
+hiring thing yeah like we're not going
+to be able to find the engineers or
+we're going to have to pay outsized
+amounts to find engers who know the
+latest and greatest when actually if we
+pick something's just a bit safer so to
+speak so yeah I think it's a great call
+out I mean just a little sort of sidebar
+I mean I'm curious what you've seen have
+you seen there being quite a lot more
+startups coming with these I guess
+slightly more evangelized languages now
+go and rust basically come to mind where
+everyone's kind of saying oh you know
+this is where we we should be going
+especially if we're you know we've got a
+green field right here we can just start
+from anything is that something you're
+seeing do you think there's any Merit to
+kind of running with them just as
+languages because you can start from
+scratch or yeah I'm just curious what
+your thoughts are on that it's funny I
+have two of my portfolio companies are
+pure go shops and one is a pure rush
+shop so cockroach Labs which is the
+company behind cockroach DB they've been
+go from the start and you know go is a
+great choice for them right they are
+building a really complex distributed
+system and that's the whole point of go
+you know it's kind of the perfect fit
+for that and so yeah they'll do things
+around the edges in different languages
+but again in terms of the recruiting
+thing which is really you know at the
+earliest stages that's probably the
+hardest part for technical teams is
+getting the right talent in there go is
+great for distributed systems people I
+think there are a lot of folks coming in
+from C++ and other areas that were
+delighted to switch to go and that was a
+real asset to be someone new and by the
+way they started with this back in like
+2015 so it's been a while and that point
+you know go is really the new shiny
+object so I'm also involved with warp
+which is this modern command line
+terminal and they tried out a bunch of
+different Technologies I mean they
+actually kind of built prototypes in the
+earliest days on different stacks and
+for performance reasons ended up in Rust
+and again rust was definitely new I
+would almost say it was maybe too new
+right when they get started but they've
+been a huge beneficiary of the ecosystem
+kind of exploding and again maybe it's
+the opposite of my net story but in this
+case folks are really excited about the
+the language they're excited about
+learning something new I don't think
+most of the people coming in there have
+a lot of rust experience but it's
+actually pretty easy to pick up and if
+you're an application developer there's
+so many just nice properties about it
+that I think if you're pulling someone
+out of I don't know a Java place or
+something else and you say hey by the
+way you get to write 100% rust that's
+actually like a really good carrot to
+bring in you know smart young Engineers
+yeah that's also a great Point yeah so
+exactly there just there really are so
+many factors to language choice and yeah
+what might attract Engineers to your
+startup for one language might be a
+completely different reason for another
+so it's yeah it's a great great thing to
+consider this episode of software
+engineering daily is brought to you by
+athlete are you trying to protect your
+API with ooth or struggling to build an
+ooth server implementing oath yourself
+can be challenging and even risky
+meanwhile One-Stop identity Solutions
+can be expensive missing necessary
+features or not fit into your existing
+architecture athlet can help delegate
+complex ooth implementation to apis
+designed and developed by the experts
+that authored many of the oo standards
+with athlete you can use your existing
+authentication system and the language
+of your choice to quickly build your
+ooth server and you'll always stay up
+toate with the latest specifications
+focus on developing applications and
+shipping features leave the complicated
+ooth implementation to The Experts
+athlete is the trusted ooth service for
+leading Financial Healthcare and media
+companies get started started today with
+a 90-day extended free trial at
+athlete.com
+SED so kind of going back to some other
+things that you know you would you'd
+kind of be doing diligence on or asking
+questions about what kind of I think
+again maybe a myth or just something
+that's never clear to people kind of
+when they're pitching or you know just
+generally talking to VC's is sort of
+which metrics or sort of Milestones you
+know everyone says oh you you have to
+have revenue and then the other one say
+no it's ious you don't have to have
+revenue or if you do what how much
+revenue and I think so many numbers and
+things get bandied around like if you go
+on Reddit you can find all sorts of
+nonsense basically so you know great to
+hear from you you know what do you look
+at in terms of metrics or Milestones
+yeah how do you look at that yeah great
+question I think the revenue one is
+always interesting right because you
+know if you have lots of Revenue people
+can invest in your company without
+knowing anything about your business
+right they can sort of plug whatever
+you're doing into some spreadsheet and
+pop out a number and write a check and
+maybe understand nothing about what
+you're doing and you know as companies
+get much later in their life that's kind
+of how it works right I mean you think
+about the public markets and things like
+that you look at what they do in the
+quarter and then the stock goes up or
+down I mean I think to me the whole
+point Adventure is investing before
+these things are super obvious so you
+know when we're getting involved again
+we are thinking about what happens if
+this goes right what is this going to
+look like 5 years from now 10 years from
+now even further into the future and so
+so you know obviously we want to invest
+in something where we think the
+opportunity is big enough right I mean
+that's a big part of venture it's like
+the prize has to be worth it like if
+we're going to work on this thing for 10
+years and put in lots of capital yeah
+it's got to be really big at the end of
+it but that doesn't mean that in year
+one or year two you have to have X
+amount of Revenue otherwise it's not
+going to work in fact I think many of
+our Best Bets it took many years of zero
+or let's called marginal revenue before
+things really pick off and that's
+because you're building this technology
+mode I'll go back to cockroach I mean I
+think they did several rounds of venture
+funding you know before they had any
+kind of serious customers and that's
+because building a big Global
+distributed database that people are
+going to trust with all their data that
+doesn't happen overnight it takes many
+years and of course look along the way
+you're going to hit all these Milestones
+that are measured both internally and
+externally in terms of the technology in
+terms of its reliability and performance
+and all these other things all of that
+matters right I mean again once you have
+Revenue maybe some of those things are
+are slightly less important but early on
+that's what we pay attention to and I
+think because you know many of us at GV
+can speak that language we can go in and
+build a lot of conviction you know maybe
+before others or before people who would
+just you know prefer to see the revenue
+so I feel like you know hey revenue is
+great like obviously that means that
+you're onto something and customers are
+excited and it's not something to be
+ignored but at the same time you know if
+you build something and you know you
+turn on Revenue 2 days later what does
+that mean it probably means someone else
+can do that and you're going to have a
+lot of competition too so striking that
+balance is really important in terms of
+building you know both a big business
+and one that's going to remain
+defensible for a while yeah that's a
+great point in terms of just what you
+said at the end there that you know
+there is very much a potential trade-off
+between you know getting Revenue in
+early but exactly your moat if you want
+to call it that is pretty small if
+that's the case whereas if actually
+you're building up a product and in
+theory building up that moat on the
+product side effectively and then and
+then able to kind of turn turn on
+Revenue slight sidebar again cockroach
+Labs we've had a couple episodes with
+them on curious what kind of attracted
+GV to cockroach Labs we knew the
+founding team really well so Spencer
+Peter and Ben you know were all early
+Google employees they' done lots of
+great work there I actually personally
+worked closely with Spencer right when I
+started and you know on top of that they
+were building something that was a
+little bit inspired by a Google
+technology which was spanner you know
+spanner was internal database that was
+you know distributed transactional all
+these other great things unfortunately
+for Google unfortunately for cockroach
+it was only running on the Google Cloud
+right and one of the big things that
+cockroach was going after was companies
+that wanted to be multicloud they wanted
+to build on top of Open Source you know
+these guys were you know famous for kind
+of creating and and gtk they'd sort
+of been open source from the beginning
+and we were we were really excited about
+that and it was very clear that that
+type of database was going to have a
+huge Market opportunity but also was
+something that was you know to our
+earlier discussion it was going to take
+a while to build right this is not
+something that's done overnight I mean
+it took Google obviously many many many
+Engineers over a while to get spanner
+and so we knew that doing the outside
+would probably be even more difficult
+right because he didn't have all other
+supporting infrastructure and so yeah we
+were very excited to back that team I
+remember reading the first white paper
+for it in early 2014 so like 10 years
+ago now and being very excited about it
+but also understanding that this was a
+big technical build and those are great
+projects for GV you know we see an
+enormous opportunity but it requires
+building lots of you know complex mey
+technology in order to get there yeah
+this of maybe Segways into given given
+GV seems to like backing these companies
+that as you say are kind of potentially
+quite meaty builds you know how hands on
+would you say sort of GP is with
+companies whether it's technical
+specifically or product y or and you
+know do you ever kind of bring in anyone
+in house I mean like yourself you're a
+practicing engineer you know so is that
+you engineering effectively on GB folio
+companies or you know how does that kind
+of look cuz again I'm aware that VCS can
+have very different approaches here in
+terms of the Hands-On this and and why
+they have that approach totally and so
+we're very lucky at GV that we have a
+whole team that we call the Ops team
+that is really worldclass people that
+we've pulled in from startups Google
+other places who work hand inand with
+our startups and they're working across
+a bunch of different areas you know that
+could be finding great talent you know
+thinking about press and marketing
+thinking about ux and design we have
+some amazing designers and ux
+researchers on the team and really it's
+about different inflection points in the
+business I mean again these are almost
+like Consultants that you would tap into
+when you're hitting you know hey I
+really need to get into the press or I
+need to get out of the press I need to
+launch this new product can you help us
+kind of test it out and see if this is
+the right moment or right strategy and
+then you know beyond that there's
+obviously lots of people at Google with
+you know they don't work directly for GV
+but they can be really helpful to us in
+terms of just checking in on different
+areas so yeah there's a ton of resources
+we can bring to bear I mean our goal is
+certainly not to like you know build
+your company for you I mean we're
+backing Founders for a reason and we
+know that they have incredible talents
+and we want to really just just kind of
+supercharge that at the right moment you
+know for me again you probably don't
+want me at this point writing any code
+for your company but I'm always happy to
+be you know a sounding board and
+Resource as you think about again
+different technology different
+strategies things like that and other
+people that you know I've worked with
+other CTO and so kind of just plugging
+into that Community can also be very
+very valuable from our end to me that
+just sounds hugely hugely valuable to
+have especially sort of a technical
+sounding board you know someone
+effectively that you can trust and kind
+of just lay out all the code and be like
+what do you think is is am I going in
+the right direction here I think I think
+a lot of Engineers struggle to probably
+have someone that they can call upon to
+do that with so yeah that sounds super
+valuable I mean again it can be super
+lonely as a Founder in the earli stages
+you know again especially if you're
+coming from a bigger place where you're
+working with you know many other
+engineers and you just had that support
+system so yeah bridging that sort of Gap
+can be really valuable in the earlier
+stages yeah this portion of software
+engineering daily is brought to you by
+Doppler are you still using EnV files to
+manage your secrets secrets are
+essential for integrating your
+infrastructure with databases and SAS
+services but but now there's a better
+way to manage them Doppler is a
+developer first platform that simplifies
+your secrets management workflow and
+helps you move Beyond EnV files it
+allows you to securely store and easily
+access your secrets eliminating the risk
+of human error and unauthorized access
+Doppler integrates seamlessly with your
+existing tools and Dev environment
+streamlining your workflow and saving
+you valuable time plus with role-based
+access control and detailed audit logs
+you can ensure your secrets are always
+under control get started with Doppler
+today and experience the future of
+Secrets management visit Doppler
+dcoms for a demo and see how Doppler can
+revolutionize your development process
+that's
+Doppler and you touched upon obviously
+Founders you need Founders for companies
+I think a lot of people have kind of you
+know YC for example is is quite well
+known in terms of some of the info they
+put out in terms of what we tend to back
+XYZ kinds of companies and I think that
+kind of filters through to most a lot of
+people's thinking is this is just how it
+is one of those is you know they talk
+pretty strongly about co-founder
+companies you know it's not they don't
+back solo founder companies but
+co-founder companies you know they laid
+out all their data to say why Etc you
+know Google ventes GV is coming in
+sometimes well it sounds like slightly
+later stage so how do you I guess look
+at that it doesn't matter at all at that
+stage whether it's being co-founded or
+solo founded or how do you look at that
+yeah it's a great point I mean I think
+we try not to have too many hard and
+fast rules about what we'll invest in
+other than like things that are you know
+ethically not aligned with us I've
+backed many companies with you know
+multiple co-founders and I've backed
+many solo Founders as well I think again
+you're really just evaluating what that
+person or group of people can do you
+know it's clearly a lot more work as a
+solo founder but often then they're
+making hires you know to kind of fill
+the gaps early on I mean I've backed
+solo technical founders and then they're
+hiring people who help with you know
+product in ux like maybe much earlier
+than they would you know if they had
+someone else on the co-founding team who
+is really great at that so I think as
+long as you know the founding team has
+the ability to recruit to fill in the
+gaps in terms of their skill set I'm
+totally fine with it I think you know
+there's maybe you know just a little bit
+of safety with investing in more people
+like oh well if the you know so and so
+leaves then we still have a company and
+and and things like that which I get in
+the earliest stages like that's probably
+more of a risk once things are you know
+kind of series a series B there's
+there's just you know more company there
+but really to me no you know number of
+co-founders other than I don't know we
+have 10 co-founders or something crazy
+is a flag as far as I'm concerned yeah
+great point on just the risk piece there
+is is maybe what some Founders aren't
+sort of thinking about in terms of well
+if you look at from the other side you
+know what what is it's not that
+someone's saying we don't think that you
+specifically are not capable of building
+this up but at the same time we've got
+to look at it you know we're putting
+money to you and the company and like
+what what's the risk profile on that if
+that's kind of a just a you company and
+not maybe two of you yeah yeah and I
+think again if you're a solo founder
+it's just important to build that
+support network again talking about it's
+lonely early on make sure you know I
+mean something i' I've done is help
+connect Founders these like other PODS
+of they can chat with each other get
+feedback you know talk about different
+strategies and things like that which
+again if you have a co-founder those are
+all the conversations you're going to be
+having internally but a lot of that
+again if you just have a good support
+network you know through investors other
+Founders just other people in the
+industry you can get a lot of that it's
+more work obviously but then you know
+you're the sole founder you have more
+more ownership of the company so it all
+kind of balances out yeah absolutely and
+you know getting to kind of sort of the
+end of the looking at how I say GV would
+evaluate companies you know the I guess
+sometimes the beginning and the end it's
+the valuation which is always the the
+bit that kind of the real numbers and
+what's kind of your opinion at the
+moment or like how valuations are kind
+of looking are they we definitely went
+through a very froy Period 2 3 years ago
+and then there's quite a lot of noise or
+or depending I would say geographically
+it's quite dependent on people say oh
+you know there's no funding anywhere Etc
+I sit in Singapore and actually I don't
+see that if I'm being honest I see
+there's quite a lot of opportunity
+certainly in this part of the world at
+least at the moment so how you know
+you're sitting in New York and I'm not
+sure kind of geographically if you have
+any leaning for in terms of GV and where
+you tend to invest but yeah how how are
+you kind of seeing valuations and sort
+of just the kind of environment at the
+moment yeah I mean it's really easy to
+talk about valuations in the past I mean
+as you pointed out there was this kind
+of covid bubble where really all ass
+assd prices shot up just because of all
+the money that was flowing into the
+system and startups weren't immune to
+that and I think a lot of these things
+matter a lot in the short term right so
+if you were someone that was about to
+sell your company let's say 2021 would
+have been an amazing time to do it
+because the prices were were super high
+and almost you know anything that you'd
+been doing in the past may or may not
+have mattered because you know the
+market was approaching a peak and and
+you could have had a great exit sort of
+regardless right there are lots of spcs
+and all these other things that happened
+I think when we're investing again when
+you're coming in at the earliest ages
+seed series a you're planning for a
+journey that could be 5 10 years maybe
+more and so you know whatever those
+conditions are in that moment are
+probably going to look a lot less less
+relevant you know when when you're
+looking backwards you may pay pay a bit
+more pay a bit less of course right
+there there's always going to be those
+perturbations but really to me what's
+kind of always been true if you look at
+Venture you know going back to the
+earliest days if you're in the kind of
+best companies right the top 10% the top
+25% of companies there's always going to
+be great returns for them kind of
+regardless of whether you know things
+are to Peak or you're in a recession or
+whatever it might be and so that's
+really how we think about it you know
+we're we're thinking like is this going
+to be transformative in the future and
+if so you know we can't really control
+what the macro situation is going to be
+then when that company is having an IP
+or what whatever the the sort of outcome
+is is is going to be so we have to pay
+attention to it I mean one of the other
+things I do at TV is I I kind of run
+something we call the macro group where
+we actually have a bunch of speakers
+that come in and talk to us about
+different things that are going on in
+macro and I think it what I've realized
+over the last you know five or six years
+is like macro is starting to affect
+Venture more and more but it's still not
+you know we could care less what's
+happening quarter to quarter in terms of
+most of our companies so really it's
+it's about can we being the best
+companies and like what what is what's
+their full potential and then we'll let
+the macro sort of fall follow where May
+yeah I think that's a great sort of
+point there yeah just that people might
+get a bit lost thinking that macro does
+affect kind of the Venture side maybe a
+bit more than than is true but you know
+it changes the amount of venture right
+so so again if people are raising lots
+of money for Venture funds there's just
+going to be more money out there
+probably means more startups gets funded
+in leaner times there'll be less of it
+but again I I think my point is that if
+you're building one of the best
+companies like there's always going to
+be Venture money for it we we you know
+we've never been in a point where like
+Venture goes to zero and again we're
+very lucky to have alphabet as our
+partner you know they have lots of
+capital and they're super super patient
+so that's the approach we take and again
+I think that that means that when things
+are hot in the market we're not like
+doubling and tripling our fund size and
+when things are a bit leaner we're also
+not cutting it in half like we have more
+of this steady approach which I think if
+you're doing long-term investing that's
+that's that's what you to do and I
+wanted to touch on on the the piece
+about geography I mean I do think
+geography does affect it a bit although
+obviously post
+pandemic entrepreneurship is everywhere
+you know you can start companies in
+almost any place on the planet and it's
+going to work but New York is where I
+sit and I feel really great about the
+ecosystem here especially post pandemic
+I mean it's it's becoming a great place
+for young smart people to move to
+Founders Engineers things like that I
+mean there's a great ecosystem of both
+you know universities big Tech companies
+startups so we feel pretty bullish about
+what's what's possible in New York just
+because of you know all of the work
+that's been put into the ecosystem over
+the last you know 10 plus years I was
+back in New York I say back I lived
+there a while ago and have tended to go
+most most years for various reasons I
+was back there in January and I couldn't
+agree more the the just the way things
+kind of look in the tech kind of
+ecosystem there at the moment look
+pretty awesome and a lot of my friends
+you I lived in Hong Kong for a long time
+and actually a lot of friends have moved
+from there to New York and a lot of
+people kind of are congregating I would
+say in New York now which is super
+interesting to see and just a bunch of
+really interesting companies in New York
+so yeah ex that's cool to hear I mean
+one of the things New York has that I
+think I you know San Francisco has in
+Spades and maybe some of the other
+cities are not quite there yet is just
+this convergence of of talent and
+ability to sort of switch jobs you know
+the the joke is Silicon Valley is always
+like hey you can change where you work
+without changing where you park you know
+in New York has big engineering offices
+from Google Microsoft meta Amazon I mean
+that the list goes on they're all here
+sometimes hiring thousands if if not
+more of Engineers and so if you leave
+one of those places or you come to New
+York and you start a company and it it
+doesn't work out you know you might be
+able to just go and and you know work at
+one of those one of those areas and you
+not have to like up root your family or
+you know move cross country or things
+like that and I think that kind of
+safety net that was really important for
+Silicon Valley and I think New York is
+one of the few places that really has
+that too you know some other cities if
+you went there and you started a startup
+and like you know the startup had to be
+there and it didn't work out okay you
+might then have to make a a shift and
+also you know there's you know tons of
+great universities there's just this
+kind of influx of talent and as you said
+people are excited to move there you
+know from other big cities and different
+places so I I I think that that is
+always the Cornerstone of a good Tech
+ecosystem and I feel really positive
+about where things are today and where
+things are headed for the city I think
+that this you know the real human
+Network should never can never be sort
+of understated there was probably a
+phase where I especially during pandemic
+people kind of thought oh you know it
+doesn't actually matter we can be
+wherever and we're still connected Etc
+but yeah I've always been someone that
+has deliberately lived in bigger cities
+for that reason I think it just it pays
+off so much yes they're expensive places
+to live especially you know if you're
+maybe a younger engineer kind of trying
+to trying to get your startup off the
+ground but the kind of the value you get
+back in who you meet and and like you
+just said Eric like being able to almost
+have a fallback if if actually doesn't
+work out you probably have already met
+someone that's ready to employ you more
+than just if you're sitting you know off
+on a different country somewhere trying
+to Ping with your your LinkedIn
+somewhere so that's a it's a great great
+advice hey it's Sean faler and I got
+something awesome to share with all you
+movers and shakers out there if you
+haven't heard of notion yet buckle up
+because your productivity is about to
+hit turbo speed notion combines your
+notes and docs into one space that's
+simple and beautifully design with a
+power of AI built right inside not a
+separate AI tool or browser tab I use it
+to organize my notes and brainstorm new
+content ideas it's also great for
+organizing my coding projects and
+tracking new machine running papers it's
+completely customizable so you can
+really make notion your own to take your
+organization and productivity to the
+next level notion isn't just a platform
+it's a game changer for collaboration
+whether you're part of the Fortune 500
+company or freelance designer notion
+brings teams together like never before
+notion AI turns knowledge into action
+from summarizing meaning notes and
+automatically generating action items to
+getting answers to any question in
+seconds if you can think it you can make
+it notion is a place where any team can
+write plan organize and ReDiscover the
+joy of play ready to experience the
+future of collaboration dive in notion
+for free today at notion.com that's all
+lowercase letters notion.com sad and
+start turning ideas into action when you
+use our link you're supporting our show
+no ./ SED let's build something
+incredible together looking at kind of
+how Google Ventures well I want to touch
+on this it's Google Ventures even though
+you know so Mothership I guess is is now
+called alphabet I'm curious was there
+any chance it was going to become
+alphabet Ventures or is Google a
+specific kind of name now in terms of
+Google Ventures yeah I think we go by
+two names now both GV and and Google
+Ventures and look we restarted in 2009
+so we technically predate the alphabet
+even though we are always set up
+independently you know our structure is
+one where we're measured on financial
+return ultimately I mean we want to have
+great impact but it's it's about
+generating you know real returns and
+that that keeps us really aligned with
+the companies we're backing we can back
+people that are you know good for Google
+bad for Google something in between I
+mean almost half of our dollars go to
+life science companies very little
+overlap with what's going on at kind of
+the core core Google business we've
+backed competitors to Google products
+things like slack I've had big exits to
+Facebook I guess now meta that's great
+their money's green you know we're happy
+to take it in terms of how we work I
+mean we work like any other VC which
+means we're paid carry or like a portion
+of the profits when our funds return we
+don't get any Google stock I hav't you
+know I don't have any Google stock from
+GV as nice as that might have been over
+the last couple years but it keeps us
+really really aligned with the founders
+we're backing and I think that's that's
+the most important thing you know it you
+know I'd feel awful if I you know go and
+write somebody a check and then hey you
+have to use these Google products or
+else right that nope you want to use AWS
+you want to use whatever that's totally
+fine and obviously if they do want to do
+things with Google we're happy to to
+make those connections but that's not a
+it's a non-factor in terms of how we
+think about who to back that's a yeah I
+think a great clarification point you
+know just I think naturally people see
+see the name Google there and probably
+think there is more connection actually
+than as you just described so that's uh
+I makes complete sense and it's of as a
+fund you want to have that Independence
+to you have to be able to make those
+decisions if we look at you know which
+areas you you just said I think life
+science is actually is about 50% but you
+know any other areas that kind of are
+sort of outsized as well you know the
+area that I spend most of my time in
+which is which would we call Enterprise
+that's everything around infrastructure
+developer tools you know classic SAS
+that's probably the other really big one
+we also do lots of consumer investing we
+do Frontier stuff which involves you
+know Hardware climate semiconductors
+things like that so it is it is really
+Broad and really diverse but I mean the
+core of it unsurprisingly is different
+types of software yeah so let's talk
+just about any of the kind of Port Co
+that's the of you know short name
+portfolio companies and what would you
+say we've touched on a couple you
+mentioned warp and we've talked a bit
+about Labs but yeah I'd love to
+hear about sort of what are some others
+that kind of come to mind in terms of
+just some really you know impressive you
+know
+transformative products and companies
+that you know that gb's invested in
+especially you know with yourself being
+involved specifically yeah I'd love to
+hear about those sure I mean I'd love to
+just touch on warp because you only
+mentioned it for a second I mean it's
+it's a really fun one so most of us
+whenever we got started with programming
+we had to use a CLI right I mean I'm old
+enough that my first exposure to
+Computing was around using a CLI whether
+I wanted to play a game or do something
+productive or anything else and now it's
+you know it's been relegated to the
+world of the programmer but honestly
+it's not something that's changed in 40
+years maybe more it's the same thing I
+mean I remember getting my first Mac
+laptop I think terminal.app is pretty
+much exactly the same as it is on a you
+know 2023 MacBook Pro and so Zach came
+to me pretty early on I was like Hey
+what if we what if we completely rebuilt
+this from the the ground up and at first
+I wasn't you know I I sort of didn't get
+it I was like oh that's just not that
+interesting and then I started realizing
+this is probably the most widely used
+developer tool and it hasn't been
+improved it has no ux improvements
+there's no kind of like AI like all
+these other things that are showing up
+in every other aspect of the development
+workflow we kind of have this least
+common denominator in terms of the the
+terminal and the
+CLI they have completely rebuilt it I
+mean if you're a programmer out there
+you and you have to download it and and
+give it a shot it's on it's on Mac and
+Linux right now and they're expanding to
+different platforms throughout this year
+but it's really a total rebuild it's
+just a joy in terms of what they can do
+and if you've ever been frustrated in
+terms of knowing I need to expand this
+and tar Dash whatever like if you
+haven't committed all that to memory
+this is the perfect tool for you because
+there's so many more ways that even you
+know i' almost call relatively simple
+technology in terms of sharing commands
+and using AI to for what you do it just
+makes you so much more productive and so
+I love that because this is a it's a
+company built by Developers for
+developers and hopefully making a lot of
+people's just you know regular
+day-to-day experience that much more
+productive by improving this tool that
+we all have to use but doesn't have to
+be so painful yeah we should already
+want to try and get them on soft AB
+absolutely Zach who's the founder is
+incredible and yeah I think You' be I'll
+put in a plug for making him a future
+guest for sure yeah fantastic I need to
+download it admittedly I kind of caught
+onto it fairly recently but yeah I'm
+going to download it and cuz as you see
+I'm in terminal every every single day
+and and yeah it hasn't changed and I
+still have to use the same shortcuts
+that still aren't that great and etc etc
+and I'm sure like yeah warp just sounds
+sounds awesome any others that kind of
+come to mind yeah another one more
+recent Edition is this company flutter
+flow and so flutter flow is an app
+creation platform it's based on the
+flutter language which if you don't know
+it it's really cool it allows for
+crossplatform devel so if you want to
+build something that works on iOS
+Android know mobile web you can write
+the code once and deploy to all of those
+areas and the thing about flutter that I
+think people forget is like there are so
+many businesses and even people that are
+just building an apps themselves that
+kind of have these parallel code bases
+between IOS and Android and it's really
+a waste right like you'd really love to
+just write something once and you know
+deploy to the widest set of users
+possible uh and you also want to be able
+to use kind of platform specific stuff
+and again that's that's pretty easy to
+do here but so flutter flow is yet a
+layer on top of that which makes
+designing and building these apps super
+super easy for someone who's who's
+Technical and wants to jump in and out
+of the code or for someone who's just
+comfortable building you know uis but
+doesn't necessarily want to get into all
+the code so what's what's really
+happening with them is they are
+democratizing the ability to build
+software and also allowing you know
+people who are really Technical and
+people who are and call it medium or or
+less technical to collaborate in the
+same app right so I I think that that's
+really a model for how software is going
+to continue being built into the future
+where you know AI has a bigger influence
+and you know there's just other people
+who understand how to build software but
+maybe haven't haven't been trained as a
+computer scientist and so we need
+platforms that allows everyone to
+contribute because frankly you know we
+just need to build a lot more software
+and we need to kind of break down as
+many barriers so so the mission of this
+company is really to go you know from
+ideation to ship production code as
+quickly as possible you know focusing on
+on on mobile obviously and I think
+they've done a great job in terms of
+what you can do you know whether you're
+starting or just like a simple UI design
+and then turning that into a work a
+working app um I mean what's really
+really cool about this this company is
+you know I was at a board meeting there
+and we have we have paying users in
+almost every country you can imagine I
+mean it's it's really really cool for a
+young young series a company this thing
+has Global impact and I think it's
+because you know the desire to build and
+and ship code you know is is universal
+and it's not like we've done a bunch of
+internationalization work there's
+there's more to do there they've really
+struck a chord with a bunch of people
+who are interested in building apps and
+I really love working with that team and
+seeing just where it goes because I do
+think the future of building software is
+just about bringing more people into it
+you know we we're despite all the kind
+of oh AI is going to replace everyone I
+still think we have way too few software
+engineers and really it's about making
+more people you know giving more people
+the ability to create software yeah no I
+couldn't agree more always kind of hear
+effectively non-technical people s
+saying oh AI is going to come and take
+your take your job like uh it's not
+exactly how I think it's going to work
+it's just that Ai and as you say kind of
+platforms that democratize the level at
+which someone can come in at to build
+things is always changing and I think
+every software developer needs to be
+always aware of of that and just never
+never sit still one company that did
+that I think really well you know
+there's a ton of reasons you might not
+want to use this product but I still
+think web flow did a great job of
+actually changing that bar where you
+suddenly didn't need a developer for a
+lot of things you you actually designer
+people that sort of called themselves
+designers effectively became web
+designers were and I love that like I
+used to employ someone who was came in
+as a pure ux person and then now he runs
+his own shop purely through web flow so
+it sounds like photo flow this the safe
+kind of approach in that way of like
+changing that bar which I think is is
+such a huge thing to be able to do
+totally and I think you know if you just
+look at how software Engineers have
+moved up the stack so to speak over the
+last several years I actually feel that
+this is in some ways more the same I
+mean I remember when I was a young
+programmer and I was writing a little
+games and I would have to go in it and
+like mess with assembly right and like
+learn about registers and all this other
+stuff I haven't thought about that in
+years you know other than someone who's
+doing very low LEL or systems programs
+very few of us do and that's a good
+thing right think about how many parts
+of building software are unpleasant you
+know writing lots of unit tests fixing
+you know API deprecations or migrating
+off old software I mean I think about
+you know how much of the Global
+Financial system is still being run on
+like mainframes with Cobalt and things
+like that there's no one who there's no
+software engineer out there who thinks
+you know transitioning that code or
+rewriting it is like a fun thing to do
+and so I'm really excited about AI
+getting rid of all of the you know not
+fun parts of of software engineering and
+letting us just kind of focus on you
+know really the joy of building software
+which is the the creation piece and I
+think that you know all these other like
+llm based tools will just kind of
+accelerate that you know and that's
+obviously a space that we're spending a
+lot of time looking at as well yeah I
+I'd love to just touch on AI we have to
+effectively it's a rule now exactly
+however not turning the whole episode
+into another AI episode but yeah we have
+to touch on it for good reason how are
+you and and GB looking at AI you know
+from I guess a sort of opportunities and
+investment point of view there's a lot
+of noise you know there's an AI for
+something popping up every day and you
+know like a Gemini for x or GPT for X
+Etc again popping up virtually every day
+how are you kind of cutting through this
+noise and sort of how are you evaluating
+AI opportunities just as as GB yeah
+absolutely I mean I think the good news
+is you know we've been looking at things
+that you could call AI for for years I
+mean probably almost in Inception of of
+GV you know even before this sort of new
+llm based craze has kind of taken over
+the industry and so I think that's been
+that's been really helpful we kind of
+think about things in two buckets so
+whether it's for AI this could be
+infrastructure like I'm involved in a
+company called light matter they do
+Optical semiconductor stuff turns out
+this is actually super helpful in terms
+of increasing bandwidth between chips
+which is really useful in doing you know
+large training or or inference workloads
+and then sometimes we also have
+companies that are like you know with AI
+so using AI this could be something like
+type face or sthesia and there you know
+obviously the llms and other kind of
+models are being used to drive you know
+some consumer Enterprise facing
+application so so we're looking up and
+down this stack and I think we have
+again the experience of not being new to
+it of having seen these things for a
+while and just just understanding like
+where the leverage points are and so
+again for me so someone who's really
+excited about infrastructure and
+developers there's a lot of exciting
+things going on in that space and so
+we're spending time with those Founders
+and those companies and figuring out you
+know where where we want to place our
+bets but again I would say even though
+the last two years or so have been
+really really exciting it still to me
+feels quite early and I think that it's
+going to take time you know for a lot of
+these applications to really kind of
+percolate through in terms of different
+consumer experiences different things on
+the Enterprise and certainly then for
+for developer I've just been talking
+about you know how your day-to-day flow
+will change I mean lots of people are
+using co-pilot and and similar tools but
+as we know you know just typing out the
+code is just one part of being a
+software engineer and there's so many
+other aspects to it in terms of you know
+production design testing integration
+all of these things will get touched by
+by at some point and we're really
+excited to you know sit down with the
+people that are kind of reimagining all
+of that and you know hopefully you know
+make make more bets into you know young
+young Founders thinking about it yeah
+that's super exciting I love that GB is
+kind of really looking at a lot of these
+developer focused areas I think that's
+that's super exciting so just to kind of
+round out again we've got probably a lot
+of people listening they in the midst of
+their startup right now or like thinking
+about kind of making that leap any kind
+of just couple anecdotes of maybe
+successes and and even failures maybe
+that have come up in the last couple
+years that might just of help give some
+takeaways to some listeners yeah I mean
+I think in terms of successes I think
+it's never it's never a straight line
+you know even with you know some of the
+companies I've involved with that
+are you know clearly leaders in in their
+respective Fields today and I just
+mentioned light matter that's in the
+semiconductor space you know they what I
+would call like a six or seven year
+overnight success like they had to do a
+lot of really hard technical work and
+then they've got to this place where now
+you know the demand for AI workloads is
+obviously going parabolic and they have
+a solution that is really well suited to
+you know building out the data centers
+of the future that will you know be
+doing all of our inference workloads
+going forward and you know again when
+the company was founded I was lucky
+enough to be there sort of as they
+launched in an entrepreneurship
+competition none of that stuff was clear
+right it was it was very uncertain
+you know when and how the market would
+come to them and so sometimes you know
+if you have a vision of of the future
+you have to stay super super focused on
+that and you know control what you can
+control and not worry so much about
+obviously not ignore but sometimes the
+market will just take a little bit
+longer to come to you and so if you feel
+like you have something that's really
+going to serve a wide set of users or
+people it's okay to be be heads down
+until until that comes to you you in
+terms of things that that don't work
+I'll go back to like one of the first
+things we talked about here which was
+not paying attention to feedback early
+on if you're building really interesting
+technology but you're doing it without
+talking to anyone who might use it
+that's generally how you go down the
+wrong path especially early on so I
+always you know if you're building
+something for other developers like talk
+to as many of them as as you can early
+on you know go talk to differ sized
+companies startups big companies
+mediumsized comp iies different
+verticals that feedback is really the
+lifeblood of an early stage startup and
+so it's I again I think for for more
+technical people it's very easy to kind
+of put on the blinders and and ignore it
+in the earliest days so I feel like the
+sooner you can get to that feedback
+flywheel the better things will go yeah
+I think both those are great advice yeah
+I can sort of turn the first one into of
+a sound bite I guess of stay on the bus
+you know there's that I don't know if
+you've heard of the the Helsinki bus
+station sort of story listeners Google
+it and you'll sort of get the gist but
+the idea is just you know stay on the
+bus if you if you have a vision for
+something all startups kind of start
+from the same place and it will look
+quite sey to you know you might be
+comparing yourself to some other outfits
+and say oh well they're they're there
+today and I'm not but that's not the
+point it depends on your journey and
+actually yeah stay on the bus and
+feedback yeah couldn't agree more there
+as well as a technical founder yeah it
+is difficult it is difficult sometimes
+to get your head in that space of woman
+you're coding the next minute you have
+to line up calls or or meetings and yeah
+you don't always want to actually hear
+what people are saying in the sense of
+that thing but I couldn't agree more you
+you just be humble and be able to take
+people's opinions and sort of then apply
+that back to what you're building and
+that's great advice it's not a natural
+thing right if you're just coming from a
+pure software background you know you
+might be doing like design reviews and
+things like that but often you're not
+the one catalyzing it and I think that's
+what happens when you shift to being a
+Founder like you have to catalyze all
+these things and it may not be the most
+natural or comfortable thing but the
+more you do it the better you're going
+to get at building Tekken products
+absolutely well we are out of time today
+unfortunately but I really appreciate
+you coming on today Eric and giving lots
+of little nuggets of wisdom there in
+terms of building companies and just
+some really fun stories there from what
+GV has been been doing and and investing
+in so Eric where can listeners sort of
+find you
+yeah so I'm on X formerly Twitter as ejn
+so find me there and I'm usually sharing
+stuff about technology and our portfolio
+companies awesome well again thank you
+so much for coming on and hope we get a
+chance to catch up again in the future
+all right thanks for having me Gregor
+this is fun
+[Music]

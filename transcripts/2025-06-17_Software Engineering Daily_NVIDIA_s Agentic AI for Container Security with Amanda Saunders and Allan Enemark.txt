@@ -1,0 +1,1248 @@
+# Podcast Transcript
+# Show: Software Engineering Daily
+# Episode: NVIDIA’s Agentic AI for Container Security with Amanda Saunders and Allan Enemark
+# YouTube URL: https://www.youtube.com/watch?v=eJM0zHAx2JY
+# Downloaded: 2025-07-19 20:58:38
+
+Docker container vulnerability analysis
+involves identifying and mitigating
+security risks within container images
+this is done to ensure that
+containerized applications can be
+securely deployed vulnerability analysis
+can often be time intensive which has
+motivated the use of AI and ml to
+accelerate the process Nvidia blueprints
+are reference workflows for agentic and
+generative AI use cases one of the most
+prominent blueprints is focused on
+vulnerability analysis for container
+security
+Amanda Saunders is the director of
+Enterprise generative AI software at
+Nvidia and Alan enmar works on nvidia's
+morphia cyber security SDK team Amanda
+and Allen joined the podcast with Gregor
+van to talk about Blueprints and their
+application to vulnerability and
+container security Gregor van is a
+security focused technologist and is the
+founder and CTO of mail pass previously
+Gregor was a CTO across cyber security
+cyber insurance and general software
+engineering companies he has been based
+in Asia Pacific for almost a decade and
+can be found via his profile at van.
+[Music]
+HK hi Amanda and Allan welcome to
+software engineering daily great to be
+here yeah great to have you both here
+today we're super privilege to have you
+from Nvidia and we're going to be
+talking all about Blueprints and
+obviously we'll get into what they even
+are and especially in the context of
+security today so as we often kick off I
+think we don't often get to hear from
+people from Nvidia so I'd love to hear
+like from both of you kind of your paths
+to Nvidia and what you're doing there
+now Absolutely I'll kick off my name is
+Amanda Saunders and I'm the director of
+Enterprise generative AI software here
+at Nvidia so my focus is on Nim
+microservices which are packaged AI
+models that are optimized to run on our
+infrastructure and blueprints I've been
+at Nvidia 10 years so I've had roles
+from everything when we started with
+Graphics through machine learning and
+data science and now obviously into one
+of the most exciting topics that we get
+to see which is generative AI so it's
+been a really fun ride awesome and yeah
+I'm Alan enar I'm part of the Morpheus
+team here at Nvidia and this is kind of
+the team working around cyber security
+cyber security issues and yeah been it
+feels a bit unreal to say it but at
+Nvidia for about 7 years now joined on
+as a data Vis person on Rapids which is
+we're still working very closely with
+but yeah actually my original background
+is in design industrial design actually
+and then kind of meandered my way to
+data viz and then to more product and
+now cyber security awesome yeah I mean
+just before we kind of dive in I guess
+both of you being Nvidia a relatively
+long time now I mean can you just
+describe maybe very briefly what's it
+felt like to kind of I guess I think you
+said 10 years ago you've been there for
+10 years yeah how does that feel cuz I
+mean I think from the outside looking in
+it's sort of I mean I was quite aware of
+Nvidia given I like gaming and just
+keeping up with technological
+advancements generally and then I think
+for most of the world sort of Nvidia has
+only become a word that even understand
+maybe one year ago maybe maybe two yeah
+how's it kind of felt from the the
+inside yeah I think I mean from the
+inside you know when I first joined the
+only questions I got were about gaming
+even though I've been focused on
+Enterprise since I joined so there was a
+lot of oh so tell me about your gaming
+gpus and things like that and now the
+questions are obviously very different
+it's all about Ai and it's all about
+what we see the future and so I think
+that's a very cool Evolution you know
+the other thing I would say is as
+somebody who's sort of watched the work
+that this company has done grow from
+graphics and particularly gaming
+Graphics into AI I think what's just
+really fascinating is that these
+building blocks it's not like we started
+something totally new it's all building
+on top of that original mathematics of
+Graphics that then transitioned
+seamlessly into Ai and again now this
+generative AI wave that we're seeing so
+it's really fun to watch people as they
+see gaming go to Graphics go to machine
+learning data science to where we are
+now to the point where we're actually
+bringing that AI back into gaming and so
+it's kind of a full circle exercise
+which I think is pretty cool yeah that's
+a fun Loop so let's dive into blueprints
+so it's interesting blueprints had
+crossed my radar from someone else in
+Singapore but admittedly I hadn't really
+gone in depth with them sort of until
+until we were going to do this episode
+and The more I've got into them I'm just
+more and more impressed and kind of
+fascinated by kind of what they are so
+maybe can we just talk about what are
+Nvidia Blueprints and I guess why this
+initiative yeah here I'll I'll jump in
+here on you know really this was again a
+journey like everything we do here at
+Nvidia we we've been building software
+we've been building libraries sdks now
+microservices all of this is to package
+up software that can run on our
+accelerated infrastructure on our gpus
+on our networking so that you know
+customers can get the most out of it
+developers can build these applications
+and as we built these building blocks
+customers developers they were really
+excited but what they started to say is
+well can you show us how to use them can
+you give us recipes can you give us
+guidelines that help us as a starting
+point and so we didn't want to build end
+applications we wanted to build
+reference workflows and that's what
+Nvidia blueprints are they take all the
+libraries the sdks the microservices
+even things from the open source and
+from the ecosystem around Ai and
+simulation and everything like that and
+it packages it up into something that
+can be taken composed customized to meet
+the needs of whatever company is is
+taking them on so I think that's really
+the why and then they're continuing to
+evolve to solve some of the most common
+use cases that we're seeing out there
+and bringing on new blueprints from not
+only Nvidia but also our partners to
+just really help people take advantage
+of this software as quickly as they can
+yeah and you know we're going to be
+diving into sort of one of those
+blueprints specifically today around
+vulnerability scanning could you also
+just before we do that just yeah what
+kind of maybe some other blueprints
+topics that sort of blueprints cover
+that come to mind yeah I think you know
+as of recording we have about 14 that
+are available as I said I think we
+introduced five at CS a couple weeks ago
+so we're continually adding to them
+there's sort of four main categories
+that we're really building these out
+today the first one is AI very common
+lots of things that we see there whether
+it's customer service agents or digital
+humans obviously as you said the
+security blue where we're going to dive
+into fits and there Omniverse which is
+our digital twin platform lots of
+blueprints around simulation and how we
+can advance those use cases biion Nemo
+the HealthCare Marketplace is a really
+important one for us and we want to help
+those digital biology developers take
+advantage of all the new techniques in
+Ai and then the latest ones that are
+going to be coming out are for Isaac
+Group which is our robotics platform so
+as we see that start to grow again how
+can can we make it faster how can we get
+developers started more easily that's
+where we're going to start adding
+blueprints nice and yeah I mean just to
+kind of I guess describe if I'm looking
+at just the build. nvidia.com site and
+like what what does the blueprint kind
+of look like you know I've got kind of
+three tabs here I've got experience so
+sort of actually being able to just try
+out what sort of results that might come
+back if I were to use this blueprint
+I've Got The Blueprint Card which is
+kind of giving me architecture and then
+I've also got Nim n IM did you say Nim
+or n how do you y Nim so these are Nim
+microservices and they are just packaged
+optimized AI models awesome again making
+that run really well in our software and
+really easy yeah I think we'll be sort
+of talking a little bit more about Nim
+and which Nims I guess are being used in
+this specific blueprint so I think let's
+now sort of dive into to the one that
+we're talking about today which is
+vulnerability scanning again we've had a
+few episodes on in the past just about
+this topic in general usually focused on
+maybe a particular product so I mean
+just kind of for listeners maybe I don't
+know Al maybe could just kick off with
+just simply talking very high level one
+is vulnerability scanning in the first
+place for those that are not familiar
+yeah absolutely cyber security broad
+broad topic lots of different areas of
+Interest this one in particular is
+around cve or you know hum
+vulnerabilities and exposures and that's
+basically this kind of registry right
+where if there's a known security
+vulnerability it's kind of registered
+there and available for everybody to
+look up and kind of mitigate on their
+own right now the issue is there are so
+many cves that are registered I think
+there was 40,000 last year it's just
+going up every year and you know this is
+in our case if you're trying to really
+secure a software it's very difficult to
+kind of manage all that and kind of keep
+track of it and yet you know case this
+particular blueprint is for container
+security right so if we have a container
+image you're trying to release a
+container you need to make sure that the
+cves it's scaned for are somehow
+mitigated or not actually a problem and
+then you have this many it kind of you
+could see how it doesn't scale very well
+right so if you're releasing thousands
+of containers and then you have tens of
+thousands of cves and each one is a real
+difficult thing to mitigate it's hard to
+put out secure software yeah so this
+uses the microservices it also uses I
+believe Nvidia Morpheus and I think
+that's a product or sort of could you
+maybe just speak to what is morphus in
+the first place yeah yeah like we call
+it cyber security AI SDK right which is
+sort of novel in itself usually when you
+think of cyber security products it's
+like part of some sort of service or
+some company that's providing services
+but what we've kind of found to be most
+useful is to release this capability out
+as a SDK which means that you can build
+the tools yourself with this framework
+right so this blueprint like we said is
+very composable it's sort of built using
+the Morpheus SDK and that sort of is an
+event driven Pipeline and so the reason
+we kind of developed this framework in
+the first place is ultimately like cyber
+secur is a data problem and you know
+there's so much data that it's hard to
+get grips on you can't store it all if
+you have stored it all it's hard to kind
+of munch through it and so really the
+way we're trying to approach that
+problem is to use it as like streaming
+inline event driven so you can kind of
+manage things line speed right and so
+having gpus enables that kind of for the
+first time because you're able to
+process data rapidly and quickly unline
+speed and do ML on it you can do ETL on
+it it's a very modular kind of pipeline
+system and so as you can see we're you
+know all kinds of capabilities through
+the Morpheus SDK and a while ago back to
+cve right it sort of our own paino where
+it was our own morace container and this
+was like during the holidays or
+something and we got like a cve it was
+like critical and nobody was around cuz
+they're all you know on break and so
+whenever kind of like leads was all
+right I'll handle this myself and he's
+going through it and munging through it
+and like to do a good cve mitigation you
+have to kind of open up the container
+you have to see if the cve is valid you
+have to again go and see all right well
+in this case it's like a version is is
+that the versions that we're using sure
+okay and then is this an actual function
+call and whatever long story short like
+hours and hours later it turned out to
+be like not actually a vulnerability
+right because in this case there was
+something with some Java runtime and
+we're not even using the Java runtime
+but like to even get to that point you
+have to dig through everything you have
+to kind of be an expert in codebase and
+at that point he's like there has to be
+a better way so like make something you
+know you have a bunch of energy figure
+it out so that's how like this whole
+thing started like to use this morphe
+6dk and then we were like okay these LMS
+at the time were starting to get really
+big so we like well how can we take
+these llm capabilities and push it
+further into cyber security stack right
+and so that sort of started the
+Prototype of what eventually became this
+blueprint and which was released out to
+the wild world basically yeah the cve
+problem as you call out it's not solved
+by any means in the sense okay it's
+great that we have cves that you know
+people report something that is in
+theory a problem with a particular piece
+of software or Hardware but the critical
+problem is knowing what is actually
+critical or sort of even moderate and
+you know there are some not exactly
+false positives but there are also some
+there that are kind of not really a
+problem for anyone but they're still
+there because yes you have to in theory
+you have to report it is a very messy
+space because sure you can have like
+tools that do the security scans for you
+right but the issue is like they don't
+have access to the full context of what
+your software is and what you're
+actually using it for right it's like a
+pretty naive scan right it's like is
+this version and this software there and
+so that's sort of what you traditionally
+would have this security analyst or
+application analyst do and often time
+it's you know not their full-time gig
+that's like something they do on the
+side as part of some group right ever
+like they meet every Tuesday and so it's
+not something that you know is terribly
+Pleasant to do because it's not even the
+software that you're writing yourself
+right you're sort of just you know you
+just want to deliver a secure software
+and so you have to go through all this
+you have to ask the right people like I
+said it's a very kind of often tedious
+process where you're aggregating tons of
+information from different sources you
+have to even validate that it's a cve
+you have to ask like how is this stuff
+used so you have to be an expert in a
+lot of different domains but then you
+also have to summarize a lot of
+information and then go out and find it
+right and so that's sort of how we
+approach this problem the first place is
+hey this kind of workflow that this
+person is running for is like it seems
+like it's something that can be kind of
+automated in a sense of like creating a
+workflow using this Morpheus and these
+llms right
+kind of that plan execute style LM
+pipelines that we can then use to really
+like you know accelerate the timeline
+right cuz some of these it could take a
+long time to kind of figure out and like
+just collect all the information and
+also like you know you just don't have
+enough people to do it do it well yeah I
+think that's what makes this such a
+great use case for AI humans do it we
+don't like doing it we're not
+particularly good at it because we get
+bored we get distracted we have other
+things that are on our plate and so by
+leveraging you know an llm to take not
+all the work out the the security
+analyst still has to come in at the end
+of the day and they have to have their
+expertise but taking out the tedium that
+they don't need to do and doing that a
+lot faster and probably a lot better to
+be honest because it is an llm it
+doesn't get bored I think that's what
+really sort of helps us identify a great
+use case for AI I completely agree I was
+in a role a couple years ago where we
+were building it was you know it's a tax
+surface management so we were looking at
+CVS more from the outside but exactly we
+had up a person who would be tasked with
+sort of trying to translate okay take
+the CV what's reported from the CV but
+let's try and change this into
+effectively natural language for the end
+recipient you know it's got to be very
+contextual like this person might not be
+technical so that can't be technical
+language and I think that's as you just
+said Amanda that's exactly what LS are
+fantastic for being able to be applied
+to yeah and it's sort of the magic sauce
+for these llms too is also they're able
+to ingest so many different types of
+information modalities right if you look
+at our architecture diagram it's like we
+are ingesting stuff from the actual code
+repository we're ingesting stuff from
+esom web searches like General
+documentation I mean it does this all
+stuff and Morpheus is really good at
+that but you're able to kind of feed
+that all into you know using vdbs and
+kind of good prompting and stuff like
+that into something that LMS can just
+Digest usually you'd have to even do the
+pre-processing back to more data
+analytics days to get it in a way that
+you could do with traditional ml for
+instance is like that's a huge project
+it's going to always break right and so
+the fluidity that these LMS enable you
+to do just kind of widens the amount of
+context you can feed them and you don't
+need that level of like API specificity
+to kind of make it be useful still right
+that's sort of it superpower and so from
+there you can then more natur Al like
+describe tasks for it right and again
+something that mimics how person analyst
+driven workflow would work right like in
+our system you have one LM call that's
+setting it up to do a task list right
+the first thing you do is like all right
+well I have the C like what are the
+tasks do I need to do to figure this out
+okay well first I'll check the version
+numbers and then second after that the
+version numbers match is like I'll do
+what as a deep function calls for this
+right and after that it's like all right
+is this actual function is you know the
+vulnerable aspect you know that is
+described in CV yes or no and then it
+kind of to the benefit of our systems
+like we can do all that in parallel
+right instead of serly like a person
+would do and then we kind of make an
+ultimate judgment on it with like kind
+of a summarization right so like based
+on all these individual tasks that these
+agents have gone out and like concluded
+on and like reasoned through through
+serial reasoning are you ultimately
+vulnerable or not and then kind of
+present that to the security analyst as
+a kind of a summarized view which is
+useful in and outright saying like yeah
+you are vulnerable you aren't vulnerable
+for ABC reasons but we also found that
+super useful is kind of generating a
+very big report that is the full kind of
+reasoning process and it's kind of
+marked down nicely so that they can go
+and verify the sources or like indicate
+that oh yeah this reasoning is accurate
+or maybe it's like a bit off here let's
+go tweak that yeah and I'd like to maybe
+just step back one piece which I mean
+we're just talking about so the actually
+the archit Ure and sort of some choices
+around what's been used here cuz I think
+you know that's where a blueprint to me
+comes into its own where you know some
+of these quite hard choices have been
+made for me in a really good way you
+know you talked about plan and execute
+llm pipeline could you just describe
+that architecture a little bit and
+actually like why that was applied to
+this blueprint yeah absolutely
+essentially something that best matched
+how the analyst actually approach the
+problem right and kind of mimic
+how you can break up a task into
+something that you can parallelize and
+then you can kind of connect this like
+reasoning too so that's sort of the main
+structure of it as well as what we're
+finding out is while this is a cyber
+specific use case like the benefit of
+the blueprint is like it's not you know
+it's extensible right and so a lot of
+people are saying hey you know what this
+kind of General architecture if I ingest
+different types of data I do different
+prompting you know I can apply it to
+different problem spaces as well right
+and so we having a lot of like isolution
+Architects which are folks that run out
+and kind of interact directly with
+Partners they're doing a lot of very
+interesting stuff with this as well that
+is like cybercity adjacent right but
+they're using the similar sort of
+agentic architecture that this blueprint
+like you said we sort of got a lot of
+the complicated stuff sorted out and
+laid out for you and like Hey how do you
+connect these pieces together what
+framework should I use and say well hey
+here's a really good reference you know
+it's much better than starting with like
+a blank page right exactly
+I mean even the choice of models and
+both you know from the S of pure llm
+side and and the embedding side I
+believe it is Lama 3.1 70b was the model
+of choice could you yeah just speak to
+sort of why that model and and how do
+you even go about choosing a model like
+for this kind of thing yeah that's been
+a fun process we've gone through the gam
+of so many different models here and
+which again shows the ability of
+Morpheus and blueprints to be very
+extensible we started with like GPT
+3.5 we were experimenting with some Lura
+tuning to make it more cyber specific
+and then essentially as we're
+prototyping this out Nims became
+available and that just made our life so
+much easier because then it kind of
+handle all that stuff for us and he's
+like look you just hit an API and we're
+like awesome you know we don't even have
+to spin something up so we just ran with
+that and we found that the specifically
+70b was sort of a sweet spot with number
+of parameters you know if you do more
+like we have some 405s out there it
+doesn't do that much more Improvement
+and then if you do smaller the agentic
+actions are as good it's not as good as
+a tool usage so it's a little bit of
+trial and error but then we kind of with
+that we sort of dialed it into 7B being
+the most robust and in the case of a
+blueprint like you could mix and match
+models if you need to if you want to go
+like just at a little bit of extra
+performance or you know tweaking it for
+your use case but in the case of a
+blueprint it was just a little less
+complexity and easier to deploy if we
+just kept it the one model which was
+pretty much good at everything yeah I
+think one of the cool things about this
+I mean and you know this Gregor it's
+like models it's almost weekly that
+we're seeing new models come out as well
+exact so I think that was the great
+thing is llama 3.1 70b is an incredible
+model it's so powerful and meta
+continues to you know innovate on what
+they're putting out there so as new
+things come out we can put it in and we
+can test it and because it's this
+containerized model it's really easy to
+swap them in and out and then say okay
+well the prompting has to be adjusted a
+little bit or things like that to get
+the same performance but it does really
+simplify this down so yeah the blueprint
+today built on llama 3.1 70b because we
+think that works really well but you
+know three months down the line six
+months down the line maybe we'll update
+it with some of the later models
+depending on what new features come out
+in the models themselves yeah I mean I'm
+going through that process at the moment
+with a product I'm working on which is
+it's both that model as well as the
+embedding model so I guess yeah just
+also speaking about the embedding side
+again I never want to assume anything
+from our listener base sort of what they
+perhaps know and don't know could you
+maybe just speak to very briefly what is
+embedding and why is there sort of a
+specific model for embedding as well
+yeah sure I mean the embedding space is
+sort of how you translate a document to
+something that the model can understand
+right there's a couple different ways
+you can give the model a context and
+embedding is sort of the best way to do
+that there's a lot of performance op
+stuff you can do by creating and
+embedding so like this is a really good
+example of for this blueprint we've made
+the embedding process and the VDB
+process like inline right and there's a
+lot of different libraries Rapids
+Associated that are good for vdbs and
+you know utilizing them in very
+accelerated ways definitely check those
+out in our case it made sense to do it
+inline because again for easier
+deployment and uh you when you're
+turning a code base into embedding you
+kind of all right is this the latest
+version of the code base is up to date
+yes you know if we do it live then
+that's not a problem if you were to take
+this into like full actual production
+maybe not the best methodology you want
+to make separate that out right you want
+to have it so that's like another
+process I mean still could use Morpheus
+it's can use the same embeddings but
+it's run on like a nightly basis because
+you could have you know again your
+thousands of different of code bases and
+that you don't want to do every time and
+it's up to you to Define your kind of
+process of like how often you want to
+update it and mimic that but piping it
+into the LM would be the same way right
+so that's sort of like you know where we
+draw the line between this is a
+blueprint versus like what somebody
+would take into production right and
+kind of being mindful of it and again
+taking the ability of the fact that a
+blueprint is pretty extensible it's not
+too hard to decompose yeah absolutely
+talk a bit about sort of how like all
+these processes are sort of how the data
+sort of makes its way into the system if
+you want to call it that and sort of at
+a higher level how that's going to be
+queried you know as a there's a repo
+with all the information incredibly well
+documented so really work very hard on
+the documentation I'm a little bit of a
+nerd when it comes to like good docks so
+thank you we work very hard to like look
+at the index it's like huge right
+because we want
+to yeah I mean yeah I was going to say
+like from from such a large company I
+was not expecting such good
+documentation so I'm within a repo
+itself you know sometimes you can go
+find it somewhere else but yeah this is
+awesome and you know Arc diagrams in
+there Etc and if I if I kind of look at
+the main one that sort of talks about
+the key components you know and you know
+on the left side we've got sort of the
+ingestion you know things you know es
+bomb Etc and then on the kind of right
+hand side that's kind of all the bits
+that are then doing the figuring out I
+guess it's mostly Nim you know we've got
+Nim checklist generation we've got Nim
+task agent Nim summarization Nim
+justification so I guess a question I've
+got is Nim walk through like are these
+sort of API endpoints or these things
+that can be self-hosted or like how do
+these work yeah I'll jump in on that one
+so yeah Nim is essentially a
+containerized optimized model so Nvidia
+as I said has loads of libraries and
+sdks that we've been working on for
+years and rather than asking developers
+out there to go package this up
+themselves we thought why don't we do it
+for you put it into a container that
+either you or your your it person can go
+deploy and then we build apis on top of
+them so we use whatever's common in the
+industry and we try to be compatible
+with that or we invent it ourselves if
+it doesn't already exist but we we have
+these standard apis so from a
+development standpoint all you're doing
+is accessing apis this is something
+we're very very used to very used to
+developing with these days but it's
+totally managed and controlled in your
+own environment so you can take it with
+you you can run it anywhere from you
+know PCS workstations all the way up
+into the cloud that's really the benefit
+there and then like you said the
+blueprint has a number of nim in it so
+this one you know we're talking llama
+3.1 70b but if they're multiple Nim one
+for embedding it's the same deployment
+mechanism so you're getting this really
+common way of deploying whatever the
+model is no matter if it's an llm
+retrieval model speech Avatar you name
+it so I think it's just a really
+powerful tool for both developers as
+well as those it teams who support them
+and that's what makes being able to do
+These Blueprints
+and give the building blocks that
+Allan's been mentioning that are
+extensible give those options to the
+developers I think that's the beauty of
+nim The Secret of nim as it
+were right yeah and again as as sort of
+documented in the docs for this
+blueprint as I imagine for for most it's
+very clear that you know they can be
+Nvidia hosted or they can be they can be
+self-hosted right what's the platform
+like for the Nvidia hosted where does
+someone go I guess to kind of spin up an
+Nvidia account for example like for that
+side of things yeah so we we host the
+Nim for prototyping on build. nvidia.com
+so hopefully easy to remember so
+everyone can find it so on there you can
+you can go you can test out all the
+different Nim you can run the blueprints
+as you said experience them without even
+doing any coding but then we also have
+options to download and deploy them
+yourself we also have another option
+called launchables where you can
+actually deploy onto another
+infrastructure so to answer your exact
+question if you're using the apis that
+are hosted on build. nvidia.com you're
+actually actually accessing those models
+running on dgx which is our most
+powerful infrastructure that's out there
+so you're getting the best of the best
+and then you can take them you can
+deploy them anywhere move them into
+production and you know really build
+real applications on top of the same
+software just wherever your gpus are
+hosted yeah yeah super nice being able
+to get to test out the Ferrari of gpus
+um even if you maybe can't afford them
+for your own project you know at
+specific times but yeah that's that's
+really nice I mean looking at kind of
+how how this has been received in sort
+of the real world what have sort of
+either of you seen in terms of let's
+let's start with this blueprint
+specifically sort of what has been the
+reaction and sort of who has given those
+reactions I guess and then we might also
+just talk about any of the other
+blueprints that have received some kind
+of attention yeah I mean I can start
+with I mean we're deploying this
+internally with our own teams security
+folks right cuz you know if anything we
+should be using our own things that
+we're putting out there and I mean the
+feedback is you if you work with
+security people you know they can be
+very kind of kind of conservative and
+skeptical right it's like oh somebody's
+just throwing another tool that I have
+to figure out how to use you know so
+there's a little bit of hesitation at
+first like once we were able to present
+it to them in in line to their
+workstream right it's like it's not like
+they have to do something new it's sort
+of part of their process they're oh wait
+this is great right oh this summarizes
+everything and you give me the sources
+okay I can start trusting it right and
+then very quickly it goes from like a I
+don't know if I want to use this to like
+starting ask for more features right and
+like hey can it do this and can we make
+sure it's accurate like that's sort of
+one of the important parts of using
+anything like this like you got to have
+good domain experts at your disposal and
+kind of Point them we have also worked
+with some Partners you know that are
+working with deploying These Blueprints
+themselves and they're working really
+closely I feel like some of the best
+feedback you can get is if folks start
+contributing back to your your code
+right because it means they're starting
+to get vested in it right they're
+starting to Tock it and and understand
+it and like they want it to improve
+right so that's sort of it's the worst
+when you don't get any feedback right
+but when you do get feedback it makes
+people like it shows that people are
+invested right so you know the
+blueprints we're continuing to improve
+them we're still doing commits and
+updating it to latest models and and you
+know any sort of new features so so
+that's sort of you know the feedback
+we're listening to it and then we're
+improving the stuff based on that yeah I
+think you know just in general I think
+developers have been really excited to
+have a starting point I think Alan sort
+of mentioned earlier it's hard to start
+with a blank page generative AI it's
+coming Fast and Furious we're all you
+know we all can think of things that we
+would love an agent to do for us but
+then actually going about building that
+and making all those decision points
+it's a lot and so I think just having
+that starting point for for people to
+then say okay well I followed the
+blueprint I did these things but
+actually for my use case if I make these
+changes it works better and and that's
+been I think the best part of feedback
+and the thing that we were really
+striving to do you know everyone's going
+to have their own changes and they're
+going to evolve over time and so we
+didn't want to try to build the final
+solution we just wanted to give you know
+a development starting point and so yeah
+so far that's been the feedback but like
+Allan said the more people use it and
+the more they contribute back and and
+let us know what you know what other use
+cases and what other areas I think will
+be really impressive and will help us
+and then I think the the next you know
+interesting one that we're we're hoping
+to see and we're starting to see a
+little bit especially internally is sort
+of daisy chaining blueprints how can you
+connect these things how can you take
+pieces from one and add it to another
+our digital human is a great example of
+that almost any agent can have an avatar
+in front of it so if you want a cve um
+Avatar you can build that so I think
+that's going to be a really cool thing
+to watch when people you know multiple
+Blueprints and build their their mansion
+or whatever it is yeah I mean just to
+chime in too it's pretty impressive to
+see Nvidia basically one of the things
+that Nvidia is really good at and I'm
+you know I'm slightly biased but like
+the way it kind of makes you can buy in
+as little as much as like you want into
+the system right Hardware wise software
+wise right it's like you can go full
+everything like in video up and down the
+line or you can just say you know what
+this one piece is what I'm interested in
+right and so we're sort of doing that a
+lot with the software now where if you
+want a Nim like this is just you can
+build out your own framework and you
+just hit the API with n okay great right
+because I don't want to deal opposition
+or blueprints great I'm going to take
+this and customize it U I'm Gonna Change
+blueprints together right and build some
+crazy crazy big system out of these
+things but it's sort of
+it's all available and like is and very
+easily enabled there's no real
+gatekeeping to this stuff it's pretty
+out there that's another reason why you
+know a lot of These Blueprints are are
+released on GitHub so it makes it kind
+of just easy to use in a sense what
+we're going for here right I think that
+comes out in I don't know all aspects of
+sort of what at least from an Outsiders
+perspective I've seen from Nvidia which
+is just this sort of overall openness to
+try and help people use its stuff you
+know it is complicated stuff but and so
+it's sort of exactly I feel like
+blueprints is to me anyway shown how
+invested Nvidia is in in actually having
+it being used in the real world as
+opposed to just sort of saying well
+we're going to produce this incredible
+gpus and then buy them and and that's
+that's kind of where where we finish so
+I mean to me this is just a really great
+initiative in terms of any of the other
+blueprints I mean I I don't know which
+would you say has had the most reception
+I don't know if it is Perhaps it is the
+one I I don't know I'm just curious if
+if any have kind of we had a standout
+again announced a couple weeks ago at
+CES was a PDF podcast so taking PDF data
+processing it having speakers multiple
+speakers be able to come out in sort of
+a format Gregor we're not coming for
+your job don't
+worry I have used I mean just to I guess
+to name it on like notebook LM obviously
+I've tried that out yeah I was impressed
+but I was also not too worried about my
+job qu exactly and so the way I like to
+think of this one and I think I think
+you know we all sort of touched on it
+and even the CV blueprint covers this is
+this is another one of those use cases
+where how can I take masses amounts of
+data and summarize it and structure it
+in a specific way we happen to choose
+podcast but it could be any structure
+and I think that's a very common task
+for us humans especially as the world
+continues to grow and data continues to
+grow and we want to absorb and learn as
+much as we can these types of tools I
+think have just endless amounts of you
+use cases so that one's been really
+popular I'm going to you know it just
+it's only been out for a couple of weeks
+we've had thousands of you know people
+going to it and testing it out so it'll
+be interesting to see what comes out of
+of those you know initial development
+efforts there that's really fun and
+exactly just sort of going back to I
+guess this sort of talking about
+reception and contributing back Etc can
+you maybe just speak to I mean there's a
+repo there I've seen like a lot of
+people forked it how do you sort of
+class from a sort of Open Source Point
+of View yeah I think we want to make
+blueprints Alan said it well we want to
+make them open and available you know
+this is a lot of this is stuff that we
+do internally we're using it ourselves
+and we had the same problem and so
+rather than just us doing it and US
+learning from it how can we put it out
+there into the community and we're going
+to continue to evolve These Blueprints
+we're going to continue to learn from
+These Blueprints we love seeing them
+forked and and being used um in other
+ways I think that's great and and you
+know I think one of the big next steps
+is is opening that up to the ecosystem
+there are incredible Partners out there
+like Lang chain and llama index and crew
+Ai and daily even even some of the mlops
+partners like weights and biases who
+have expertise in this who have
+blueprints that not only include Nvidia
+and and Nim and and and the great work
+we do there but include their own you
+know libraries sdks uh services and so
+being able to create a high
+of recipes for the community I think is
+you know it's just really that's what
+we're trying to do and be as open as
+possible yeah I kind of want to just
+like maybe wrap it up in a little bow
+tie here with like you maybe like
+noticed that we haven't talked that much
+about cyber security specific things and
+it's sort of in a sense uh
+what we do here in Vidia is like we take
+all these amazing Frameworks we build
+out new Frameworks and then we apply
+them to like a multitude of use cases
+right we're not trying to do one
+specific product domain or anything you
+can see like we're all over the place
+with interesting problems we're trying
+to solve and we're sort of we're not
+prescript of like how we think they
+should be solved right it's like we're
+going to give all these tools and all
+these capabilities out there and like
+morphus has sort of started that way
+right it's like well what are these GPU
+acceleration capabilities how can we do
+new things with them to solve cyber
+security problems right hey these LMS
+are out there how can we use them to
+solve cyber security problems and so
+like you know it's that same thing can
+be said for all kinds of different
+domains in in the tech space and you
+know Enterprise space right and so
+that's sort of what we like to do is put
+all this really interesting useful
+Frameworks and then see what people can
+like build with them right we're not
+trying to build the end thing ourselves
+we're just trying to find how people can
+come up with really great and
+interesting solutions to their specific
+use cases cuz I mean at the end of the
+day folks are their own domain experts
+right they they know their problems face
+better than anybody else and so you know
+being able to enabling you to build for
+your own problems and solve them is is
+something we like to do I'm glad you
+brought that out because I did want to
+kind of just come back so to speak to
+kind of the security part of this and I
+I think to me even it was a little bit
+sort of almost surprising to sort of
+learn that Nvidia was looking at
+security full stop so how might we sort
+of I mean you you've sort of I guess
+summarized it there about you know how
+might we see Nvidia evolve in the future
+from a sort of security standpoint I
+mean I liked that the blueprint this one
+specifically you mentioned that of it
+actually came from like an internal
+paino of how do we solve our own
+container cve munging yeah and half of
+the best products in the world come from
+people trying to solve their own
+problems so can we expect to sort of see
+more maybe outward facing security I
+don't know products or like I don't know
+gpus that are almost like designed with
+this use case in mind I'm I'm curious
+how that looks yeah I mean there's so
+many cyber security specific use cases
+that are big problems and you know you
+can solve them a lot of different ways
+yeah we're continuing to just see what
+we can do with like the morphe SDK and
+with Gen and like essentially trying to
+get this sense of there's been a shift
+here where we're you know instead of
+thinking about like you're making an
+application you're more of a a gentic
+system application right
+and so we're sort of me like
+internalizing that shift a lot and
+seeing you know how can we uplevel that
+kind of capability to like a wider
+audience so you don't necessarily need
+to be like uh you know some hardcore Dev
+person but like blueprints is like it's
+a good starting point for you to kind of
+take advantage all this agentic AI stuff
+so continuing to do that and then
+there's there's always graph which is
+something that is like super powerful
+but always kind of gets like pretty be
+back a bit there's some amazing graph
+capabilities within Rapids and that
+we're working around the cyber security
+space but yeah we're just sort of a lot
+of Applied research that we're doing in
+morph's tide yeah and just to make a
+make a point on that one is you know we
+don't want to be a cyber security
+solution provider you're not going to
+see Nvidia up there competing in that
+space we are an AI company we under we
+love AI we're excited about it we've got
+a lot of experience in it so what we
+want to do is bring AI to cyber security
+providers to cyber security problems to
+things like that so I think just to you
+know I don't want to confuse people to
+say hey Nvidia they're they're diving
+into the cyber security space no we we
+really we're we're focused on AI and
+where it can help and and whatever those
+problems are and cyber security just
+happens to be one of the the great ones
+that we can we can help with someone
+came up with a phrase the other week
+saying sort of you know the future or at
+least 2025 looks more like it's not
+software as a service but it's Service
+as software I think that's kind of a
+good way to think about it which is sort
+of solving slightly more specific
+problems in a in a very deep way whether
+it's for a specific Enterprise or maybe
+a group of companies but sort of not
+this sort of blanket one tool fits all
+for and I feel like this is a very good
+example of this where again cve
+remediation has many different contexts
+am I remediating from a external attack
+surface point of view am I remediating
+it for internal container point of view
+I would want very different results
+based on that so I think this definitely
+lean leans into that way of thinking
+just as we wrap up I always like to sort
+of ask uh guests just a couple of kind
+of questions the main one I I like to
+ask is knowing what you know now if you
+could sort of tell yourself in at so
+start of your career what would you tell
+yourself I'll jump in on that one I
+would tell myself you can learn anything
+you know as somebody who doesn't have a
+traditional technology background to now
+having been you know in in technology
+for a long time but been in aidia 10
+years there are things I have learned
+that I never realized I could and would
+never have bet on but I think as long as
+you stay open and keep learning there's
+no telling where you can go so that's
+that's what I would have comforted
+myself that there's nothing that you
+really can't just learn yeah love that I
+was thinking this morning I was on the
+bike this morning and thinking yeah it's
+just about so long as someone knows how
+to learn then possibilities are endless
+so I like that a lot Alan what about you
+it's hard to top that I mean if you're
+working inid it's kind of you have to
+right the amount of different and new
+things I've had to learn every couple of
+years and just not out of like necessity
+but out of just like curiosity right
+because it's like wow that's neat like
+how far does that go you just got to be
+open to that and adaptable to it even as
+I'm getting a little bit older and I'm
+like you know getting a little bit more
+grumpy about ah this new thing came out
+do I have to learn it or not you start
+getting a sick sense of like if you've
+been in technology Place long enough
+where like no no there's a thing this
+this one has a thing to it right and so
+this this AI stuff I mean yes very hyped
+but like there's a thing there and it's
+kind like Weir sometimes it's easy to be
+very jaded about this Tech stuff but
+like sometimes it's also good to take a
+break and pause and like real like this
+is like kind of magic like it really is
+Magic like I mean I was thinking about
+Star Trek the other day and how you know
+before they were like oh iPads you know
+they're little pads right you're like oh
+they're so futuristic and now like oh
+they look clunky you know and then but
+I'm like oh that's so funny the tech
+looks and then I was like uh talking to
+the computers and like you'll just
+magically make a thing like that's never
+going to happen and now I'm like that
+could they're doing that right now I'm
+like huh so yeah it's like it's pretty
+magic right what what stuff is uh able
+to be done right now so on some level
+just be open to it and yeah stay curious
+definitely yeah know I mean I can
+identify with that you know there was a
+phase you know where JavaScript
+Frameworks s a dime a dozen and I think
+my learning capacity just kind of like
+tanked at that point I was like yeah
+this is difficult this is really
+difficult to get excited or or even
+think about learning and then as you say
+like things evolve and luckily that's
+that phase went by and and now we're
+here and again my learning kind of
+enthusiasm is just like rocketed so I
+couldn't agree more with that look it
+has been again such a V to have you both
+join software engineering today just
+again as a recap where's the best place
+for you know a developer just to to head
+to kind of get stuck in go to build.
+nvidia.com that's their starting point
+we've got all the latest models on there
+we've got These Blueprints that you can
+go and explore and then your journey
+just starts there we'll give you the
+notebooks you can start running and
+hopefully you'll have your application
+going in no time awesome well thank you
+again and yeah hope we get to catch up
+again in the future thanks so much
+thanks
+[Music]

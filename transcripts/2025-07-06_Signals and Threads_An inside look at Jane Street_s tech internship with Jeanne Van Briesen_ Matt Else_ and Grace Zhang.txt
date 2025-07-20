@@ -1,0 +1,1923 @@
+# Podcast Transcript
+# Show: Signals and Threads
+# Episode: An inside look at Jane Street's tech internship with Jeanne Van Briesen, Matt Else, and Grace Zhang
+# YouTube URL: https://www.youtube.com/watch?v=V06-rpAllKg
+# Downloaded: 2025-07-19 20:58:03
+
+[Music]
+welcome to signals and threads in-depth
+conversations about every layer of the
+Tex stack from Jane Street I'm Ron
+Minsky so this time we're going to do
+something a little different than our
+usual episode instead of digging in deep
+with one person talking on on one
+focused technical topic we have a few
+people here today and the topic is a
+general one which is we're going to talk
+about Jan Street's internship uh and so
+we have three people who know a lot
+about it they've all gone through the
+internship before Grace Yang Jean Van
+brezen and Matt Ells and we're going to
+talk with them about what their
+experience was like both at the time of
+the internship and also how that
+transitioned to being a full-tim here
+how that worked so to start with let's
+have you guys all introduce yourselves
+and tell us a little bit about where
+you're from and where you guys are now
+yeah of course I'm Grace I just
+graduated from Harvard this past may I
+studied CSN statistics at school and I
+just joined Jane Street full-time pretty
+soon after grad graduation I am a
+software developer on rev which is also
+a team that I interned on last summer so
+I am back in the Jan Street New York
+office full-time um and excited to be
+back since I'm also from New York
+originally although these days not quite
+the same notion of office as we used to
+have that's right perhaps you don't
+really get the feel of uh the difference
+between the New York and London offices
+so much these days yeah I'm Matt else I
+work in the London office and I
+graduated from Cambridge in 2019 and
+started as a full-timer around September
+2019 after interning in the summer of
+2018 I now work in a team in trading
+systems where I've worked since I
+started as a full-timer and I'm Jean um
+I graduated from carnegi melon about a
+year ago I interned two years ago now
+and I currently work on a team called
+RFQ Dev uh so Jean how did you hear
+about Jane Street I heard about Jane
+Street through Cary melon's functional
+programming class people would always
+ask questions like oh when is functional
+programming going to be useful and then
+they would say oh but don't say Jane
+Street because we know they're the only
+one who uses functional programming it
+sounded like you said Carnegie melon's
+functional programming class as opposed
+to Carnegie melon's functional
+programming cult well the functional
+programming cult sort of originates from
+the functional programming class maybe
+um yeah CMU has quite a big programming
+languages group and quite a few
+functional programming classes and
+there's a lot of hype for functional
+programming there I was one of those
+people who both bought into the hype and
+was perpetuating hype in fact you you
+literally taught a class called hype for
+types if I remember correctly this is
+right yeah that class is still going on
+now so there have been three generations
+of instructors now so still going strong
+so yeah so applying to Jane Street was
+really a no-brainer for me is it was a
+place that was known for doing
+functional programming okay great I feel
+like that you you act as an effective
+representative of a a small but
+important set of people who apply to jam
+street because of an unhealthy interest
+in functional programming Grace how
+about you so Harvard also has a
+functional programming class but we just
+have one that was definitely like I
+think a good start to spark my interest
+in functional programming and Ron also
+came to gave like a short talk on using
+o camel in the real world which was
+actually pretty cool because that was
+certainly a question a lot of us had
+coming into the course I eventually got
+to know Jane Street through Insight
+which is Jane Street's program for women
+in stem there different tracks uh so I
+did the dev track at insight and it's
+pretty cool because I think it gave you
+a good sense of what it's like to work
+at Jane Street and work with the people
+at Jane Street Insight is like a like
+weak long program where they bring you
+to the Jan Street New York office and
+you go through something like an no
+camel boot camp where you do different
+exercises to kind of learn about o camel
+and get a taste of the kind of work that
+we do here at Jane Street and I thought
+that was really cool I really enjoyed
+working with the people at insight and I
+felt like I got to see a lot of the
+culture at Jane Street which was really
+exciting I applied to Jane Street to be
+an intern last summer and I'm now back
+full-time by the way now that you're
+you're here fulltime have you gotten
+involved in Insight from the other side
+yeah that's pretty cool so Insight I
+think is during January so we haven't
+quite done it yet but I I will be
+helping out with InFocus and I've also
+helped out with some of the other
+programs so it's pretty exciting to be
+on the other side of things because I
+think these programs are really
+important and really help spark an
+interest right and when you say these
+programs these are like various kinds of
+Outreach programs essentially Insight is
+aiming for reaching out to women there
+are some that are aimed for trying to
+get at various non-core schools we have
+over represented from like a small
+number of schools where we get a lot of
+people and trying to Branch out and
+there's some programs we're working on
+for underrepresented minorities so
+there's a bunch of different efforts in
+different directions there yeah y y yeah
+really excited to be part of it great
+Matt how about you yeah so similar to
+both Gan and Grace i' done a little bit
+of functional programming at University
+and I guess unlike Jean The Cult of O
+camel doesn't stretch quite so widely at
+Cambridge but it was certainly something
+that I'd come across and kind of enjoyed
+but the main reason I applied for an
+internship at Jan Street was because a
+friend of mine who at the time was a
+visiting student from MIT had done the
+internship the summer before told me all
+about it told me how much fun it was and
+how interesting it was and generally
+just kind of made me want to apply as
+well and as it turns out we're now both
+full-timers here at Jane Street that's
+great so one thing that immediately
+strikes me from these stories is that
+you guys are a little unrepresentative
+in that you've all had functional
+programming experience and maybe all
+programmed specifically in oaml before
+coming here whereas I think in reality
+if you sample incoming interns a quite
+solid majority I think haven't done any
+functional programming at all which is
+actually a pretty big change from what
+recruiting was like 12 years ago or
+something where I think at that point we
+leaned pretty heavily on hey we program
+in this interesting functional
+programming language so maybe you want
+to come work here uh and now we have
+lots of other ways of attracting people
+and so the functional programming part
+is much less of the thing that brings
+people in the door and indeed I think
+people often think to come work here
+they have to already know a camel which
+is totally not true and in fact people
+sometimes think they should interview in
+O camel which is also almost always the
+wrong idea because there's really a very
+small slice of people for whom o camel
+is the language that they can best show
+what they're good at and people who
+choose to use o camel to please us often
+discover that it is not a very effective
+technique anyway so I wondering if you
+guys could say a little bit more about
+how the internship worked like what's
+the basic structure of the internship I
+guess I can talk about at first uh since
+it's perhaps a little bit fresher on my
+mind than uh for Gina and Matt so I
+interned last summer and I think I
+really enjoyed Jane Street's internship
+structure actually I think that was one
+of the first things that I think I was
+pretty excited about which is Jane
+Street's Dev internship is structured so
+that you can work on two different teams
+and often times there are like two um
+teams that are spread across the firm
+that is really nice so for example I
+worked on the larger like trading
+systems team and also post trade and I
+thought that was pretty cool it kind of
+gives you a better sense of firm as a
+whole and kind of gives you a little bit
+more exposure there it was really nice
+to have been able to intern on two teams
+and also the internship is structured
+like Ron mentioned before so that
+doesn't assume that anyone comes in with
+any uh oam knowledge so the first I
+think week or so of the internship we
+did like an oam boot camp which is a way
+to help people learn the kinds of tools
+and the language that we use at Jane
+Street which I think is pretty exciting
+and it was really cool because you know
+the internship class does it as a whole
+and so it was like nice to start off
+your internship with the rest of your
+class and all go through this together
+that's a lovely thing about the
+internship that I think wasn't clear to
+me until it just kind of happened is how
+nice the community of people who come in
+all at the same time all knowing nothing
+about the organization and about the
+technology and just come to be friends
+with each other and that's I think been
+a very positive experience for lots of
+people over the years for sure that was
+a great way to um introduce us to each
+other and build this internship
+Community I think that's definitely one
+of my favorite Parts as well cuz once
+you finish boot camp all the interns sit
+next to their teams and mentors and so
+you're kind of more spread out but it
+was really nice like I sat close to a
+few different interns and you know
+sometimes when you're super caught up in
+the code you're writing you might forget
+that you have like an intern event
+coming up or something so we always
+grabbed each other to go to the events
+which is great because otherwise I think
+some of us may not have made it to them
+that was really nice and yeah I think
+camel boot camp in general is also
+really a great start to the program
+because your first Mentor is the one
+who's reviewing your code and who's kind
+of working with you
+uh and you go through like the code
+review patterns that you would go
+through once you start on your project
+and so it gives you a good way to get
+settled in your new team how hard did
+you guys find it to acclimate to the
+tools like a side effect of the fact
+that jam Street uses a comically obscure
+programming language is that we have
+also invented a comically large number
+of idiosyncratic tools for working with
+that programming language and I'm
+curious how you guys found it to
+acclimate to a bunch of tools that you
+hadn't used before personally I
+certainly found it kind of a challeng it
+was one of was one of the more
+challenging things of first starting was
+getting used to all of the tools and to
+some extent kind of dealing with all of
+this institutional knowledge that is
+kind of in people's heads that may or
+may not be written down and can be
+sometimes quite challenging to access
+but once you get over this initial
+hurdle of figuring out these tools and
+figuring out how to find out more
+information about these tools it wasn't
+too bad and you kind of adjust to it
+fairly quickly I don't know what you
+guys thought about it I also thought the
+classes that they do for interns like
+the tech classes about our code review
+tool or some of the libraries with a
+steeper learning curve really helped us
+get on board better than maybe just
+doing our projects would have yeah I
+think over time we've realized that we
+needed to build more of a kind of formal
+education program it's one of these
+things where we built out formal
+education programs in stages I think the
+first one we built the program that was
+called oel boot camp was initially
+designed primarily for Traders who
+needed to learn how to get comfortable
+the technology that the tech side had
+been building uh and then we repurposed
+that material and started using it for
+teaching interns and started developing
+more material for that purpose and now
+we use some of those same materials and
+in fact a bunch of other stuff that
+we've been developing as part of a
+longer term teaching program for people
+who start full-time in that as the
+organization grows you come to realize
+there's more specialized knowledge that
+becomes valuable to share between people
+and across teams and so it just makes
+more sense over time to build up more of
+that I guess the other thing that you
+have to come to grips with you guys
+haven't talked about yet is the whole
+Finance side of things how well did the
+program prepare you for having to deal
+with projects which are about a subject
+matter that you presumably had no
+experience with before we had lots of
+classes which I think was really helpful
+and we had for example like some Traders
+give an overview of finance and
+economics things like that so I think
+that was really helpful to paint kind of
+broad strokes but I think what was most
+helpful was just that we work very
+closely with our mentor and the teams
+that were're on and I think my mentors
+both did a really great job of providing
+the context to help me understand where
+my project fits in and how it's useful
+for the firm and I think that was very
+valuable and helped me understand the
+motivation for my project and also just
+think about how I would want to design
+it and work on it so maybe this is a
+good time to talk about actual projects
+so can you tell us about one of the
+projects that you worked on as an intern
+yeah of course one of the projects I
+worked on was Jane Street's manual order
+entry system it allows traders to
+manually enter orders into the market
+and has lots of different risk limits
+which is important because you know you
+need to think about the risk of just
+actually sending trades out to the
+market for example like a risk limit
+might be something like you know we
+can't fill more than say X in a day and
+these risk limits are at different
+Scopes so it could be at the user level
+but it can also be at the system level
+and so the state of the world before my
+project was that Traders could easily
+adjust their user limits very quickly
+during the trading day but we were not
+able to adjust our for example system
+level limits very quickly during the
+trading day which is important and
+something that people had been asking
+for because during a busy trading day
+you might need to increase your risk
+limits during the day and in general you
+want to do things quickly but especially
+during like a busier trading day okay so
+that reades something that's maybe worth
+explaining which is this whole idea that
+Traders might just like go and directly
+up their own limits seems kind of odd on
+the face of it you would think if a
+Trader has a limit then they wouldn't be
+authorized to just go past that Li
+but it turns out the way we have our
+risk system set up there are multiple
+different kinds of limits and some of
+them are hard limits that you know when
+you bump up against it that's it and you
+have to get someone else to authorize an
+increase if an increase is necessary but
+there are other limits that have a
+preconfigured number of times that a
+Trader is allowed to essentially bump
+their limits so this kind of limit acts
+more like a speed bump than like an
+absolute barrier on further trading and
+as you said when you hit one of those
+limits it's really important to be able
+to move past it quickly because the time
+when that's likely to happen is exactly
+when trading is busy and therefore when
+trading is at its most valuable yeah
+exactly you're able to increase your
+limits like a configurable number of
+times and we wanted this kind of same
+behavior for limits at other Scopes and
+prior to you doing this work what did
+the process look like when you did need
+to increase those system wide limits
+prior to this someone need to go in and
+actually make a change the way we've
+configured our limits and actually go
+through a process that is basically code
+review so they would need to update the
+limits they need to get it code reviewed
+by someone else they need to then like
+release and apply this actual change
+which is like a slightly slower process
+amusingly our process for changing risk
+limits is exactly the same process that
+we use for modifying code which is not
+obviously the natural thing to do but I
+think over time we came to realize that
+it was in fact more or less the same
+thing and that we have a bunch of
+configuration which is a big technical
+document with precise technical meaning
+that people need to make changes to and
+many years ago the way we did this is
+when different people wanted to propose
+limit changes they would literally like
+an old traditional Linux developer they
+would generate a patch representing the
+change that they wanted to make and send
+that to the trade support people who
+would then manually apply that patch to
+the codebase acting kind of like a human
+version control system and then multiple
+people would do it at around the same
+time cuz things were busy and lots of
+people wanted to do it and if it sounds
+like a nightmare it's because it kind of
+was so now we have this much more
+organized process that looks a lot like
+the code review process which I think
+makes sense for changing the core risk
+limits but you obviously as you said you
+want to have some fast path for simple
+changes and that's exactly the thing
+that you worked on and it was pretty
+exciting because when I came back
+full-time I realized that my old Mentor
+had emailed me basically like my first
+or second day kind of forwarding me an
+email that we a Trader was like today we
+had a really busy day of trading and I
+needed to increase our risk limits
+quickly and I was really excited to be
+able to do so using the project that I
+worked on and that was just super nice
+my mentor was like you know yeah my
+intern worked on it I'll be sure to
+forward it to her when she joins
+fulltime and it was just great to see
+and great to hear from my mentor when I
+got back full-time so a very warm
+welcome back to Jane stade right and
+this highlights I think a lovely thing
+about a lot of the intern projects which
+is interns get to work on real things
+right and a lot of those projects
+actually land not all of them but a lot
+of those projects end up Landing in
+production and I guess this one did yeah
+it was super exciting always good to see
+people are using and benefiting from
+your work Matt how about you can you
+tell us about one of the projects that
+you worked on for the first half of my
+internship I worked in a team called RFQ
+Dev which you might remember from Jean
+talking earlier she now works in there
+as a full-timer so when people think
+about trading shares and ETFs and
+securities in general you probably think
+about sending an order to an exchange
+like the New York Stock Exchange or the
+London Stock Exchange but there are
+other ways of trading that are
+preferable maybe for really large trades
+or for technical reasons where you might
+want to trade directly with a company
+such as Jan Street and so historically
+the way that this would happen is you
+would pick up the phone and call Jan
+Street and say I want to buy Apple let's
+say and Jan Street would say well I'm
+willing to sell you Apple for this
+amount of money there would be some sort
+of back and forth and maybe the trade
+would happen or maybe it wouldn't and
+over time people gradually realized that
+oh it would be kind of useful to be able
+to automate this system and so there was
+this thing called rfqs that were
+developed which is an automated way of
+someone saying I want to buy this thing
+and then sending this request for quotes
+to a whole bunch of different market
+makers and seeing what price they were
+willing to trade for and so jam stre
+developed a way of interacting with this
+automated system that at first involved
+another person at Jan Street responding
+to these quotes and then gradually
+developed into a more automated system
+with risk checks similar to what Grace
+described with her project and just to
+interrupt I think this all highlights
+the fact that trading is way more manual
+than I think people often think fact
+especially people who know about Jam
+Street by paying attention to the
+technical side of their work imagine
+that the entire place is just a bunch of
+people built some algorithms and there
+are people like thinking hard about the
+algorithms during the day and looking at
+the results of week-long experiments and
+then on their way out the door they
+check like oh how much money did we make
+today and like oh my God it is not like
+that at all there's a huge amount of
+judgment and intervention and also just
+stuff that's manual like we have manual
+order entries you just go and directly
+type in exactly what price and size you
+would like to trade at the human just
+makees that decision directly and we
+have lots of things that have human
+involvement and communication and then
+we do a lot of work to automate various
+aspects of this but it's not like we
+want to completely get rid of the human
+element the human element and the
+Judgment that comes in there is actually
+incredibly important to how we operate
+yeah definitely this is something I
+probably didn't realize before I started
+at Jane Street was the amount of human
+interaction that's involved you still
+have lots of people making trades over
+the phone especially for big trades and
+you have people making manual trades and
+making tiny manual adjustments to
+trading systems throughout the day but
+anyway so we have all of this automated
+infrastructure for doing this trading
+directly with counterparties but still a
+lot of this trading happens over the
+phone and so we built all of this
+automated infrastructure so we at some
+point decided that we were going to add
+a way that a sales Trader who's on the
+phone with the C party could ping our
+automated system and say right how much
+would we normally trade this for if it
+was on the automated system and then
+they have a number that they can base
+their trade on right essentially a chat
+system almost which lets the sales
+Trader understand where the automated
+systems are willing to buy and sell and
+use that to inform their own trading
+yeah exactly and so there's a sort of
+implicit risk check here that you have a
+human interacting with the trade in the
+middle but this didn't use the same
+automated risk checks that we had for
+the automated to trading just because
+there was kind of no need to because we
+have a human who is thinking about this
+trade in the middle but at some point we
+realized that it seems kind of silly to
+have all of these risk checks and then
+not use them for this one weird case and
+so the project that I was doing was to
+make these manual requests to the system
+behave more like automated requests as
+though they were coming from a
+counterparty over some automated system
+as a result we would get all of these
+fancy risk checks for free so basically
+what you're doing is taking there's a
+system which had two different kinds of
+requests one for fully automated one
+that was just kind of providing
+information to a sales Trader and take
+the RIS system that apply to just part
+of it and apply to the whole thing in
+some sense that sounds relatively simple
+I'm curious what were the interesting
+and challenging parts of that as a
+project I think for me getting my head
+around all of this complex
+infrastructure that took me like 5
+minutes to just describe after I've
+spent a year working here and kind of
+have some background it was getting my
+head around all of this financy stuff in
+the space of a few weeks because you
+spend two weeks learning o camel and
+then immediately you are working on this
+project about something that's
+completely opaque to you and this was a
+pretty big challenge to me and it took a
+lot of input and discussions with my
+mentor who was really helpful and really
+willing to answer questions for me to
+just get my head around what on Earth
+are these things called rfqs and why do
+I care about them effectively why does
+Jane Street care about them I suppose
+and so whatever technical difficulties I
+had were kind of dwarfed by just getting
+my head around the basic concept of of
+what I was working on the other thing
+that strikes me about actually both your
+and Grace's project is that they're both
+working on risk systems which could make
+you a little nervous of like you know
+have a couple of no offense no nothing
+kids out of school who are coming and
+working on oh that's an underst
+understatement yeah you're right working
+on some pretty core things that are
+really important to the safe workings of
+the business and I think in part this is
+just a story about the approach that we
+have towards essentially the kind of
+quality control aspects of how we build
+software which is there's this very very
+intense code review process where the
+people who are reading and approving the
+code the process involves them really
+deeply understanding what's going on
+it's not like you throw up a patch and
+they're like looks good to me and
+approve it no they are reading through
+carefully often rewriting various pieces
+of it giving detailed feedback on
+various parts to the point where the
+person who reviews the code often feels
+like a second author rather than being
+just someone who kind of looked it over
+and checked that it was okay a nice
+advantage of this system is it gives you
+a way of taking people who don't have
+that much context and don't have that
+much experience and letting them work on
+a wide variety of different places
+including places that are quite critical
+yeah this this is something I've
+particularly noticed since I've been a
+full-timer that this code review process
+where someone is effectively
+co-authoring your patch for a particular
+library or a particular application can
+teach you quite a lot in the process of
+doing code review which I found really
+useful yeah I think of this as like one
+of the key advantages that a company
+like ours has over academic institutions
+in terms of teaching people a
+technological concept which is this kind
+of intense High investment thing that
+you do where an experienced person works
+with a more Junior person and works very
+closely with them and gives this very
+detailed feedback it's a kind of thing
+that from a cost structure point of view
+you can't do in an academic context but
+it totally makes sense because the
+people who come and join are very close
+to being very useful and so it really
+rewards your investment in them and you
+can teach people stuff really fast and
+and I think that teaching works well
+when you have someone who's very new to
+the organization but actually is a way
+that as time continues and you hear for
+longer you continue to learn a lot from
+people through the process of code
+review at least that's been my
+experience so Jean we haven't gotten to
+you yet can you tell us something that
+you worked on while you were an intern
+yes so for my second project of the
+summer I worked on the tools and
+compilers team working on a library
+called inkom which is Jane Street's
+library for building Dynamic web apps in
+okl so Jan Street doesn't have a ton of
+external facing websites but we use web
+apps as a lot of user interfaces for
+various trading systems and one of the
+things that's very important for web
+apps in general but also especially for
+trading system interfaces is that if
+something changes on your web page you
+don't want to have to render the entire
+web page you know you imagine you have
+like a million cells of various bits of
+information for your trading system you
+don't want to be rendering that every
+time something updates because that
+would be incredibly slow so Ingram is
+built on top of Jane Street's
+incremental Library which is a library
+that handles
+computations that you set up once and
+then when their inputs change they only
+recompute the thing that they need to in
+order to get a new output so in this way
+we managed to avoid doing any extra
+computation that we shouldn't do in
+order to render The View on a web page
+when I started my internship the way
+incom was set up was it had two
+different types of interfaces one was a
+relatively simple interface that most
+web apps used that didn't sort of take
+advantage of the full power of
+incrementality that you could get out of
+this incremental Library so you could
+sort of compute some things
+incrementally but not everything the
+other was a very complicated interface
+sort of an advanced interface that could
+take advantage of sort of the full power
+of incrementality but was more
+complicated to use and at least in my
+impression you only used it if you
+really had to so my project was to take
+these two interfaces and combine them
+into one more usable interface that
+still allowed you to have just as much
+expressive power as the more complicated
+interface full disclosure I I was the
+mentor for this project so I kind of
+know know an unusual amount about this
+one in particular but I'm still curious
+about some aspects of it so one thing
+that strikes me about your description
+is it's very designning right you're
+like oh there are two apis like one of
+them is bad in this way one of them bad
+is the other way come up with one that's
+good I'm wondering how you found the
+process of going from this like fairly
+high level complaint about it to coming
+up with an actual concrete design that
+made sense it was very tricky and also
+very educational I think I had never
+thought about any sort of API design
+before that project maybe like very
+small things at college but really it
+was just not something I had learned so
+it was really very much a learning
+process trying to understand how you
+should design an interface like what
+actually makes a good interface it was
+not what I expected to be doing as an
+intern project I think I sort of
+expected to be told to write some code
+and then to write some code but I
+actually got to think a lot about how
+this was designed so that was way more
+freedom than than I expected and I want
+to be clear when we gave you the project
+I did not know what the right answer was
+it was not like oh yeah we want it to
+look like this and please Jean go ahead
+and make it look like this it was like
+oh this is kind of terrible and we have
+some ideas but we don't really know if
+they're right and I think I had ideas
+that I thought were pretty likely to
+work out and they mostly didn't and you
+ended up doing something pretty
+different from the original Direction I
+was imagining we'd go okay so you got to
+do a bunch of this API design work I
+guess another aspect of your project I
+remember is you got to also work on a
+PPX can you talk a little bit about what
+what a PPX is and how that fit into the
+project so okl has this thing called PPX
+which essentially allows you to extend
+okl syntax there are these little tags
+you can put in the code and then you can
+write some code that will take one piece
+of syntax and transform it into another
+piece of syntax before compilation
+happens and so the particular PPX that I
+got to write was one that made it a lot
+easier to to use like a particular
+commonly used idiom in inom it was
+previously done in a pretty gross way
+that involve raising exceptions and
+stuff like that and the PPX allowed you
+to write it in a way that was much more
+nice and took advantage of some of O's
+good features I think of PPX as
+basically a kind of simple form of
+language extension and we have a bunch
+of PPX some of them for doing things
+like autogenerating comparison functions
+or hash functions for standard data
+types but the kind of PPX you were
+working on are PPX that basically almost
+add Primitives for making certain kinds
+of embedded domain specific languages
+fit more easily and naturally into the
+language so kind of looks more like
+ordinary o camel with a few extra
+special magic annotations indicating
+what's the special thing that you're
+doing in this case and you basically
+added some new magic invocations that
+extended the set of idioms that were
+expressable in this domain specific
+language so what was the process like of
+working on this more compiler like part
+of the system uh it was actually
+surprisingly smooth there's some like
+very good libraries out there that make
+it very easy to do Transformations on
+EML syntax and so I learned how to use
+those and I had worked with abstract
+syntax trees before so I sort of knew a
+little bit of what was going on but
+there were definitely some tricky things
+like getting the source code positions
+to match up properly between like the
+old tree and the new tree and stuff like
+that yeah and and what you're talking
+about here is essentially one of the
+complexities of adding a new syntactic
+construct to a language in this way
+which is to say there's some new bit of
+syntax some syntactic sugar you want to
+add to the language and you do that by
+writing a desugaring function something
+that takes the new syntactic construct
+and desugar it translates it into some
+existing syntax in the language but the
+tricky bit is then when you have an
+error in the desugared version of the
+code you need to translate that error
+back to the original so say your editor
+can point at the right place when you
+have a compilation error and it's all
+too easy to mess up the locations in the
+course of writing the desugaring anyway
+I'm curious what was the process like of
+taking all this work that you did and
+trying to land it in production after I
+wrote the interface and all the code
+behind it and everything like that I
+then did a big tree smash on all of the
+projects that currently use this library
+to convert them to use the new interface
+I basically went through our whole repo
+found every instance where this was used
+and changed it to use the new thing so I
+got to dive into a little bit of every
+single web app that was currently in use
+um and change it up so that it used the
+new interface and yeah it's actually
+still in use today there's a couple of
+successors to it that are sort of built
+on top of the interface that I designed
+but it's still alive and going even now
+so you guys were all interns and now you
+all work full time I'd be interested in
+hearing a little bit more about what
+that transition was like yeah I guess
+the transition was pretty recent for me
+though I did learn that a year is long
+and I have forgotten much um so the
+project that I'd worked on during my
+internship was an options pricing app so
+it prices options for different
+scenarios so for example like if you
+know Apple were to go up by like x% what
+would the price of I don't know this
+option on Apple be and so over my
+internship I worked on a bunch of
+different features and I am back on the
+team that I Ed on so spent a lot of time
+reviewing the code it was very
+interesting when I was like oh I wonder
+who wrote this and then did a quick
+blame and realized I wrote it and I was
+like well I have no recollection of this
+at all yeah this is the process by which
+you learn how important it is to
+carefully document your code and make it
+really clean cuz sometimes there some
+annoying person later is's going to come
+by and have to understand it and that
+annoying person might be you this is
+true after you've forgotten all the
+details for sure it feels like your
+experien is a really good controlled
+experiment in that you worked as an
+intern on a project and then you worked
+on that same exact project project as a
+full-tim so how does that transition
+what's different about being an intern
+versus being a full-timer how do those
+experiences compare I think in some ways
+honestly like an internship is very
+representative of what it would be like
+if you were to work full-time at Jane
+Street I think that's something that I
+liked a lot about the internship at Jan
+Street which was that you know you don't
+necessarily feel like you're an intern
+you know I think it's always really nice
+to feel like you're part of the team and
+you're actively contributing um and that
+you know your ideas are valued and I
+think that really came through in the
+internship term projects feel much more
+scoped out your Mentor probably has a
+pretty good sense of how long these
+things might take and a good direction
+and the probably a sense that you know
+you we can get there eventually I think
+as a full-timer you have more time so
+the things you're working on can have a
+longer timeline and they often can be
+more open-ended and I think that's
+definitely uh come through yeah the sort
+of highlights that that actually picking
+intern projects is actually quite hard
+because you want to pick something we
+legitimately want something that we
+haven't done yet and something that I
+guess the way I like to say it has a
+favorable surface area to volume ratio
+which is to say you don't have to dig
+into a billion other systems just to
+figure out the part that you want to
+write you want there to be a relatively
+meaty piece of code that can be written
+by someone who's pretty new to the
+organization and these different
+properties fight against each other if
+we want it and it's well scoped out and
+it's not incredibly hard to do we've
+probably already done it so you need to
+in some ways look pretty hard to find
+things and I feel like this sometimes
+leans in the direction of intern
+projects that are a little bit more
+ambitious it's a little more speculative
+and we think it's a good idea but it's
+not quite to the top of our priority
+Stacks or we're not totally sure that we
+want it for sure I'm curious for genan
+and Matt how did you find that same
+transition I can definitely agree with
+what Grace said about getting back as a
+full-timer and being like wow there's a
+lot of things that I've forgotten that I
+thought I knew just like relearning all
+of these tools that you got used to as a
+as an intern and suddenly they're kind
+of all foreign and completely new to you
+again is kind of weird and a little bit
+unsettling when you first come back as a
+as a full-timer because you think oh I
+did all of this when I was an intern
+it's going to be easy then you come back
+and it's just like everything I have
+some muscle memory for some emac
+shortcuts that I can remember from when
+I was an intern but that's about it also
+we we've helped by changing a bunch of
+things in the intering year oh yeah
+that's super helpful they are usually
+better when we change them that is true
+that is true a funny thing I I didn't
+come back to the the team that I intered
+on I did come back to the team that Matt
+intered on though oh yeah I didn't go
+back to the team that I interned on
+either so I guess we just kind of
+shuffled around but yeah I'm actually
+currently rolling Matt's intern project
+into production that's amazing so I
+guess this is also a thing that it's
+been so long it's it's it's a little bit
+of a tricky thing to roll into
+production because it requires
+coordination between a lot of groups and
+things like that so it's not surprising
+that it's taken so long right and I
+think it does connect to the fact that
+intern projects for the reasons I
+mentioned before are often chosen to be
+things that are not super super urgent
+because if it was really really urgent
+you probably would have done it already
+have any of you guys been involved in
+picking projects for interns now uh it
+definitely gave me a lot of respect for
+the people who picked my intern projects
+I I went through multiple different
+projects trying to find something that
+was both interesting enough didn't
+require a lot of context and wasn't
+super urgent and also wasn't a web UI
+cuz I guess those aren't allowed for
+interns wait that that's a funny thing
+why aren't webui allowed for interns I
+guess interns don't enjoy writing them
+so we're not allowed to propose webui
+projects which was my first project
+proposal so I had to go then pick
+another project I didn't know we' gotten
+quite to the point of like not allowed
+to propose but I I there's this funny
+bias that I think people come in with
+where they think UI work is somehow low
+class and not interesting and I think
+this is totally insane I think web UI
+are actually super super interesting
+there's often lots of beautiful
+questions around API design and around
+how to appropriately build something
+that both does the task it needs to do
+and presents a useful UI but also does
+it in a way where the code itself is
+easy to understand and extend and not
+likely to have bugs I think in the
+outside world there's a feeling of oh
+yeah we'll just like treat this as a low
+class problem and if there's someone who
+doesn't know anything we'll throw them
+at a web UI and they can't really get
+anything wrong there anyway I do not
+understand why the world has this set of
+views about web UI but it it seems to I
+think inters often come in they don't
+always say it because people are nice
+but people are often like disappointed
+when they're asked to work on this part
+of the infrastructure yeah it's not like
+your intern project at Jane Street is
+going to be like adjusting the padding
+between these two buttons that's right
+webui right like it's going to be
+something more concrete if your whole
+project is modifying CSS I could see why
+you'd be pretty sad about
+it so what did you end up finding one of
+the things that we do when we receive an
+RFQ is we do a whole bunch of validation
+on it to make sure that like the message
+we received is well formed it has all of
+the right fields we have enough
+information to know how to quote it and
+things like that and if we find
+something slightly off about it one
+thing we'll do is we'll freeze it so we
+won't try to quote it until a Trader
+acknowledges that like yes this is safe
+to quote right going back to the
+importance of human involvement in
+decision-making around trading so one of
+the things we wanted to do is we wanted
+to get more information into our UI to
+show to Traders when they made the
+decision on whether or not to unfreeze
+these rfqs and actually allow us to
+quote so one of the things in particular
+we wanted them to be able to see was
+what we would quote if they allowed us
+to quote it and this required a whole
+bunch of changes to a couple different
+systems to sort of reroute things and
+allow us to actually see these quotes
+and so that was going to be the interns
+project it didn't end up happening
+because of covid and I ended up doing
+the project
+but so you didn't get to the end to end
+quite how it worked out right I guess to
+be clear Co caused us not to end our
+internship program but to rearrange it
+pretty seriously and this year we ended
+up instead of having every intern go
+through two teams for mostly because of
+time constraints we ended up having
+interns stay in one team the entire
+summer in this odd circumstance where
+everyone was totally remote in this case
+it was our spring internship where they
+only did one project and then Co hit so
+then we sent them home so I had an
+intern for one day I bet at the end of
+having scoped it out as an intern
+project you had a much better idea how
+to actually get it done yeah it was
+great I'd already thought through the
+whole thing I also wonder how being a
+full-timer feels different in terms of
+the kind of decisions that you end up
+making right I think as an intern a
+plate is set for you we figure out
+what's the thing that you're going to
+work on and why it's important and as a
+full-timer you end up having more to do
+in deciding what's important and
+actually making choices about the
+systems that you're working on it is
+true that you are often making a lot of
+maybe perhaps larger decisions as a
+full-timer but I also want to say even
+as an intern I think I think you also
+have a lot of voice in what you're doing
+and what you're working on and how you
+want to design it I think this is
+something I really liked about Jane
+Street's culture which is that it's
+super openminded and it's very
+collaborative and I think people are
+always interested in what you're
+thinking about and always open to a
+conversation about if you think
+something should be changed or if you
+think something might work differently
+this is definitely true full-time I
+think this was particularly apparent for
+me recently because I'm working on a
+larger project to help deal with the
+load that we're experiencing my previous
+Mentor was the one who knows a lot about
+it and so he's already written up a
+design doc for this and it's interesting
+because so like as a new hire you're
+paired up with a navigator who is
+usually someone on a different team just
+to kind of get another perspective on
+life at Jan Street and to feeli any
+questions you might have and to share
+their experiences and I was talking to
+my navigator he mentioned his intern was
+working on some uh supporting client
+site caching for redis he was saying you
+know maybe you can consider it using
+this I was like that sounds cool and I
+think this is also kind of an example of
+the Cross team collaboration that we
+have at Jan street it's always really
+cool to talk to people and learn about
+things that you didn't really know we
+available before and we had already
+scoped out the previous Library we were
+going to use and we had a sense of it's
+very well supported at Jane Street but
+it did seemed like redus was actually a
+better choice for our use case and once
+I had convinced myself of that I brought
+it up to our team that you know we
+actually have this available as a
+library now and it was really cool
+because everyone was super supportive
+they were like oh I didn't know this was
+available like it sounds really cool and
+there are lots of questions that come up
+especially with newer libraries but they
+were pretty excited about it it actually
+worked out really well and I think this
+is actually the final version we're
+going with this kind of like
+open-mindedness and like collaboration
+is something that I I I really really
+like about Jane stream it's super
+important to have a culture where you
+you basically can talk about technical
+decisions in a way where you can propose
+new ideas and disagree with people and
+that's a positive experience rather than
+one that feels like negative and
+combative so how did you guys end up
+choosing the teams that you're on what
+was the whole process of you know when
+you come in as an intern I think you
+don't have a lot of choice about where
+you end up you kind of find like a good
+spot for you but then when you go from
+from that to fulltime I'm curious what
+the process looked like for you of
+figuring out where you're going to be I
+think I actually just got an email from
+someone in the London office saying this
+is the team we think that you would suit
+quite well here's some details about it
+and here's a tech talk that someone gave
+a few years ago about it let us know
+whether or not you think this would see
+you cuz I end up working in either of
+the teams that I I worked in as a as a
+full-timer partly because one of the
+teams is quite small and I don't really
+know why I didn't end up in the other
+team but I guess for whatever reason it
+made sense to put me in in the team that
+I'm in now and I've really enjoyed it I
+get to work with you Ron so can't
+complain about that can I yeah it's very
+similar for me except for they also said
+like oh and we can also set up meetings
+with like a couple different teams if
+you want to explore other options so I
+ended up doing that and talking to a
+couple of different teams and then
+settling on the team that they
+originally suggested to me so I feel
+like Jan Street after an internship does
+have a good sense of you know what you
+enjoy working on and so the
+recommendations are usually pretty on
+point there I had a very similar
+experience to Jean so like they talked
+about a few different teams I like
+really liked both teams that I'd worked
+on and so definitely it was it was just
+in general a hard decision but I talked
+to a few different teams and the biggest
+thing perhaps was just that you know
+when people on my old team kind of
+popped up on my screen I was like this
+was after I did this team thing talk to
+different teams after Co hit so we did
+this the fully remote team matching
+process exactly the fully remote exactly
+process and so uh when they popped up on
+my screen I was like really excited to
+see them and I think a little bit more
+excited than I thought I would
+be and so I think that was really nice I
+was just I feel like a big part of the
+team you're on is kind of the people
+you're working with and I think I was
+really excited to see them really
+excited to hear you know what they've
+been working on what kinds of projects
+they have available so I I am back on
+the same team these days it's very
+common for people to do lots of
+internships so I imagine you guys have
+all worked at some other technical
+places I'm curious if you have a feel
+for how the Jan Street experience of
+being an intern was different from what
+you'd seen in other spots before I guess
+my previous experience was kind of maybe
+a little bit unusual because I worked at
+the same place for multiple summers in a
+row even before I went to UNI I worked
+there and then worked there after my
+first and second years of of uni and so
+I guess I'd got very used to one
+particular place and and so I wasn't
+necessarily all that plugged into like
+the other interns that were doing
+internships at the same time as me and I
+I guess the big difference for me was
+being part of this like big formalized
+internship program where there were
+events organized and you got to know all
+of the other interns and uh for me this
+was really enjoyable and kind of showed
+me that that that it was kind of nice to
+also find out about different teams in
+the in the organization the place that
+I'd interned at before I ended up
+working in the same place over and over
+again just cuz I knew the people and
+enjoyed it but getting AO opportunity to
+learn about the company was was also
+super cool yeah I interned a pretty big
+company extremely big company before
+coming to Jane Street and I think
+there's there was a very large
+difference in terms of just the size of
+the code base that you work on as an
+intern here versus at my other
+internships vinu's code base is very
+small there's a mere 20 million lines of
+code something like that I never know
+whether to think of that as small or big
+it kind of depends on your perspective
+it seems enormous to me kind of
+terrifyingly large on some level yeah I
+guess only only small by comparison but
+also a lot smaller yeah I guess one one
+thing that I had I had never done at my
+previous internships was start writing
+code in a blank file that was just
+something that never happened I was just
+editing lots and lots of pre-existing
+systems cuz there was just so much code
+that already existed so getting to start
+writing something from scratch was
+pretty cool I would like to think that
+if Jane shs code base grows Again by you
+know another factor of 10 that it would
+still be the case that people would not
+so rarely start brand new files and
+write brand new things like there's
+something about like the kind of modular
+approach to building things there's
+something quite lovely about being able
+to write a program with a very small
+number of dependencies it's like small
+and easy to think about and then you
+take those small easy to think about
+things and compose them into larger
+systems but I wonder if that's purely
+about size or if there's something else
+going on about maybe like the nature of
+the projects or the nature of the kind
+of work in the different spots at least
+I hope as we grow we don't end up into a
+world where one never opens a blank file
+and write something from scratch yeah I
+wonder if it was just the types of
+projects I had there versus here there
+seemed to be a lot more freedom to the
+projects at Jan Street than at my
+previous internship I think the need to
+build completely new things continues on
+and is a is a pretty big part of work so
+like Matt for example maybe it's worth
+talking a little bit about the zero
+project that you're working on now
+that's like an interesting example of
+like a totally brand new thing yeah
+basically the goal of zero fundamentally
+it's a way of specifying protocols that
+you might use to talk between two
+different apps so similar to how you
+might use rpcs basically a good example
+for someone from not our world like
+things like Proto Buffs it's similar to
+Proto Buffs it's very heavily inspired
+by Captain Proto which is it's solving
+slightly different problem in fact
+Captain Proto is a is a system for
+representing messages that was written
+by the guy who wrote at Google one of
+the earlier versions of protuff so the
+guy named Kenton V if I remember
+correctly that sounds right yeah so so
+basically I think yeah the the the easy
+way for people to think about this is to
+think about Proto Buffs which is
+probably the thing that people are most
+likely to have come across and so the
+goal of zero is to solve this problem of
+have two different applications maybe
+they're running the same version maybe
+they're running different versions and I
+would like them still to be able to talk
+to each other without too much faf of
+kind of converting between different
+versions or like a lot of bookkeeping or
+maybe a lot of runtime code to move
+things around and figure out what data
+should have been there and so so it
+solves this problem of having two apps
+that maybe have different ideas of what
+a protocol looks like maybe because
+you've added a field to something or
+maybe you've added another message to
+your RPC and it also wants to do this in
+an efficient way that lets us represent
+really complicated structures in a way
+that is still fast to use specifically
+in camel but I think most of the
+performance improvements made by zero
+would also kind of be applicable in
+other programming languages and there
+are a whole bunch of like clever things
+that I can't claim credit for that
+basically allow us to do this process of
+adding new fields to a message and
+maintaining backwards compatibility and
+I've been here at Jan Street for about a
+year and a month or so now I've
+gradually been able to get more and more
+involved in this project to the point
+that now I'm the main person working on
+most of the new functionality that we
+need to get this project out into the
+world of chain Street and used more
+widely which is really cool yeah it's a
+project that exemplify some of the
+things that Grace was talking about
+about connections between teams right
+because there's a lot of problems you
+need to solve for this effectively you
+need an efficient way of representing
+messages on the wire and nice apis for
+interacting with those messages and so
+that's involved a lot of collaboration
+with the market data team with a system
+they have for generating nice apis for
+efficiently dealing with messages of
+various different layouts there's lots
+of brand new pieces of code to write
+following what jean said so for example
+writing brand new pieces of code one of
+the things that you did when you started
+was you wrote the PPX this kind of
+syntactic level language extension to
+make it nice and easy to specify in O
+camel messages in this format there's
+also other interesting technical
+challenges around having the
+specification language of how messages
+work and being able to do compatibility
+checks between different layers lots and
+lots of brand new stuff that needs to be
+written and at the same time you also
+want to take this thing and then
+integrate it into real live existing
+software code bases so it's not like
+everything is writing brand new pieces
+of code there's also lots of work
+learning how to live inside of large
+complex code bases so it's it's almost
+like there are kind of two separate
+challenges there's this challenge of
+like writing a ton of code in the first
+place and it's also like making that
+live kind of nicely in this like broader
+ecosystem of things already exist and
+integrating it into things that we want
+to use it and this is my challenge for
+what I'm currently working on in the
+next few months I suppose I think one of
+the interesting differences between
+those two kinds of work of like building
+new things and working on extending
+existing things is that there's a
+different kind of problem of integrating
+with other people right for new things
+you have to figure out how to convince
+people to use your shiny new thing and
+how to solve the problems that they
+don't even necessarily know that they
+have yet and with existing things
+there's a lot of work that you need to
+do to go out and talk to to people and
+gather their understanding of the world
+and what they think is important and
+prioritize the 60 million different
+things that they want from you and
+figure out from that enormous list the
+three things you actually have time to
+do there's always that painful
+difference between how much people want
+and how much you can actually provide
+yeah and and also we want to make sure
+that we're not just writing this code
+really quickly and then we're going to
+need to go back and change it in three
+months or something because we realize
+we've done it wrong so we're putting a
+lot of effort into thinking about the
+apis and thinking about the code that we
+write to make sure that we kind of get
+it at least mostly right the first time
+especially because with a protocol
+format we maybe can't go back and change
+it in the future because the whole point
+is that it's backwards compatible and so
+we need to be quite careful about that y
+yeah know versioning is a surprisingly
+tricky corner of the world how much
+experience do you guys have interacting
+with people in non-developer teams and
+kind of trying to understand what their
+needs are like be it Traders or people
+in operations or compliance or whatever
+I talk to Traders every day we have
+several group chats going on constant
+pings what are you talking to them about
+like what's the what's the what do you
+trying to achieve with all of that
+communication often times they'll
+message oh I'm confused about why this
+particular thing happened with this RFQ
+can you explain what went wrong or if
+anything went wrong so sometimes it's
+things like that sometimes it's like
+small feature requests so you know can
+you add this confirmation dialogue to
+the UI in setting up new systems often
+times we'll need to talk to Traders a
+lot to say hey can you help us test this
+out and can you tell us what you want in
+this particular system so I also do a
+lot of that kind of talking so yeah so
+it varies widely sounds like some of
+that is essentially day-to-day support
+and some of that is this process of
+trying to understand what's actually
+important how important do you think the
+communication with Traders is for
+figuring out that kind of bigger picture
+question of like what's the next thing
+that you're supposed to be working on
+yeah I think it's it's definitely
+impossible to figure out what the next
+thing we're supposed to be working on is
+without talking to Traders a lot because
+our app is used for trading we sort of
+need to understand what the priorities
+of different desks are because our app
+is used by a lot of different groups so
+we need to understand sort of what they
+all want what sorts of new trades that
+they want to do that we might need to be
+able to set up and then to sort of
+figure out how to prioritize the
+different needs of everyone and then
+actually start doing them I always found
+prioritization to be kind of like an
+interesting question so I I'd actually
+asked my navigator about this and it
+sounds pretty similar like he works on
+the options desk and I think they work
+very closely with the Traders and he
+described it as kind of like a nice mix
+between balancing the priorities of our
+users and also like having the devs
+think about what are we in the best
+position to do and so I think it's a
+nice mix of creating a shared context
+between the two to like figure out how
+our priorities work out eventually I
+feel like one of the things that that is
+super hard is there there's all this
+questions of balance right on some level
+you want to provide the stream of
+features that your users want and figure
+out what's important to them into the
+organization into the business and move
+things forward there you also want to
+work on things that make you more
+efficient in the short term so places
+where you can clean up technical debt
+improve the architecture of this or that
+piece of the code base and then the
+third thing which I think can get easily
+get lost between those two is sometimes
+you need to think big about large
+changes you can make to how the overall
+system works whether it be something
+like oh we want to you know change
+completely the tooling that we're using
+underneath from you know we used to be
+using you know we were going to use some
+internal tool we're going to switch to
+using redus that's one kind of bigger
+change or we want to build some
+completely new architectural piece like
+Matt's talking about and finding the
+time and space to do those larger things
+that impact not just your team sometimes
+but lots of different teams is another
+thing that's kind of challenging to find
+time for and I think people who are
+helping organizing manage the work I
+think one of the key things is figuring
+out how to build an appropriate balance
+between those different requirements and
+I think it's one of the reasons why it's
+good to have different teams that are
+kind of focused on different areas and
+in different parts of the organization
+there's all sorts of teams that are
+attached to this or that infrastructure
+group or attached to a particular
+trading desk and then there are free
+floating developer teams that are
+serving more broadly large swaths of the
+organization and I think that that
+causes people to kind of pay attention
+to like different areas of the stack and
+it lets people focus on prioritizing
+smaller scopes of the world where it's
+easier to think about what's going on so
+like we also work very closely with the
+infrastructure group risk because they
+have big ideas about what the big pushes
+we want to do are and I think those are
+always those meetings are always really
+helpful because they kind of set like a
+like the broader goal that we're working
+towards um and it's really nice to have
+these conversations because especially
+during remote work because our team at
+least we're we're often times working on
+like coordinated efforts towards like a
+larger goal and it's really nice to be
+able to kind of sync up on what everyone
+is working on and how we're all working
+towards this one bigger push and also to
+hear from risk about the infrastructure
+side of things and like you know the
+motivation behind this and also like you
+know how the different pieces fit
+together so you guys have mostly only
+said nice things about working here are
+there any things you found either as an
+intern or as a full-timer that were like
+challenging that you wish could be made
+easier maybe things about the intern
+program that now that you are on the
+other side of the scale that you're
+interested in seeing if you can make
+better or easier one funny thing about
+the internship is that there is just so
+much going on and we start coding and
+then we're like oh no now there's a
+class or there's a there's a yeah
+there's like a social there's like a
+game like kind of sometimes made it
+difficult to find like a huge chunk of
+time to like just be coding do you think
+we should do it differently should there
+be a little less this is like a personal
+opinion I think maybe some things we
+could do is I like kind of Chunk it up
+so that it's like in all together in one
+block during the day or something like
+that I don't know cuz it was pretty
+spread out because I think like you need
+you need people to kind of run these
+classes so you know they're they're very
+busy their schedules it's hard to
+schedule everyone in I think like it
+could be nice to have like I don't know
+like just be always always it's always
+the classes are always before lunch um
+or like something like that I think it
+just helps us kind of gain some sense of
+like you know consistency throughout the
+day right because like focus is hard and
+important and having stuff scouted all
+around can make that difficult but we
+got very good at context switching uh so
+no worries lesson learn in the
+internship honestly I felt totally the
+opposite I really liked all the like
+scattered breaks throughout the day
+where You' go and change it up and do
+something else like I really liked the
+variety I think I really like the
+programming too I think it's just
+sometimes when you're like really into
+the code then you're like oh that's that
+that's when it hits you I am late to
+this intern
+event yeah I'm I guess I'm going to
+complete it and be somewhere in the
+middle like there are some days where
+it's really nice to have little breaks
+from from from work and there are other
+days where you're like or I just really
+want to do this code let me like I don't
+want to have to wait I have to say I
+feel that way way more as a full-timer
+than I ever did as an intern now I'm
+like please give me a block of time to
+code whereas before I was like oh
+there's so many things it's so exciting
+do you feel like it's hard to find a
+block of time to code now that like as a
+full-timer is that is there is there too
+much in the way of distraction of
+various kinds I think it depends on the
+day if I'm doing like phone into you or
+something then that's kind of fine but
+if it's like a phone into you then 15
+minutes and some other random thing and
+an hour and then another thing it can
+kind of be kind of annoying but it's not
+it doesn't happen too often I would say
+to what degree are are your days full of
+little meetings of various kinds that
+kind of interrupt the flow of the work
+we have meetings sprinkled throughout
+the day also like I think with remote
+work it's just a lot harder to have
+these spontaneous conversations that
+might happen in the office we have like
+an opt-in kind of social every day in
+the morning to like see the other people
+on your rer team but it's like very
+opt-in right so if you're in the middle
+of something and you don't want to break
+that flow you don't have to go to that
+personally I actually pretty big fan of
+having meetings because I think it's
+always interesting to hear about like
+what other people are working on and
+things uh and to talk about kind of
+larger goals but I think it's not the
+worst I do think that we are actually
+pretty good at context switching
+especially with remote work I think
+there's just less distraction going on
+you don't hear all the noises in the
+office I really enjoy the noises in the
+office
+same I missed the I missed the 100% I
+think it becomes very apparent
+especially now that there's like nothing
+going on at home but I think because of
+that I think you wind up actually kind
+of just like sitting there and not
+realizing you've been coding for a
+really long time a lot more than if you
+were in the office so actually
+especially now I think the the meetings
+that break up the day are kind of nice I
+I like it to be the case like you know
+when I finish like a particular thing
+like come to a logical like stop I like
+reassess what I've done and then that's
+when I like you know check to see if you
+know someone's reviewed my code or
+something you know these smaller breaks
+in the day are actually kind of nice to
+have too the hardest thing for me is not
+necessarily around meetings but just
+around like oh suddenly a Trader has
+messaged and I need to do some support
+thing now and context switching between
+those I think is much more tricky
+because they're they're random and not
+planned so that makes it harder to like
+plan things out that's a good point that
+kind of distraction varies a lot between
+teams and roles right there are roles
+where there's like a kind of constant
+overhead of interaction and it's good
+and bad right because it gives you this
+kind of very concrete way
+of hooking into the people who are using
+your software and you learn a lot from
+that and that can be both fun and
+motivating and you learn a lot about
+what's going on in the business and the
+downside is it can make certain kinds of
+focused work harder to get done so you
+need to balance your day and find find
+time for both of those yeah it doesn't
+help that I really enjoy doing those
+tasks so then I just drop everything and
+go do
+them so is there anything else about the
+internship that you guys feel like you
+would you would want to make better
+sounds like we just had a great
+time yeah you guys are clearly too nice
+I've clearly stacked the interview with
+nice
+people I think I think one thing that
+that I would have liked especially early
+on in the internship was like I don't
+know if it's more feedback or more
+encouragement or something like that but
+I was very unsure about like whether I
+was doing my project fast enough and
+stuff like that and there was like a
+designated feedback meeting at some
+point but I felt like it would have been
+helpful to like have more periodic
+updates or something maybe I should have
+just asked for them but I didn't think
+to do that so yeah and I like at the
+scale of the internship there are almost
+no problems to which the solution is the
+interns should just ask for the things
+that they need because people's needs
+are actually really quite commonly
+shared and I think this is actually a
+thing that we're constantly struggling
+to get better at with interns and also
+with full-timers just of like giving
+people enough feedback like I think one
+of the downsides of the friendly and
+collegial environment is that it's it's
+it takes a real kind of effort of will
+for people to think oh I am maning ing
+someone's experience here and I need to
+think about their growth and their
+progress and the fact that they might be
+anxious about the work that they're
+doing and try and give them feedback and
+concretely help them along I think
+people are generically very helpful but
+especially as we grow having people take
+the role of managing other people as
+like a serious and First Class part of
+the job and the internship is among
+other things a large organization scale
+management problem and you know it's a
+thing that as we grown we try and get
+better at but like many of the technical
+things we do it's like a real hard thing
+that takes experience to do well yeah
+this is something I've kind of found
+hard both in the internship and as a
+full-timer is like working with lots of
+smart people who seem to really know
+what they're doing and feeling like you
+know nothing which is kind of reasonable
+because you only just started right but
+like you feel as though you should know
+everything and this is like this is kind
+of stressful I I imagine it's kind of
+similar to to what you you might have at
+University where everyone seems like
+they're really on top of everything and
+in the workplace it's it's kind of
+similar I guess and um
+it kind of takes some getting used to
+and it's almost something like I've kind
+of had to remind myself every so often
+that like learning new stuff is good and
+important and it's not like something to
+be ashamed of yeah impostor syndrome is
+a real thing and it's one of the things
+that has surprised me over time how
+poorly these feelings are correlated to
+how well people are doing like I do not
+think it is the case that that I think
+the people who are doing awesome are
+just as often like worried and concerned
+about what they're doing as people who
+are struggling and I think it's a lot of
+people who have been here for a while
+and responsible for managing other
+people just make this mistake of
+thinking that person's doing great I've
+said some nice things to them and so
+presumably they're fine and that is just
+not how human psychology works right you
+can even you can say the occasional life
+thing to someone about their work and
+feel positively about it and it doesn't
+necessarily translate and you really
+need to take the time and try and get a
+feeling for where people are because
+even if you're just saying nice things
+people will often think oh you're just
+saying that yeah I don't know how to
+solve that I say knowing about impostor
+syndrome doesn't make impostor syndrome
+go away you just believe you're the only
+real impostor that's
+right everyone else just thinks they're
+an impostor I really am yeah in case
+you're wondering none of you are
+imposters I can just give you a he's
+just being nice I'm going to win Among
+Us now yeah he's I was getting Among Us
+Vibes too I'm glad I'm not the only one
+yeah this was something that I I spoke
+to my navigator about similar to what
+Grace um mentioned and and he was like
+oh yeah yeah it's everyone gets this it
+doesn't help but it it's it's nice to
+know that other people
+to all right well this has been
+incredibly fun thank you guys for
+joining me yeah thanks Ron yeah this was
+super fun thanks for having us yeah
+thanks
+Ron you can find a full transcript of
+the episode along with the glossery and
+links to some of the topics we discussed
+at signals andth threads.com this is our
+last episode of the season and we hope
+you enjoyed these conversations half as
+much as we did we don't know what's
+coming next for signals and threads but
+we've got lots of ideas brewing and if
+you have any ideas you want to share
+with us you can reach us at signals and
+threads at Jan street.com so one last
+time thanks for joining us
