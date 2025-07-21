@@ -79,7 +79,27 @@ ollama pull llama3
 
 ## 🎯 Usage
 
-### Interactive Podcast Chatbot
+### 🌐 Web UI (Recommended)
+
+```bash
+# Terminal 1: Start the backend API
+python3 controller.py
+
+# Terminal 2: Start the frontend
+cd frontend
+npm run dev
+```
+
+Then open: **http://localhost:5173**
+
+**Features:**
+
+- 🔍 Semantic search across all podcasts
+- 💬 Interactive chat with selected podcasts
+- 🎨 Beautiful dark theme interface
+- ⚡ Real-time responses with loading indicators
+
+### 💻 Command Line Interface
 
 ```bash
 python3 podcast_rag.py
@@ -91,17 +111,6 @@ Commands:
 - `load filename.txt` - Load a specific transcript
 - `clear` - Clear current transcript
 - Ask questions about the loaded podcast!
-
-Example:
-
-```
-🎙️ Podcast RAG Chatbot
-> load 2025-07-14_Lex_Fridman_Podcast_DHH.txt
-✓ Ready to answer questions about this podcast!
-
-> What did DHH say about Ruby on Rails?
-> What are the main points about AI in programming?
-```
 
 ### Advanced RAG Systems
 
