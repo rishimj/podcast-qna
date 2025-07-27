@@ -304,7 +304,7 @@ def main():
     
     elif args.method == "whisper-api":
         if not args.api_key:
-            print("❌ --api-key required for OpenAI Whisper API method")
+            print("❌ api-key required for OpenAI Whisper API method")
             return
         
         download_from_saved_episodes(args.method, api_key=args.api_key)
