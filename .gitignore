@@ -88,4 +88,93 @@ temp/
 
 # Cost tracking data (keep only in memory/DB)
 cost_data/
-billing_reports/ 
+billing_reports/
+
+# ===== SENSITIVE DATA - NEVER COMMIT =====
+
+# Transcripts (potentially copyrighted content)
+data/transcripts/
+transcripts/
+*.txt
+
+# API Keys and Secrets
+*secret*
+*key*
+*token*
+*credentials*
+config.env
+.env*
+*.env*
+
+# Spotify Auth
+.spotifycache
+spotify_cache/
+.cache-*
+
+# Authentication & Session Data
+*.pem
+*.p12
+*.pfx
+*.key
+*.crt
+*.cert
+session_data/
+auth_cache/
+
+# User Data & Privacy
+user_data/
+personal_data/
+saved_podcasts.json
+top_tracks_*.json
+
+# Database Files (may contain personal data)
+*.db
+*.sqlite
+*.sqlite3
+data/databases/
+databases/
+
+# Embeddings & ML Models (large files + potentially sensitive)
+*.csv
+embeddings_export.csv
+data/exports/
+*.pkl
+*.model
+*.weights
+
+# Email & Communication
+email_logs/
+smtp_logs/
+
+# Backup Files
+*.backup
+*.bak
+*_backup
+backup/
+
+# IDE & Editor Files  
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Cache & Temporary
+cache/
+.cache/
+tmp/
+temp/
+*.tmp
+*.temp
+node_modules/.cache/ 

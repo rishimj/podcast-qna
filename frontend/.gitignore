@@ -28,3 +28,32 @@ __pycache__/
 .env
 venv/
 env/
+
+# ===== SENSITIVE DATA - NEVER COMMIT =====
+
+# Environment variables
+.env*
+*.env*
+config.env
+
+# API Keys and Secrets
+*secret*
+*key*
+*token*
+*credentials*
+
+# User Data
+user_data/
+personal_data/
+
+# Logs
+*.log
+logs/
+
+# Cache
+.cache/
+cache/
+
+# Backup files
+*.backup
+*.bak
