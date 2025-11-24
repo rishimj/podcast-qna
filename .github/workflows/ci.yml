@@ -1,4 +1,4 @@
-name: 🚀 Podcast Q&A CI/CD Pipeline
+name: Podcast Q&A CI/CD Pipeline
 
 on:
   push:
