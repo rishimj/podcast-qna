@@ -13,10 +13,38 @@ import logging
 from functools import wraps
 import time
 
+# ADD THIS: Load environment variables from config file
+def load_config():
+    """Load environment variables from config.env file"""
+    from pathlib import Path
+    # Path to config file (from backend/api/ to config/env/config.env)
+    config_path = Path(__file__).parent.parent.parent / 'config' / 'env' / 'config.env'
+    
+    if config_path.exists():
+        logger.info(f"📄 Loading configuration from {config_path}")
+        with open(config_path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip()
+        logger.info("✓ Configuration loaded successfully")
+        
+        # Log loaded email config (without password)
+        if os.getenv('SMTP_USERNAME'):
+            logger.info(f"✓ Email configured for: {os.getenv('SMTP_USERNAME')}")
+        else:
+            logger.warning("⚠️  SMTP_USERNAME not found in config")
+    else:
+        logger.error(f"❌ Config file not found: {config_path}")
+        logger.info("💡 Please ensure config/env/config.env exists with your SMTP credentials")
+        
 # Import our existing modules
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from search.podcast_semantic_search_complete import PodcastTwoTierSearch
+from search.summarization_service import PodcastSummarizationService
+from search.email_service import EmailService
 from langchain_ollama import OllamaLLM
 
 # Initialize Flask app
@@ -27,13 +55,18 @@ CORS(app)  # Enable CORS for React frontend
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Load environment variables
+load_config()
+
 # Global instances
 llm = None
+summarization_service = None
+email_service = None
 current_sessions = {}  # Store chat sessions
 
 def init_services():
-    """Initialize LLM (search system will be created per request)"""
-    global llm
+    """Initialize LLM, summarization, and email services"""
+    global llm, summarization_service, email_service
     
     try:
         # Initialize LLM
@@ -47,6 +80,35 @@ def init_services():
         logger.info("Testing LLM connection...")
         test_response = llm.invoke("Hello")
         logger.info("✓ LLM initialized")
+        
+        # Initialize summarization service
+        logger.info("Initializing summarization service...")
+        try:
+            # Manually specify the correct database path
+            from pathlib import Path
+            api_dir = Path(__file__).parent  # backend/api
+            project_root = api_dir.parent.parent  # project root
+            db_path = project_root / "data" / "databases" / "podcast_index_v2.db"
+            logger.info(f"🗃️ Using database path: {db_path}")
+            
+            summarization_service = PodcastSummarizationService(db_path=str(db_path))
+            logger.info("✓ Summarization service initialized")
+        except Exception as e:
+            logger.error(f"❌ Failed to initialize summarization service: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            raise
+        
+        # Initialize email service
+        logger.info("Initializing email service...")
+        try:
+            email_service = EmailService()
+            logger.info("✓ Email service initialized")
+        except Exception as e:
+            logger.error(f"❌ Failed to initialize email service: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            raise
         
         return True
     except Exception as e:
@@ -63,8 +125,8 @@ def require_services(f):
     """Decorator to ensure services are initialized"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        global llm
-        if llm is None:
+        global llm, summarization_service, email_service
+        if llm is None or summarization_service is None or email_service is None:
             logger.info("Services not initialized, reinitializing...")
             if not init_services():
                 return jsonify({
@@ -84,7 +146,9 @@ def health_check():
         'timestamp': datetime.now().isoformat(),
         'services': {
             'search_system': True,  # Always available since we create per request
-            'llm': llm is not None
+            'llm': llm is not None,
+            'summarization_service': summarization_service is not None,
+            'email_service': email_service is not None
         }
     }
     
@@ -391,6 +455,158 @@ def get_stats():
         logger.error(f"Stats error: {e}")
         return jsonify({'error': str(e)}), 500
 
+# ========== SUMMARY ENDPOINTS ==========
+
+@app.route('/api/summary/generate', methods=['POST'])
+@require_services
+def generate_summary():
+    """
+    Generate summary for a podcast
+    
+    Request body:
+    {
+        "podcast_id": 1,
+        "force_regenerate": false
+    }
+    """
+    try:
+        data = request.get_json()
+        podcast_id = data.get('podcast_id')
+        force_regenerate = data.get('force_regenerate', False)
+        
+        if not podcast_id:
+            return jsonify({'error': 'podcast_id is required'}), 400
+        
+        # Generate summary
+        start_time = time.time()
+        result = summarization_service.get_or_generate_summary(podcast_id, force_regenerate)
+        generation_time = time.time() - start_time
+        
+        if result['success']:
+            return jsonify({
+                'success': True,
+                'podcast_id': podcast_id,
+                'summary': result['summary'],
+                'cached': result.get('cached', False),
+                'podcast_title': result.get('podcast_title', ''),
+                'generation_time_ms': round(generation_time * 1000, 2)
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': result.get('error', 'Failed to generate summary'),
+                'podcast_id': podcast_id
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"Summary generation error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/summary/email', methods=['POST'])
+@require_services
+def email_summary():
+    """
+    Generate and email summary for a podcast
+    
+    Request body:
+    {
+        "podcast_id": 1,
+        "email": "user@example.com",
+        "force_regenerate": false
+    }
+    """
+    try:
+        data = request.get_json()
+        podcast_id = data.get('podcast_id')
+        user_email = data.get('email', '').strip()
+        force_regenerate = data.get('force_regenerate', False)
+        
+        logger.info(f"📧 Email summary request - Podcast ID: {podcast_id}, Email: {user_email}")
+        
+        if not podcast_id or not user_email:
+            logger.error("❌ Missing required fields: podcast_id or email")
+            return jsonify({'error': 'podcast_id and email are required'}), 400
+        
+        # Validate email format (basic check)
+        import re
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, user_email):
+            logger.error(f"❌ Invalid email format: {user_email}")
+            return jsonify({'error': 'Invalid email format'}), 400
+        
+        # First check if podcast exists
+        search_system = get_search_system()
+        try:
+            cursor = search_system.conn.cursor()
+            cursor.execute('SELECT id, title FROM podcasts WHERE id = ?', (podcast_id,))
+            podcast_check = cursor.fetchone()
+            
+            if not podcast_check:
+                cursor.execute('SELECT id, title FROM podcasts LIMIT 5')
+                available = cursor.fetchall()
+                logger.error(f"❌ Podcast {podcast_id} not found. Available IDs: {[p[0] for p in available]}")
+                return jsonify({
+                    'error': f'Podcast with ID {podcast_id} not found',
+                    'available_podcasts': [{'id': p[0], 'title': p[1]} for p in available]
+                }), 404
+            
+            logger.info(f"✅ Found podcast: {podcast_check[1]}")
+        finally:
+            search_system.close()
+        
+        # Generate summary for email
+        start_time = time.time()
+        logger.info("🤖 Generating summary...")
+        summary_result = summarization_service.generate_summary_for_email(podcast_id)
+        
+        if not summary_result['success']:
+            logger.error(f"❌ Summary generation failed: {summary_result.get('error')}")
+            return jsonify({
+                'success': False,
+                'error': summary_result.get('error', 'Failed to generate summary'),
+                'podcast_id': podcast_id
+            }), 500
+        
+        logger.info("✅ Summary generated successfully")
+        
+        # Send email
+        logger.info(f"📤 Sending email to {user_email}...")
+        email_result = email_service.send_summary_email(
+            to_email=user_email,
+            subject=summary_result['subject'],
+            html_content=summary_result['email_content'],
+            podcast_title=summary_result['podcast_title']
+        )
+        
+        total_time = time.time() - start_time
+        
+        if email_result['success']:
+            logger.info(f"✅ Email sent successfully to {user_email}")
+            return jsonify({
+                'success': True,
+                'message': f'Summary sent to {user_email}',
+                'podcast_id': podcast_id,
+                'podcast_title': summary_result['podcast_title'],
+                'email': user_email,
+                'cached': summary_result.get('cached', False),
+                'sent_at': email_result.get('sent_at'),
+                'total_time_ms': round(total_time * 1000, 2)
+            })
+        else:
+            logger.error(f"❌ Email sending failed: {email_result.get('error')}")
+            return jsonify({
+                'success': False,
+                'error': email_result.get('error', 'Failed to send email'),
+                'podcast_id': podcast_id,
+                'email': user_email
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"❌ Email summary error: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
 # ========== ERROR HANDLERS ==========
 
 @app.errorhandler(404)
@@ -420,12 +636,14 @@ if __name__ == '__main__':
         print("2. Make sure database exists: python podcast_semantic_search_complete.py")
     
     print("\n📡 API Endpoints:")
-    print("  GET    /api/health        - Health check")
-    print("  POST   /api/search        - Search for podcasts")
-    print("  POST   /api/chat          - Chat with podcast")
-    print("  GET    /api/podcasts      - List all podcasts")
-    print("  GET    /api/podcast/<id>  - Get podcast details")
-    print("  GET    /api/stats         - System statistics")
+    print("  GET    /api/health             - Health check")
+    print("  POST   /api/search             - Search for podcasts")
+    print("  POST   /api/chat               - Chat with podcast")
+    print("  GET    /api/podcasts           - List all podcasts")
+    print("  GET    /api/podcast/<id>       - Get podcast details")
+    print("  GET    /api/stats              - System statistics")
+    print("  POST   /api/summary/generate   - Generate podcast summary")
+    print("  POST   /api/summary/email      - Generate and email summary")
     print(f"\n🌐 Starting server on http://localhost:3000")
     
-    app.run(debug=True, host='0.0.0.0', port=3000)
+    app.run(debug=True, host='127.0.0.1', port=3000)

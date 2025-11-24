@@ -178,3 +178,4 @@ temp/
 *.tmp
 *.temp
 node_modules/.cache/ 
+.spotifycache

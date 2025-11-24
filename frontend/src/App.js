@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Send, Mic, Loader2, ChevronRight, Clock, BarChart3, Podcast } from 'lucide-react';
+import { Search, Send, Mic, Loader2, ChevronRight, Clock, BarChart3, Podcast, Mail, FileText, X } from 'lucide-react';
 import axios from 'axios';
 
 const API_BASE = 'http://localhost:3000/api'; // Direct connection to Flask server
@@ -76,6 +76,113 @@ const Message = ({ message, isUser }) => {
   );
 };
 
+// Email Summary Modal component
+const EmailSummaryModal = ({ isOpen, onClose, podcast, onSendEmail, isLoading }) => {
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+
+  const validateEmail = (email) => {
+    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return re.test(email);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setEmailError('');
+    
+    if (!email.trim()) {
+      setEmailError('Email is required');
+      return;
+    }
+    
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    
+    onSendEmail(email);
+  };
+
+  const handleClose = () => {
+    setEmail('');
+    setEmailError('');
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-zinc-800 rounded-lg border border-zinc-700 p-6 max-w-md w-full">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Mail className="w-5 h-5 text-blue-500" />
+            <h3 className="text-lg font-medium">Email Summary</h3>
+          </div>
+          <button
+            onClick={handleClose}
+            className="text-zinc-400 hover:text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        
+        <p className="text-sm text-zinc-400 mb-4">
+          Get a detailed AI-generated summary of "{podcast?.title}" sent to your email.
+        </p>
+        
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-2">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              className="w-full px-3 py-2 bg-zinc-900 border border-zinc-600 rounded-md focus:outline-none focus:border-blue-500 transition-colors text-white placeholder-zinc-500"
+              disabled={isLoading}
+            />
+            {emailError && (
+              <p className="text-red-400 text-sm mt-1">{emailError}</p>
+            )}
+          </div>
+          
+          <div className="flex space-x-3">
+            <button
+              type="button"
+              onClick={handleClose}
+              disabled={isLoading}
+              className="flex-1 px-4 py-2 text-sm bg-zinc-700 hover:bg-zinc-600 rounded-md transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading || !email.trim()}
+              className="flex-1 px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 rounded-md transition-colors disabled:opacity-50 flex items-center justify-center space-x-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Sending...</span>
+                </>
+              ) : (
+                <>
+                  <Mail className="w-4 h-4" />
+                  <span>Send Summary</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 // Main App Component
 function App() {
   const [view, setView] = useState('search'); // 'search' or 'chat'
@@ -88,6 +195,11 @@ function App() {
   const [sessionId, setSessionId] = useState(null);
   const [stats, setStats] = useState(null);
   const [error, setError] = useState(null);
+  
+  // Summary functionality
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   
   const messagesEndRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -187,6 +299,65 @@ function App() {
     setSelectedPodcast(null);
     setMessages([]);
     setError(null);
+    setSuccessMessage('');
+  };
+
+  const handleEmailSummary = async (email) => {
+    if (!selectedPodcast) return;
+    
+    setIsSendingEmail(true);
+    setError(null);
+    setSuccessMessage('');
+    
+    try {
+      console.log('🔍 Sending summary request:', {
+        podcast_id: selectedPodcast.podcast_id,
+        email: email,
+        podcast_title: selectedPodcast.title
+      });
+
+      const response = await axios.post(`${API_BASE}/summary/email`, {
+        podcast_id: selectedPodcast.podcast_id,
+        email: email
+      });
+      
+      console.log('📧 Summary response:', response.data);
+      
+      if (response.data.success) {
+        setSuccessMessage(`Summary sent successfully to ${email}!`);
+        setShowEmailModal(false);
+        
+        // Clear success message after 5 seconds
+        setTimeout(() => setSuccessMessage(''), 5000);
+      } else {
+        setError(response.data.error || 'Failed to send summary');
+      }
+    } catch (error) {
+      console.error('❌ Summary email failed:', error);
+      console.log('📊 Error details:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      
+      if (error.response?.data?.error) {
+        setError(error.response.data.error);
+      } else if (error.response?.status === 404) {
+        setError(`Podcast not found. Please try selecting a different podcast.`);
+      } else if (error.response?.status >= 500) {
+        setError('Server error. Please check that the backend is running and try again.');
+      } else {
+        setError('Failed to send summary. Please check your connection and try again.');
+      }
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
+  const handleShowSummary = () => {
+    setShowEmailModal(true);
+    setError(null);
+    setSuccessMessage('');
   };
 
   return (
@@ -217,6 +388,15 @@ function App() {
         <div className="bg-red-900/20 border-b border-red-800/50 px-4 py-3">
           <div className="max-w-6xl mx-auto">
             <p className="text-sm text-red-400">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Success Banner */}
+      {successMessage && (
+        <div className="bg-green-900/20 border-b border-green-800/50 px-4 py-3">
+          <div className="max-w-6xl mx-auto">
+            <p className="text-sm text-green-400">{successMessage}</p>
           </div>
         </div>
       )}
@@ -308,12 +488,21 @@ function App() {
                     {selectedPodcast?.filename} • Confidence: {Math.round(selectedPodcast?.confidence * 100)}%
                   </p>
                 </div>
-                <button
-                  onClick={handleNewSearch}
-                  className="px-3 py-1.5 text-sm bg-zinc-700 hover:bg-zinc-600 rounded transition-colors"
-                >
-                  Change Podcast
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={handleShowSummary}
+                    className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 rounded transition-colors flex items-center space-x-2"
+                  >
+                    <FileText className="w-4 h-4" />
+                    <span>Email Summary</span>
+                  </button>
+                  <button
+                    onClick={handleNewSearch}
+                    className="px-3 py-1.5 text-sm bg-zinc-700 hover:bg-zinc-600 rounded transition-colors"
+                  >
+                    Change Podcast
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -364,6 +553,15 @@ function App() {
           </div>
         )}
       </main>
+
+      {/* Email Summary Modal */}
+      <EmailSummaryModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        podcast={selectedPodcast}
+        onSendEmail={handleEmailSummary}
+        isLoading={isSendingEmail}
+      />
     </div>
   );
 }
