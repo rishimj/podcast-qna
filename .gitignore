@@ -180,3 +180,6 @@ temp/
 node_modules/.cache/ 
 .spotifycache
 .github/workflows/ci.yml
+
+# Documentation
+docs/

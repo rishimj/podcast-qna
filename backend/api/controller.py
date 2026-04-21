@@ -12,6 +12,10 @@ from datetime import datetime
 import logging
 from functools import wraps
 import time
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent.parent.parent / '.env')
 
 # ADD THIS: Load environment variables from config file
 def load_config():
@@ -45,6 +49,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from search.podcast_semantic_search_complete import PodcastTwoTierSearch
 from search.summarization_service import PodcastSummarizationService
 from search.email_service import EmailService
+from search.corrective_rag import run_corrective_rag, init_rag_resources
 from langchain_ollama import OllamaLLM
 
 # Initialize Flask app
@@ -80,6 +85,17 @@ def init_services():
         logger.info("Testing LLM connection...")
         test_response = llm.invoke("Hello")
         logger.info("✓ LLM initialized")
+        
+        # Initialize corrective RAG resources
+        logger.info("Initializing corrective RAG pipeline...")
+        try:
+            rag_search = PodcastTwoTierSearch()
+            init_rag_resources(search=rag_search, llm=llm)
+            logger.info("✓ Corrective RAG pipeline initialized")
+        except Exception as e:
+            logger.error(f"❌ Failed to initialize corrective RAG: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
         
         # Initialize summarization service
         logger.info("Initializing summarization service...")
@@ -152,7 +168,7 @@ def health_check():
         }
     }
     
-    # Test database connection
+    # Test database + Pinecone connection
     try:
         search_system = get_search_system()
         stats = search_system.get_stats()
@@ -161,6 +177,10 @@ def health_check():
             'podcasts': stats['podcasts'],
             'chunks': stats['chunks']
         }
+        status['pinecone'] = {
+            'connected': True,
+            'vectors': stats.get('pinecone_vectors', 0)
+        }
         search_system.close()
     except Exception as e:
         logger.error(f"Database stats error: {e}")
@@ -168,6 +188,10 @@ def health_check():
             'connected': False,
             'podcasts': 0,
             'chunks': 0,
+            'error': str(e)
+        }
+        status['pinecone'] = {
+            'connected': False,
             'error': str(e)
         }
     
@@ -244,8 +268,7 @@ def list_podcasts():
         try:
             cursor = search_system.conn.cursor()
             cursor.execute('''
-                SELECT id, filename, title, char_count, indexed_at,
-                       CASE WHEN title_embedding IS NOT NULL THEN 1 ELSE 0 END as has_embeddings
+                SELECT id, filename, title, char_count, indexed_at
                 FROM podcasts
                 ORDER BY indexed_at DESC
             ''')
@@ -258,8 +281,8 @@ def list_podcasts():
                     'title': row[2],
                     'char_count': row[3],
                     'indexed_at': row[4],
-                    'has_embeddings': bool(row[5]),
-                    'duration_estimate': f"{row[3] // 150} min"  # Rough estimate
+                    'has_embeddings': True,
+                    'duration_estimate': f"{row[3] // 150} min"
                 })
             
             return jsonify({
@@ -338,20 +361,6 @@ def chat():
         if not podcast_id or not message:
             return jsonify({'error': 'podcast_id and message are required'}), 400
         
-        # Get podcast content
-        search_system = get_search_system()
-        try:
-            cursor = search_system.conn.cursor()
-            cursor.execute('SELECT title, content FROM podcasts WHERE id = ?', (podcast_id,))
-            result = cursor.fetchone()
-        finally:
-            search_system.close()
-        
-        if not result:
-            return jsonify({'error': 'Podcast not found'}), 404
-        
-        title, content = result
-        
         # Get or create session
         if session_id not in current_sessions:
             current_sessions[session_id] = {
@@ -361,33 +370,14 @@ def chat():
         
         session = current_sessions[session_id]
         
-        # Build conversation history
-        history_str = ""
-        for h in session['history'][-5:]:  # Last 5 exchanges
-            history_str += f"Human: {h['human']}\nAssistant: {h['assistant']}\n\n"
-        
-        # Create prompt
-        prompt = f"""You are a helpful assistant for answering questions about podcasts based on their transcripts.
-
-IMPORTANT INSTRUCTIONS:
-- Answer questions based ONLY on the podcast transcript provided below
-- Quote relevant parts from the transcript when answering
-- Be specific and accurate
-- The podcast is titled: {title}
-
-PODCAST TRANSCRIPT:
-{content}
-
-CONVERSATION HISTORY:
-{history_str}
-
-CURRENT QUESTION: {message}
-
-Please answer the question based on the podcast transcript above."""
-        
-        # Get response from LLM
+        # Run corrective RAG graph
         start_time = time.time()
-        response = llm.invoke(prompt)
+        rag_result = run_corrective_rag(
+            query=message,
+            podcast_id=podcast_id,
+            history=session['history'][-5:],
+        )
+        response = rag_result["generation"]
         response_time = time.time() - start_time
         
         # Save to history
@@ -400,8 +390,13 @@ Please answer the question based on the podcast transcript above."""
             'response': response,
             'session_id': session_id,
             'podcast_id': podcast_id,
-            'podcast_title': title,
-            'response_time_ms': round(response_time * 1000, 2)
+            'podcast_title': rag_result.get('podcast_title', ''),
+            'response_time_ms': round(response_time * 1000, 2),
+            'rag_info': {
+                'used_fallback': rag_result.get('used_fallback', False),
+                'nodes_visited': rag_result.get('nodes_visited', []),
+                'relevant_chunks': len(rag_result.get('relevant_docs', [])),
+            }
         })
         
     except Exception as e:
@@ -437,17 +432,17 @@ def get_stats():
         return jsonify({
             'database': {
                 'total_podcasts': stats['podcasts'],
-                'podcasts_with_embeddings': stats['title_embeddings'],
                 'total_chunks': stats['chunks'],
-                'embedded_chunks': stats['embedded_chunks']
+            },
+            'pinecone': {
+                'total_vectors': stats.get('pinecone_vectors', 0),
             },
             'sessions': {
                 'active': len(current_sessions),
                 'total_messages': sum(len(s['history']) for s in current_sessions.values())
             },
             'system': {
-                'search_ready': stats['title_embeddings'] > 0,
-                'embedding_coverage': round((stats['embedded_chunks'] / stats['chunks'] * 100), 1) if stats['chunks'] > 0 else 0
+                'search_ready': stats.get('pinecone_vectors', 0) > 0,
             }
         })
         

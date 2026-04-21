@@ -1,0 +1,722 @@
+[
+  {
+    "query": "container security with AI",
+    "expected_podcast_id": 1,
+    "podcast_title": "Software Engineering Daily NVIDIA s Agentic AI for Container Security with Amanda Saunders and Allan Enemark",
+    "query_type": "topic"
+  },
+  {
+    "query": "Amanda Saunders NVIDIA",
+    "expected_podcast_id": 1,
+    "podcast_title": "Software Engineering Daily NVIDIA s Agentic AI for Container Security with Amanda Saunders and Allan Enemark",
+    "query_type": "person"
+  },
+  {
+    "query": "agentic vulnerability scanning",
+    "expected_podcast_id": 1,
+    "podcast_title": "Software Engineering Daily NVIDIA s Agentic AI for Container Security with Amanda Saunders and Allan Enemark",
+    "query_type": "concept"
+  },
+  {
+    "query": "secure docker containers fast",
+    "expected_podcast_id": 1,
+    "podcast_title": "Software Engineering Daily NVIDIA s Agentic AI for Container Security with Amanda Saunders and Allan Enemark",
+    "query_type": "casual"
+  },
+  {
+    "query": "using AI for cybersecurity",
+    "expected_podcast_id": 1,
+    "podcast_title": "Software Engineering Daily NVIDIA s Agentic AI for Container Security with Amanda Saunders and Allan Enemark",
+    "query_type": "vague"
+  },
+  {
+    "query": "life of developers today",
+    "expected_podcast_id": 2,
+    "podcast_title": "SED News Corporate Spies Postgres and the Weird Life of Devs Right Now",
+    "query_type": "topic"
+  },
+  {
+    "query": "Sean Falconer podcast",
+    "expected_podcast_id": 2,
+    "podcast_title": "SED News Corporate Spies Postgres and the Weird Life of Devs Right Now",
+    "query_type": "person"
+  },
+  {
+    "query": "Snowflake Databricks news",
+    "expected_podcast_id": 2,
+    "podcast_title": "SED News Corporate Spies Postgres and the Weird Life of Devs Right Now",
+    "query_type": "concept"
+  },
+  {
+    "query": "how are devs working now",
+    "expected_podcast_id": 2,
+    "podcast_title": "SED News Corporate Spies Postgres and the Weird Life of Devs Right Now",
+    "query_type": "casual"
+  },
+  {
+    "query": "corporate spies and tech news",
+    "expected_podcast_id": 2,
+    "podcast_title": "SED News Corporate Spies Postgres and the Weird Life of Devs Right Now",
+    "query_type": "vague"
+  },
+  {
+    "query": "nicotine addiction and mental health",
+    "expected_podcast_id": 3,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg ICE Raids LA Riots Strong Economic Data Politicized Fed Iran War with Tucker Carlson",
+    "query_type": "topic"
+  },
+  {
+    "query": "Chamath Sacks on nicotine patches",
+    "expected_podcast_id": 3,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg ICE Raids LA Riots Strong Economic Data Politicized Fed Iran War with Tucker Carlson",
+    "query_type": "person"
+  },
+  {
+    "query": "Zen-like relaxation with nicotine",
+    "expected_podcast_id": 3,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg ICE Raids LA Riots Strong Economic Data Politicized Fed Iran War with Tucker Carlson",
+    "query_type": "concept"
+  },
+  {
+    "query": "what are nicotine patches like to use",
+    "expected_podcast_id": 3,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg ICE Raids LA Riots Strong Economic Data Politicized Fed Iran War with Tucker Carlson",
+    "query_type": "casual"
+  },
+  {
+    "query": "addiction and mindfulness in modern life",
+    "expected_podcast_id": 3,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg ICE Raids LA Riots Strong Economic Data Politicized Fed Iran War with Tucker Carlson",
+    "query_type": "vague"
+  },
+  {
+    "query": "White House funny videos",
+    "expected_podcast_id": 4,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg 12 Day War Socialism Wins in NYC Stocks All Time High AI Copyright Science Corner",
+    "query_type": "topic"
+  },
+  {
+    "query": "Mark Ruto NATO",
+    "expected_podcast_id": 4,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg 12 Day War Socialism Wins in NYC Stocks All Time High AI Copyright Science Corner",
+    "query_type": "person"
+  },
+  {
+    "query": "NATO summit party",
+    "expected_podcast_id": 4,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg 12 Day War Socialism Wins in NYC Stocks All Time High AI Copyright Science Corner",
+    "query_type": "concept"
+  },
+  {
+    "query": "fun podcasts to listen to",
+    "expected_podcast_id": 4,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg 12 Day War Socialism Wins in NYC Stocks All Time High AI Copyright Science Corner",
+    "query_type": "casual"
+  },
+  {
+    "query": "podcasts about pop culture and politics",
+    "expected_podcast_id": 4,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg 12 Day War Socialism Wins in NYC Stocks All Time High AI Copyright Science Corner",
+    "query_type": "vague"
+  },
+  {
+    "query": "Debt Crisis Solutions",
+    "expected_podcast_id": 5,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Trump vs Powell Solving the Debt Crisis The 10T AGI Prize GENIUS Act Becomes Law",
+    "query_type": "topic"
+  },
+  {
+    "query": "Gavin Baker interview All In",
+    "expected_podcast_id": 5,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Trump vs Powell Solving the Debt Crisis The 10T AGI Prize GENIUS Act Becomes Law",
+    "query_type": "person"
+  },
+  {
+    "query": "Tariff pricing strategies",
+    "expected_podcast_id": 5,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Trump vs Powell Solving the Debt Crisis The 10T AGI Prize GENIUS Act Becomes Law",
+    "query_type": "concept"
+  },
+  {
+    "query": "How to fix the economy",
+    "expected_podcast_id": 5,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Trump vs Powell Solving the Debt Crisis The 10T AGI Prize GENIUS Act Becomes Law",
+    "query_type": "casual"
+  },
+  {
+    "query": "Government and finance discussions",
+    "expected_podcast_id": 5,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Trump vs Powell Solving the Debt Crisis The 10T AGI Prize GENIUS Act Becomes Law",
+    "query_type": "vague"
+  },
+  {
+    "query": "IPOs and SPACs explained",
+    "expected_podcast_id": 6,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg IPOs and SPACs are Back Mag 7 Showdown Zuck on Tilt Apple s Fumble GENIUS Act passes Senate",
+    "query_type": "topic"
+  },
+  {
+    "query": "Chamath Palihapitiya interview",
+    "expected_podcast_id": 6,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg IPOs and SPACs are Back Mag 7 Showdown Zuck on Tilt Apple s Fumble GENIUS Act passes Senate",
+    "query_type": "person"
+  },
+  {
+    "query": "mag 7 showdown podcast",
+    "expected_podcast_id": 6,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg IPOs and SPACs are Back Mag 7 Showdown Zuck on Tilt Apple s Fumble GENIUS Act passes Senate",
+    "query_type": "concept"
+  },
+  {
+    "query": "how to invest in stocks with no experience",
+    "expected_podcast_id": 6,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg IPOs and SPACs are Back Mag 7 Showdown Zuck on Tilt Apple s Fumble GENIUS Act passes Senate",
+    "query_type": "casual"
+  },
+  {
+    "query": "business and technology news recap",
+    "expected_podcast_id": 6,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg IPOs and SPACs are Back Mag 7 Showdown Zuck on Tilt Apple s Fumble GENIUS Act passes Senate",
+    "query_type": "vague"
+  },
+  {
+    "query": "TanStack libraries",
+    "expected_podcast_id": 7,
+    "podcast_title": "TanStack and the Future of Frontend with Tanner Linsley",
+    "query_type": "topic"
+  },
+  {
+    "query": "Tanner Linsley interview",
+    "expected_podcast_id": 7,
+    "podcast_title": "TanStack and the Future of Frontend with Tanner Linsley",
+    "query_type": "person"
+  },
+  {
+    "query": "JavaScript state management",
+    "expected_podcast_id": 7,
+    "podcast_title": "TanStack and the Future of Frontend with Tanner Linsley",
+    "query_type": "concept"
+  },
+  {
+    "query": "learn about frontend development",
+    "expected_podcast_id": 7,
+    "podcast_title": "TanStack and the Future of Frontend with Tanner Linsley",
+    "query_type": "casual"
+  },
+  {
+    "query": "new front-end frameworks and tools",
+    "expected_podcast_id": 7,
+    "podcast_title": "TanStack and the Future of Frontend with Tanner Linsley",
+    "query_type": "vague"
+  },
+  {
+    "query": "Contra series development",
+    "expected_podcast_id": 8,
+    "podcast_title": "WayForward Games with Tomm Hulett and Voldi Way",
+    "query_type": "topic"
+  },
+  {
+    "query": "Tomm Hulett interview",
+    "expected_podcast_id": 8,
+    "podcast_title": "WayForward Games with Tomm Hulett and Voldi Way",
+    "query_type": "person"
+  },
+  {
+    "query": "game studio history",
+    "expected_podcast_id": 8,
+    "podcast_title": "WayForward Games with Tomm Hulett and Voldi Way",
+    "query_type": "concept"
+  },
+  {
+    "query": "video game development tips",
+    "expected_podcast_id": 8,
+    "podcast_title": "WayForward Games with Tomm Hulett and Voldi Way",
+    "query_type": "casual"
+  },
+  {
+    "query": "retro game remakes and updates",
+    "expected_podcast_id": 8,
+    "podcast_title": "WayForward Games with Tomm Hulett and Voldi Way",
+    "query_type": "vague"
+  },
+  {
+    "query": "Tony Robbins seminars",
+    "expected_podcast_id": 9,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Tony Robbins All In Live from Miami",
+    "query_type": "person"
+  },
+  {
+    "query": "burning the boats",
+    "expected_podcast_id": 9,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Tony Robbins All In Live from Miami",
+    "query_type": "concept"
+  },
+  {
+    "query": "self-help gurus",
+    "expected_podcast_id": 9,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Tony Robbins All In Live from Miami",
+    "query_type": "topic"
+  },
+  {
+    "query": "how to achieve goals",
+    "expected_podcast_id": 9,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Tony Robbins All In Live from Miami",
+    "query_type": "casual"
+  },
+  {
+    "query": "inspiration from self-help",
+    "expected_podcast_id": 9,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Tony Robbins All In Live from Miami",
+    "query_type": "vague"
+  },
+  {
+    "query": "Ruby on Rails AI",
+    "expected_podcast_id": 10,
+    "podcast_title": "Lex Fridman Podcast 474 DHH Future of Programming AI Ruby on Rails Productivity Parenting",
+    "query_type": "topic"
+  },
+  {
+    "query": "DHH podcast",
+    "expected_podcast_id": 10,
+    "podcast_title": "Lex Fridman Podcast 474 DHH Future of Programming AI Ruby on Rails Productivity Parenting",
+    "query_type": "person"
+  },
+  {
+    "query": "cookie banner removal",
+    "expected_podcast_id": 10,
+    "podcast_title": "Lex Fridman Podcast 474 DHH Future of Programming AI Ruby on Rails Productivity Parenting",
+    "query_type": "concept"
+  },
+  {
+    "query": "productivity tips from DHH",
+    "expected_podcast_id": 10,
+    "podcast_title": "Lex Fridman Podcast 474 DHH Future of Programming AI Ruby on Rails Productivity Parenting",
+    "query_type": "casual"
+  },
+  {
+    "query": "future of web development AI",
+    "expected_podcast_id": 10,
+    "podcast_title": "Lex Fridman Podcast 474 DHH Future of Programming AI Ruby on Rails Productivity Parenting",
+    "query_type": "vague"
+  },
+  {
+    "query": "F1 venture business",
+    "expected_podcast_id": 11,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Nico Rosberg on the Booming Business of F1 All In Live from Miami",
+    "query_type": "topic"
+  },
+  {
+    "query": "Nico Rosberg F1 champion",
+    "expected_podcast_id": 11,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Nico Rosberg on the Booming Business of F1 All In Live from Miami",
+    "query_type": "person"
+  },
+  {
+    "query": "Formula 1 safety improvements",
+    "expected_podcast_id": 11,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Nico Rosberg on the Booming Business of F1 All In Live from Miami",
+    "query_type": "concept"
+  },
+  {
+    "query": "how to get into F1 racing",
+    "expected_podcast_id": 11,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Nico Rosberg on the Booming Business of F1 All In Live from Miami",
+    "query_type": "casual"
+  },
+  {
+    "query": "former athletes in business ventures",
+    "expected_podcast_id": 11,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Nico Rosberg on the Booming Business of F1 All In Live from Miami",
+    "query_type": "vague"
+  },
+  {
+    "query": "superintelligent AI in startups",
+    "expected_podcast_id": 12,
+    "podcast_title": "Y Combinator Startup Podcast Cursor CEO Going Beyond Code Superintelligent AI Agents And Why Taste Still Matters",
+    "query_type": "topic"
+  },
+  {
+    "query": "Michael Tru startup CEO",
+    "expected_podcast_id": 12,
+    "podcast_title": "Y Combinator Startup Podcast Cursor CEO Going Beyond Code Superintelligent AI Agents And Why Taste Still Matters",
+    "query_type": "person"
+  },
+  {
+    "query": "replacing coding with AI agents",
+    "expected_podcast_id": 12,
+    "podcast_title": "Y Combinator Startup Podcast Cursor CEO Going Beyond Code Superintelligent AI Agents And Why Taste Still Matters",
+    "query_type": "concept"
+  },
+  {
+    "query": "how to build a successful startup",
+    "expected_podcast_id": 12,
+    "podcast_title": "Y Combinator Startup Podcast Cursor CEO Going Beyond Code Superintelligent AI Agents And Why Taste Still Matters",
+    "query_type": "casual"
+  },
+  {
+    "query": "AI in software development future",
+    "expected_podcast_id": 12,
+    "podcast_title": "Y Combinator Startup Podcast Cursor CEO Going Beyond Code Superintelligent AI Agents And Why Taste Still Matters",
+    "query_type": "vague"
+  },
+  {
+    "query": "Python OCaml machine learning",
+    "expected_podcast_id": 13,
+    "podcast_title": "Signals and Threads Python OCaml and Machine Learning with Laurent Mazare",
+    "query_type": "topic"
+  },
+  {
+    "query": "Laurent Mazare Jane Street",
+    "expected_podcast_id": 13,
+    "podcast_title": "Signals and Threads Python OCaml and Machine Learning with Laurent Mazare",
+    "query_type": "person"
+  },
+  {
+    "query": "functional programming language comparison",
+    "expected_podcast_id": 13,
+    "podcast_title": "Signals and Threads Python OCaml and Machine Learning with Laurent Mazare",
+    "query_type": "concept"
+  },
+  {
+    "query": "use Python for data analysis",
+    "expected_podcast_id": 13,
+    "podcast_title": "Signals and Threads Python OCaml and Machine Learning with Laurent Mazare",
+    "query_type": "casual"
+  },
+  {
+    "query": "statically typed languages in finance",
+    "expected_podcast_id": 13,
+    "podcast_title": "Signals and Threads Python OCaml and Machine Learning with Laurent Mazare",
+    "query_type": "vague"
+  },
+  {
+    "query": "multi agent diplomacy championship",
+    "expected_podcast_id": 14,
+    "podcast_title": "Latent Space The AI Engineer Podcast Scaling Test Time Compute to Multi Agent Civilizations Noam Brown OpenAI",
+    "query_type": "topic"
+  },
+  {
+    "query": "Noam Brown OpenAI guest",
+    "expected_podcast_id": 14,
+    "podcast_title": "Latent Space The AI Engineer Podcast Scaling Test Time Compute to Multi Agent Civilizations Noam Brown OpenAI",
+    "query_type": "person"
+  },
+  {
+    "query": "Cicero AI game development",
+    "expected_podcast_id": 14,
+    "podcast_title": "Latent Space The AI Engineer Podcast Scaling Test Time Compute to Multi Agent Civilizations Noam Brown OpenAI",
+    "query_type": "concept"
+  },
+  {
+    "query": "diplomacy games with AI bots",
+    "expected_podcast_id": 14,
+    "podcast_title": "Latent Space The AI Engineer Podcast Scaling Test Time Compute to Multi Agent Civilizations Noam Brown OpenAI",
+    "query_type": "casual"
+  },
+  {
+    "query": "AI in competitive strategy games",
+    "expected_podcast_id": 14,
+    "podcast_title": "Latent Space The AI Engineer Podcast Scaling Test Time Compute to Multi Agent Civilizations Noam Brown OpenAI",
+    "query_type": "vague"
+  },
+  {
+    "query": "startup hunger games",
+    "expected_podcast_id": 15,
+    "podcast_title": "Minus One Alexandr Wang Scale AI the Startup Hunger Games",
+    "query_type": "topic"
+  },
+  {
+    "query": "Alexandr Wang",
+    "expected_podcast_id": 15,
+    "podcast_title": "Minus One Alexandr Wang Scale AI the Startup Hunger Games",
+    "query_type": "person"
+  },
+  {
+    "query": "YC startup idea generation",
+    "expected_podcast_id": 15,
+    "podcast_title": "Minus One Alexandr Wang Scale AI the Startup Hunger Games",
+    "query_type": "concept"
+  },
+  {
+    "query": "what is a good startup idea",
+    "expected_podcast_id": 15,
+    "podcast_title": "Minus One Alexandr Wang Scale AI the Startup Hunger Games",
+    "query_type": "casual"
+  },
+  {
+    "query": "finding the right entrepreneurial path",
+    "expected_podcast_id": 15,
+    "podcast_title": "Minus One Alexandr Wang Scale AI the Startup Hunger Games",
+    "query_type": "vague"
+  },
+  {
+    "query": "NASA administrator nomination withdrawal",
+    "expected_podcast_id": 16,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Jared Isaacman What went wrong at NASA The All In Interview",
+    "query_type": "topic"
+  },
+  {
+    "query": "Jared Isaacman interview",
+    "expected_podcast_id": 16,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Jared Isaacman What went wrong at NASA The All In Interview",
+    "query_type": "person"
+  },
+  {
+    "query": "government bureaucracy space race",
+    "expected_podcast_id": 16,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Jared Isaacman What went wrong at NASA The All In Interview",
+    "query_type": "concept"
+  },
+  {
+    "query": "what went wrong with NASA nomination",
+    "expected_podcast_id": 16,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Jared Isaacman What went wrong at NASA The All In Interview",
+    "query_type": "casual"
+  },
+  {
+    "query": "space agency politics and leadership",
+    "expected_podcast_id": 16,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Jared Isaacman What went wrong at NASA The All In Interview",
+    "query_type": "vague"
+  },
+  {
+    "query": "elon musk on scotus and rif",
+    "expected_podcast_id": 17,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Grok 4 Wows The Bitter Lesson Elon s Third Party AI Browsers SCOTUS backs POTUS on RIFs",
+    "query_type": "topic"
+  },
+  {
+    "query": "heath ra boy gop",
+    "expected_podcast_id": 17,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Grok 4 Wows The Bitter Lesson Elon s Third Party AI Browsers SCOTUS backs POTUS on RIFs",
+    "query_type": "person"
+  },
+  {
+    "query": "third party ai browsers",
+    "expected_podcast_id": 17,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Grok 4 Wows The Bitter Lesson Elon s Third Party AI Browsers SCOTUS backs POTUS on RIFs",
+    "query_type": "concept"
+  },
+  {
+    "query": "what's the bitter lesson in technology",
+    "expected_podcast_id": 17,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Grok 4 Wows The Bitter Lesson Elon s Third Party AI Browsers SCOTUS backs POTUS on RIFs",
+    "query_type": "casual"
+  },
+  {
+    "query": "ai and politics intersection",
+    "expected_podcast_id": 17,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Grok 4 Wows The Bitter Lesson Elon s Third Party AI Browsers SCOTUS backs POTUS on RIFs",
+    "query_type": "vague"
+  },
+  {
+    "query": "Jane Street internship experience",
+    "expected_podcast_id": 18,
+    "podcast_title": "Signals and Threads An inside look at Jane Street s tech internship with Jeanne Van Briesen Matt Else and Grace Zhang",
+    "query_type": "topic"
+  },
+  {
+    "query": "Jeanne Van Briesen Jane Street",
+    "expected_podcast_id": 18,
+    "podcast_title": "Signals and Threads An inside look at Jane Street s tech internship with Jeanne Van Briesen Matt Else and Grace Zhang",
+    "query_type": "person"
+  },
+  {
+    "query": "software development at Jane Street",
+    "expected_podcast_id": 18,
+    "podcast_title": "Signals and Threads An inside look at Jane Street s tech internship with Jeanne Van Briesen Matt Else and Grace Zhang",
+    "query_type": "concept"
+  },
+  {
+    "query": "tech internships for CS students",
+    "expected_podcast_id": 18,
+    "podcast_title": "Signals and Threads An inside look at Jane Street s tech internship with Jeanne Van Briesen Matt Else and Grace Zhang",
+    "query_type": "casual"
+  },
+  {
+    "query": "tech industry transition stories",
+    "expected_podcast_id": 18,
+    "podcast_title": "Signals and Threads An inside look at Jane Street s tech internship with Jeanne Van Briesen Matt Else and Grace Zhang",
+    "query_type": "vague"
+  },
+  {
+    "query": "happiest city in America",
+    "expected_podcast_id": 19,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Miami Mayor Francis Suarez The Recipe for Creating America s Happiest City All In Live from Miami",
+    "query_type": "topic"
+  },
+  {
+    "query": "Francis Suarez Miami Mayor",
+    "expected_podcast_id": 19,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Miami Mayor Francis Suarez The Recipe for Creating America s Happiest City All In Live from Miami",
+    "query_type": "person"
+  },
+  {
+    "query": "zero homeless strategy",
+    "expected_podcast_id": 19,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Miami Mayor Francis Suarez The Recipe for Creating America s Happiest City All In Live from Miami",
+    "query_type": "concept"
+  },
+  {
+    "query": "ways to make a city happy",
+    "expected_podcast_id": 19,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Miami Mayor Francis Suarez The Recipe for Creating America s Happiest City All In Live from Miami",
+    "query_type": "casual"
+  },
+  {
+    "query": "making cities successful",
+    "expected_podcast_id": 19,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Miami Mayor Francis Suarez The Recipe for Creating America s Happiest City All In Live from Miami",
+    "query_type": "vague"
+  },
+  {
+    "query": "All In Summit Elon Musk",
+    "expected_podcast_id": 20,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Big Beautiful Bill Elon Trump Dollar Down Big Harvard s Money Problems Figma IPO",
+    "query_type": "event"
+  },
+  {
+    "query": "Chamath Sacks Jason Friedberg podcast",
+    "expected_podcast_id": 20,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Big Beautiful Bill Elon Trump Dollar Down Big Harvard s Money Problems Figma IPO",
+    "query_type": "person"
+  },
+  {
+    "query": "Figma IPO and Harvard's money problems",
+    "expected_podcast_id": 20,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Big Beautiful Bill Elon Trump Dollar Down Big Harvard s Money Problems Figma IPO",
+    "query_type": "concept"
+  },
+  {
+    "query": "Best podcasts about entrepreneurship",
+    "expected_podcast_id": 20,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Big Beautiful Bill Elon Trump Dollar Down Big Harvard s Money Problems Figma IPO",
+    "query_type": "casual"
+  },
+  {
+    "query": "Business leaders speaking on AI investments",
+    "expected_podcast_id": 20,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg Big Beautiful Bill Elon Trump Dollar Down Big Harvard s Money Problems Figma IPO",
+    "query_type": "vague"
+  },
+  {
+    "query": "LLVM creator Chris Lattner",
+    "expected_podcast_id": 21,
+    "podcast_title": "The Top Shelf Chris Lattner Creator of LLVM Swift and Mojo",
+    "query_type": "person"
+  },
+  {
+    "query": "Chris Lattner PhD story",
+    "expected_podcast_id": 21,
+    "podcast_title": "The Top Shelf Chris Lattner Creator of LLVM Swift and Mojo",
+    "query_type": "casual"
+  },
+  {
+    "query": "Mojo vs Swift programming languages",
+    "expected_podcast_id": 21,
+    "podcast_title": "The Top Shelf Chris Lattner Creator of LLVM Swift and Mojo",
+    "query_type": "concept"
+  },
+  {
+    "query": "influential software engineers",
+    "expected_podcast_id": 21,
+    "podcast_title": "The Top Shelf Chris Lattner Creator of LLVM Swift and Mojo",
+    "query_type": "topic"
+  },
+  {
+    "query": "biggest innovations in computer science",
+    "expected_podcast_id": 21,
+    "podcast_title": "The Top Shelf Chris Lattner Creator of LLVM Swift and Mojo",
+    "query_type": "vague"
+  },
+  {
+    "query": "AI doomerism",
+    "expected_podcast_id": 22,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg AI Doom vs Boom EA Cult Returns BBB Upside US Steel and Golden Votes",
+    "query_type": "topic"
+  },
+  {
+    "query": "David Sachs",
+    "expected_podcast_id": 22,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg AI Doom vs Boom EA Cult Returns BBB Upside US Steel and Golden Votes",
+    "query_type": "person"
+  },
+  {
+    "query": "employment impact of AI",
+    "expected_podcast_id": 22,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg AI Doom vs Boom EA Cult Returns BBB Upside US Steel and Golden Votes",
+    "query_type": "concept"
+  },
+  {
+    "query": "how to prepare for AI in the workplace",
+    "expected_podcast_id": 22,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg AI Doom vs Boom EA Cult Returns BBB Upside US Steel and Golden Votes",
+    "query_type": "casual"
+  },
+  {
+    "query": "artificial intelligence effects on society",
+    "expected_podcast_id": 22,
+    "podcast_title": "All In with Chamath Jason Sacks Friedberg AI Doom vs Boom EA Cult Returns BBB Upside US Steel and Golden Votes",
+    "query_type": "vague"
+  },
+  {
+    "query": "What is an operating system",
+    "expected_podcast_id": 23,
+    "podcast_title": "Signals and Threads What Is an Operating System with Anil Madhavapeddy",
+    "query_type": "topic"
+  },
+  {
+    "query": "Anil Madhavapeddy systems researcher",
+    "expected_podcast_id": 23,
+    "podcast_title": "Signals and Threads What Is an Operating System with Anil Madhavapeddy",
+    "query_type": "person"
+  },
+  {
+    "query": "operating system architecture design",
+    "expected_podcast_id": 23,
+    "podcast_title": "Signals and Threads What Is an Operating System with Anil Madhavapeddy",
+    "query_type": "concept"
+  },
+  {
+    "query": "what is mirage os",
+    "expected_podcast_id": 23,
+    "podcast_title": "Signals and Threads What Is an Operating System with Anil Madhavapeddy",
+    "query_type": "casual"
+  },
+  {
+    "query": "modern internet protocols security",
+    "expected_podcast_id": 23,
+    "podcast_title": "Signals and Threads What Is an Operating System with Anil Madhavapeddy",
+    "query_type": "vague"
+  },
+  {
+    "query": "venture capital investing in software",
+    "expected_podcast_id": 24,
+    "podcast_title": "Software Engineering Daily Google Ventures with Erik Norlander",
+    "query_type": "topic"
+  },
+  {
+    "query": "Erik Norlander Google Ventures",
+    "expected_podcast_id": 24,
+    "podcast_title": "Software Engineering Daily Google Ventures with Erik Norlander",
+    "query_type": "person"
+  },
+  {
+    "query": "machine learning investment strategies",
+    "expected_podcast_id": 24,
+    "podcast_title": "Software Engineering Daily Google Ventures with Erik Norlander",
+    "query_type": "concept"
+  },
+  {
+    "query": "best devops practices for cloud infrastructure",
+    "expected_podcast_id": 24,
+    "podcast_title": "Software Engineering Daily Google Ventures with Erik Norlander",
+    "query_type": "casual"
+  },
+  {
+    "query": "investing in software and tech startups",
+    "expected_podcast_id": 24,
+    "podcast_title": "Software Engineering Daily Google Ventures with Erik Norlander",
+    "query_type": "vague"
+  }
+]
