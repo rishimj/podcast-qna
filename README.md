@@ -4,6 +4,8 @@ A full-stack RAG application for searching across podcast transcripts and asking
 
 Given a user's question and ~24 podcast episodes (905 text chunks), the system finds the right episode via two-stage retrieval, then produces a grounded answer with hallucination checking — all running locally via Ollama.
 
+![Podcast AI search interface](assets/screenshot.png)
+
 ---
 
 ## Architecture
