@@ -4,42 +4,33 @@ Podcast Summarization Service
 Generates detailed summaries of podcast episodes using LLM
 """
 
-import os
 import logging
+import os
+import re
 import sqlite3
-from typing import Dict, Optional, List
 from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional
+
 from langchain_ollama import OllamaLLM
 
 logger = logging.getLogger(__name__)
 
+
 class PodcastSummarizationService:
     def __init__(self, db_path=None, model="llama3"):
         if db_path is None:
-            # Default to absolute path from current script location
-            from pathlib import Path
-            # Go from backend/search to project root, then to data/databases
-            current_dir = Path(__file__).parent  # backend/search
-            project_root = current_dir.parent.parent  # project root
-            db_path = project_root / "data" / "databases" / "podcast_index_v2.db"
-            db_path = str(db_path.resolve())  # Convert to absolute path
-            
-            logger.info(f"🔍 Path resolution debug:")
-            logger.info(f"   __file__: {__file__}")
-            logger.info(f"   current_dir: {current_dir}")
-            logger.info(f"   project_root: {project_root}")
-            logger.info(f"   db_path: {db_path}")
-        
+            project_root = Path(__file__).parent.parent.parent
+            db_path = str((project_root / "data" / "databases" / "podcast_index_v2.db").resolve())
+
         self.db_path = db_path
         self.model = model
         self.llm = None
-        
-        # Validate database exists
+
         if not os.path.exists(self.db_path):
-            logger.error(f"Database not found at: {self.db_path}")
             raise FileNotFoundError(f"Database not found at: {self.db_path}")
-        
-        logger.info(f"✓ Using database at: {self.db_path}")
+
+        logger.info("Using database at: %s", self.db_path)
         self._init_llm()
     
     def _init_llm(self):
@@ -56,43 +47,23 @@ class PodcastSummarizationService:
             raise
     
     def get_podcast_content(self, podcast_id: int) -> Optional[Dict]:
-        """Get podcast content from database"""
+        """Get podcast content from database."""
         try:
-            logger.info(f"🔍 Fetching podcast content for ID: {podcast_id}")
-            logger.info(f"📁 Database path: {self.db_path}")
-            
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
-            
-            # First, check if the podcast ID exists
-            cursor.execute('SELECT COUNT(*) FROM podcasts WHERE id = ?', (podcast_id,))
-            count = cursor.fetchone()[0]
-            logger.info(f"📊 Found {count} podcasts with ID {podcast_id}")
-            
-            if count == 0:
-                # Let's see what podcast IDs we do have
-                cursor.execute('SELECT id, title FROM podcasts LIMIT 10')
-                available_podcasts = cursor.fetchall()
-                logger.info(f"📋 Available podcast IDs: {[p[0] for p in available_podcasts]}")
-                logger.info(f"📋 Available podcast titles: {[p[1][:50] + '...' if len(p[1]) > 50 else p[1] for p in available_podcasts]}")
-                conn.close()
-                return None
-            
+
             cursor.execute('''
                 SELECT id, filename, title, content, char_count, indexed_at
-                FROM podcasts
-                WHERE id = ?
+                FROM podcasts WHERE id = ?
             ''', (podcast_id,))
-            
+
             row = cursor.fetchone()
             conn.close()
-            
+
             if not row:
-                logger.error(f"❌ No podcast found with ID: {podcast_id}")
+                logger.warning("Podcast not found with ID: %s", podcast_id)
                 return None
-            
-            logger.info(f"✅ Successfully fetched podcast: {row[2][:50]}...")
-            
+
             return {
                 'id': row[0],
                 'filename': row[1],
@@ -101,11 +72,9 @@ class PodcastSummarizationService:
                 'char_count': row[4],
                 'indexed_at': row[5]
             }
-        
+
         except Exception as e:
-            logger.error(f"❌ Error fetching podcast content: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
+            logger.error("Error fetching podcast content: %s", e, exc_info=True)
             return None
     
     def check_existing_summary(self, podcast_id: int) -> Optional[str]:
@@ -320,9 +289,7 @@ Please provide a detailed summary following the requirements above:"""
         return email_html
     
     def _convert_markdown_to_html(self, text: str) -> str:
-        """Simple markdown to HTML conversion for email"""
-        import re
-        
+        """Simple markdown to HTML conversion for email."""
         # Convert headers
         text = re.sub(r'^### (.*$)', r'<h3>\1</h3>', text, flags=re.MULTILINE)
         text = re.sub(r'^## (.*$)', r'<h2>\1</h2>', text, flags=re.MULTILINE)

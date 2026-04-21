@@ -138,7 +138,6 @@ Person/name queries saw the biggest improvement thanks to BM25 keyword matching.
 # Backend
 cd backend
 pip install -r requirements.txt
-pip install pinecone pinecone-text langgraph  # not yet in requirements.txt
 
 # Frontend
 cd frontend

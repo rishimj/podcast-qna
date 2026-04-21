@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, Send, Mic, Loader2, ChevronRight, Clock, BarChart3, Podcast, Mail, FileText, X } from 'lucide-react';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:3000/api'; // Direct connection to Flask server
+const API_BASE = 'http://localhost:3000/api';
 
 // Confidence badge component
 const ConfidenceBadge = ({ score }) => {
@@ -310,19 +310,11 @@ function App() {
     setSuccessMessage('');
     
     try {
-      console.log('🔍 Sending summary request:', {
-        podcast_id: selectedPodcast.podcast_id,
-        email: email,
-        podcast_title: selectedPodcast.title
-      });
-
       const response = await axios.post(`${API_BASE}/summary/email`, {
         podcast_id: selectedPodcast.podcast_id,
         email: email
       });
-      
-      console.log('📧 Summary response:', response.data);
-      
+
       if (response.data.success) {
         setSuccessMessage(`Summary sent successfully to ${email}!`);
         setShowEmailModal(false);
@@ -333,13 +325,6 @@ function App() {
         setError(response.data.error || 'Failed to send summary');
       }
     } catch (error) {
-      console.error('❌ Summary email failed:', error);
-      console.log('📊 Error details:', {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message
-      });
-      
       if (error.response?.data?.error) {
         setError(error.response.data.error);
       } else if (error.response?.status === 404) {
@@ -455,8 +440,8 @@ function App() {
                 </div>
                 <div className="bg-zinc-800/50 rounded-lg p-4 text-center">
                   <Search className="w-5 h-5 text-zinc-500 mx-auto mb-2" />
-                  <p className="text-2xl font-light">{stats.system.embedding_coverage}%</p>
-                  <p className="text-sm text-zinc-500">Indexed</p>
+                  <p className="text-2xl font-light">{stats.pinecone?.total_vectors || 0}</p>
+                  <p className="text-sm text-zinc-500">Vectors indexed</p>
                 </div>
               </div>
             )}

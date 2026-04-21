@@ -10,24 +10,26 @@ Two-stage retrieval pipeline:
 Dense embeddings from Ollama (nomic-embed-text), sparse vectors from BM25Encoder.
 """
 
-import sqlite3
-import os
-import json
-import numpy as np
-from typing import List, Dict, Optional
-from pathlib import Path
-import requests
-import re
 import glob
+import logging
+import os
+import re
+import sqlite3
 import time
-from collections import defaultdict
+import traceback
+from pathlib import Path
+from typing import Dict, List, Optional
 
+import numpy as np
+import requests
 from dotenv import load_dotenv
 from pinecone import Pinecone, ServerlessSpec
-from pinecone_text.sparse import BM25Encoder
 from pinecone_text.hybrid import hybrid_convex_scale
+from pinecone_text.sparse import BM25Encoder
 
 load_dotenv(Path(__file__).parent.parent.parent / '.env')
+
+logger = logging.getLogger(__name__)
 
 PINECONE_INDEX_NAME = "podcast-hybrid"
 PINECONE_DIMENSION = 768
@@ -331,9 +333,7 @@ class PodcastTwoTierSearch:
             return True
 
         except Exception as e:
-            print(f"❌ Error indexing {filepath}: {e}")
-            import traceback
-            traceback.print_exc()
+            logger.error("Error indexing %s: %s", filepath, e, exc_info=True)
             self.conn.rollback()
             return False
 

@@ -4,141 +4,109 @@ Flask Backend API for Podcast RAG Chatbot
 Provides REST endpoints for search and chat functionality
 """
 
+import logging
+import os
+import re
+import sys
+import time
+from datetime import datetime
+from functools import wraps
+from pathlib import Path
+
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
-import sys
-from datetime import datetime
-import logging
-from functools import wraps
-import time
-from pathlib import Path
-from dotenv import load_dotenv
+from langchain_ollama import OllamaLLM
 
-load_dotenv(Path(__file__).parent.parent.parent / '.env')
-
-# ADD THIS: Load environment variables from config file
-def load_config():
-    """Load environment variables from config.env file"""
-    from pathlib import Path
-    # Path to config file (from backend/api/ to config/env/config.env)
-    config_path = Path(__file__).parent.parent.parent / 'config' / 'env' / 'config.env'
-    
-    if config_path.exists():
-        logger.info(f"📄 Loading configuration from {config_path}")
-        with open(config_path) as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith('#') and '=' in line:
-                    key, value = line.split('=', 1)
-                    os.environ[key.strip()] = value.strip()
-        logger.info("✓ Configuration loaded successfully")
-        
-        # Log loaded email config (without password)
-        if os.getenv('SMTP_USERNAME'):
-            logger.info(f"✓ Email configured for: {os.getenv('SMTP_USERNAME')}")
-        else:
-            logger.warning("⚠️  SMTP_USERNAME not found in config")
-    else:
-        logger.error(f"❌ Config file not found: {config_path}")
-        logger.info("💡 Please ensure config/env/config.env exists with your SMTP credentials")
-        
-# Import our existing modules
-import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from search.podcast_semantic_search_complete import PodcastTwoTierSearch
 from search.summarization_service import PodcastSummarizationService
 from search.email_service import EmailService
 from search.corrective_rag import run_corrective_rag, init_rag_resources
-from langchain_ollama import OllamaLLM
 
-# Initialize Flask app
-app = Flask(__name__)
-CORS(app)  # Enable CORS for React frontend
+load_dotenv(Path(__file__).parent.parent.parent / '.env')
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load environment variables
-load_config()
+app = Flask(__name__)
+CORS(app)
 
-# Global instances
+
+def _load_config():
+    """Load environment variables from config/env/config.env."""
+    config_path = Path(__file__).parent.parent.parent / 'config' / 'env' / 'config.env'
+
+    if not config_path.exists():
+        logger.warning("Config file not found: %s", config_path)
+        return
+
+    with open(config_path) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                key, value = line.split('=', 1)
+                os.environ[key.strip()] = value.strip()
+
+    logger.info("Configuration loaded from %s", config_path)
+    smtp_user = os.getenv('SMTP_USERNAME')
+    if smtp_user:
+        logger.info("Email configured for: %s", smtp_user)
+    else:
+        logger.warning("SMTP_USERNAME not found in config")
+
+
+_load_config()
+
 llm = None
 summarization_service = None
 email_service = None
-current_sessions = {}  # Store chat sessions
+current_sessions = {}
 
 def init_services():
-    """Initialize LLM, summarization, and email services"""
+    """Initialize LLM, summarization, and email services."""
     global llm, summarization_service, email_service
-    
+
     try:
-        # Initialize LLM
         logger.info("Initializing LLM...")
         llm = OllamaLLM(
             model="llama3",
             temperature=0.7,
             base_url="http://localhost:11434"
         )
-        # Test LLM connection
-        logger.info("Testing LLM connection...")
-        test_response = llm.invoke("Hello")
-        logger.info("✓ LLM initialized")
-        
-        # Initialize corrective RAG resources
+        llm.invoke("Hello")
+        logger.info("LLM initialized")
+
         logger.info("Initializing corrective RAG pipeline...")
         try:
             rag_search = PodcastTwoTierSearch()
             init_rag_resources(search=rag_search, llm=llm)
-            logger.info("✓ Corrective RAG pipeline initialized")
+            logger.info("Corrective RAG pipeline initialized")
         except Exception as e:
-            logger.error(f"❌ Failed to initialize corrective RAG: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
-        
-        # Initialize summarization service
+            logger.error("Failed to initialize corrective RAG: %s", e, exc_info=True)
+
         logger.info("Initializing summarization service...")
-        try:
-            # Manually specify the correct database path
-            from pathlib import Path
-            api_dir = Path(__file__).parent  # backend/api
-            project_root = api_dir.parent.parent  # project root
-            db_path = project_root / "data" / "databases" / "podcast_index_v2.db"
-            logger.info(f"🗃️ Using database path: {db_path}")
-            
-            summarization_service = PodcastSummarizationService(db_path=str(db_path))
-            logger.info("✓ Summarization service initialized")
-        except Exception as e:
-            logger.error(f"❌ Failed to initialize summarization service: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
-            raise
-        
-        # Initialize email service
+        project_root = Path(__file__).parent.parent.parent
+        db_path = project_root / "data" / "databases" / "podcast_index_v2.db"
+        summarization_service = PodcastSummarizationService(db_path=str(db_path))
+        logger.info("Summarization service initialized")
+
         logger.info("Initializing email service...")
-        try:
-            email_service = EmailService()
-            logger.info("✓ Email service initialized")
-        except Exception as e:
-            logger.error(f"❌ Failed to initialize email service: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
-            raise
-        
+        email_service = EmailService()
+        logger.info("Email service initialized")
+
         return True
     except Exception as e:
-        logger.error(f"Failed to initialize services: {e}")
-        import traceback
-        logger.error(traceback.format_exc())
+        logger.error("Failed to initialize services: %s", e, exc_info=True)
         return False
 
 def get_search_system():
-    """Get a new search system instance for this thread"""
+    """Create a new search system instance (one per request)."""
     return PodcastTwoTierSearch()
 
+
 def require_services(f):
-    """Decorator to ensure services are initialized"""
+    """Decorator to ensure services are initialized before handling a request."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         global llm, summarization_service, email_service
@@ -152,7 +120,8 @@ def require_services(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# ========== HEALTH CHECK ==========
+
+# ──────────────────────────── Health ────────────────────────────
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
@@ -183,7 +152,7 @@ def health_check():
         }
         search_system.close()
     except Exception as e:
-        logger.error(f"Database stats error: {e}")
+        logger.error("Database stats error: %s", e)
         status['database'] = {
             'connected': False,
             'podcasts': 0,
@@ -197,7 +166,7 @@ def health_check():
     
     return jsonify(status)
 
-# ========== SEARCH ENDPOINTS ==========
+# ──────────────────────────── Search ────────────────────────────
 
 @app.route('/api/search', methods=['POST'])
 @require_services
@@ -254,10 +223,10 @@ def search_podcasts():
         })
         
     except Exception as e:
-        logger.error(f"Search error: {e}")
+        logger.error("Search error: %s", e)
         return jsonify({'error': str(e)}), 500
 
-# ========== PODCAST ENDPOINTS ==========
+# ──────────────────────────── Podcasts ──────────────────────────
 
 @app.route('/api/podcasts', methods=['GET'])
 @require_services
@@ -293,7 +262,7 @@ def list_podcasts():
             search_system.close()
         
     except Exception as e:
-        logger.error(f"List podcasts error: {e}")
+        logger.error("List podcasts error: %s", e)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/podcast/<int:podcast_id>', methods=['GET'])
@@ -334,10 +303,10 @@ def get_podcast(podcast_id):
             search_system.close()
         
     except Exception as e:
-        logger.error(f"Get podcast error: {e}")
+        logger.error("Get podcast error: %s", e)
         return jsonify({'error': str(e)}), 500
 
-# ========== CHAT ENDPOINTS ==========
+# ──────────────────────────── Chat ──────────────────────────────
 
 @app.route('/api/chat', methods=['POST'])
 @require_services
@@ -400,7 +369,7 @@ def chat():
         })
         
     except Exception as e:
-        logger.error(f"Chat error: {e}")
+        logger.error("Chat error: %s", e)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/chat/session/<session_id>', methods=['GET'])
@@ -416,7 +385,7 @@ def get_session(session_id):
         'history': session['history']
     })
 
-# ========== STATISTICS ENDPOINT ==========
+# ──────────────────────────── Statistics ────────────────────────
 
 @app.route('/api/stats', methods=['GET'])
 @require_services
@@ -447,10 +416,10 @@ def get_stats():
         })
         
     except Exception as e:
-        logger.error(f"Stats error: {e}")
+        logger.error("Stats error: %s", e)
         return jsonify({'error': str(e)}), 500
 
-# ========== SUMMARY ENDPOINTS ==========
+# ──────────────────────────── Summaries ─────────────────────────
 
 @app.route('/api/summary/generate', methods=['POST'])
 @require_services
@@ -494,7 +463,7 @@ def generate_summary():
             }), 500
             
     except Exception as e:
-        logger.error(f"Summary generation error: {e}")
+        logger.error("Summary generation error: %s", e)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/summary/email', methods=['POST'])
@@ -516,67 +485,51 @@ def email_summary():
         user_email = data.get('email', '').strip()
         force_regenerate = data.get('force_regenerate', False)
         
-        logger.info(f"📧 Email summary request - Podcast ID: {podcast_id}, Email: {user_email}")
-        
+        logger.info("Email summary request - Podcast ID: %s, Email: %s", podcast_id, user_email)
+
         if not podcast_id or not user_email:
-            logger.error("❌ Missing required fields: podcast_id or email")
             return jsonify({'error': 'podcast_id and email are required'}), 400
-        
-        # Validate email format (basic check)
-        import re
+
         email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(email_pattern, user_email):
-            logger.error(f"❌ Invalid email format: {user_email}")
             return jsonify({'error': 'Invalid email format'}), 400
-        
-        # First check if podcast exists
+
         search_system = get_search_system()
         try:
             cursor = search_system.conn.cursor()
             cursor.execute('SELECT id, title FROM podcasts WHERE id = ?', (podcast_id,))
             podcast_check = cursor.fetchone()
-            
+
             if not podcast_check:
                 cursor.execute('SELECT id, title FROM podcasts LIMIT 5')
                 available = cursor.fetchall()
-                logger.error(f"❌ Podcast {podcast_id} not found. Available IDs: {[p[0] for p in available]}")
                 return jsonify({
                     'error': f'Podcast with ID {podcast_id} not found',
                     'available_podcasts': [{'id': p[0], 'title': p[1]} for p in available]
                 }), 404
-            
-            logger.info(f"✅ Found podcast: {podcast_check[1]}")
         finally:
             search_system.close()
-        
-        # Generate summary for email
+
         start_time = time.time()
-        logger.info("🤖 Generating summary...")
         summary_result = summarization_service.generate_summary_for_email(podcast_id)
-        
+
         if not summary_result['success']:
-            logger.error(f"❌ Summary generation failed: {summary_result.get('error')}")
             return jsonify({
                 'success': False,
                 'error': summary_result.get('error', 'Failed to generate summary'),
                 'podcast_id': podcast_id
             }), 500
-        
-        logger.info("✅ Summary generated successfully")
-        
-        # Send email
-        logger.info(f"📤 Sending email to {user_email}...")
+
         email_result = email_service.send_summary_email(
             to_email=user_email,
             subject=summary_result['subject'],
             html_content=summary_result['email_content'],
             podcast_title=summary_result['podcast_title']
         )
-        
+
         total_time = time.time() - start_time
-        
+
         if email_result['success']:
-            logger.info(f"✅ Email sent successfully to {user_email}")
             return jsonify({
                 'success': True,
                 'message': f'Summary sent to {user_email}',
@@ -588,21 +541,18 @@ def email_summary():
                 'total_time_ms': round(total_time * 1000, 2)
             })
         else:
-            logger.error(f"❌ Email sending failed: {email_result.get('error')}")
             return jsonify({
                 'success': False,
                 'error': email_result.get('error', 'Failed to send email'),
                 'podcast_id': podcast_id,
                 'email': user_email
             }), 500
-            
+
     except Exception as e:
-        logger.error(f"❌ Email summary error: {e}")
-        import traceback
-        logger.error(traceback.format_exc())
+        logger.error("Email summary error: %s", e, exc_info=True)
         return jsonify({'error': str(e)}), 500
 
-# ========== ERROR HANDLERS ==========
+# ──────────────────────────── Error Handlers ────────────────────
 
 @app.errorhandler(404)
 def not_found(e):
@@ -612,33 +562,17 @@ def not_found(e):
 def server_error(e):
     return jsonify({'error': 'Internal server error'}), 500
 
-# ========== MAIN ==========
+# ──────────────────────────── Main ──────────────────────────────
 
 if __name__ == '__main__':
-    print("🚀 Starting Podcast RAG API Server\n")
-    
-    # Initialize services
     services_ready = init_services()
-    
+
     if services_ready:
-        print("✅ LLM service initialized successfully")
-        print("✅ Search system will be initialized per request")
+        logger.info("All services initialized successfully")
     else:
-        print("⚠️ LLM service failed to initialize - API will start but functionality may be limited")
-        print("Check the logs above for details")
-        print("\nTo fix:")
-        print("1. Make sure Ollama is running: ollama serve")
-        print("2. Make sure database exists: python podcast_semantic_search_complete.py")
-    
-    print("\n📡 API Endpoints:")
-    print("  GET    /api/health             - Health check")
-    print("  POST   /api/search             - Search for podcasts")
-    print("  POST   /api/chat               - Chat with podcast")
-    print("  GET    /api/podcasts           - List all podcasts")
-    print("  GET    /api/podcast/<id>       - Get podcast details")
-    print("  GET    /api/stats              - System statistics")
-    print("  POST   /api/summary/generate   - Generate podcast summary")
-    print("  POST   /api/summary/email      - Generate and email summary")
-    print(f"\n🌐 Starting server on http://localhost:3000")
-    
+        logger.warning(
+            "Service initialization failed — ensure Ollama is running "
+            "(ollama serve) and the database exists"
+        )
+
     app.run(debug=True, host='127.0.0.1', port=3000)

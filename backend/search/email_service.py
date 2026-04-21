@@ -4,13 +4,14 @@ Email Service for Podcast Summaries
 Handles sending podcast summaries via email using SMTP
 """
 
-import os
-import smtplib
 import logging
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from typing import Dict, Optional
+import os
+import re
+import smtplib
 from datetime import datetime
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from typing import Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -113,9 +114,7 @@ class EmailService:
             }
     
     def _html_to_text(self, html_content: str) -> str:
-        """Convert HTML content to plain text for email fallback"""
-        import re
-        
+        """Convert HTML content to plain text for email fallback."""
         # Remove HTML tags
         text = re.sub('<[^<]+?>', '', html_content)
         

@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-Podcast RAG Chatbot with Two-Tiered Search
-Uses enhanced semantic search for better accuracy
+Podcast RAG Chatbot with Two-Tiered Search (standalone CLI)
+
+Usage (from project root):
+    python -m backend.search.podcast_rag
 """
 
-import sys
 import os
+import sys
+
 from langchain_ollama import OllamaLLM
-from podcast_semantic_search_complete import PodcastTwoTierSearch
+
+from search.podcast_semantic_search_complete import PodcastTwoTierSearch
 
 def create_chatbot():
     """Initialize the Llama chatbot"""
