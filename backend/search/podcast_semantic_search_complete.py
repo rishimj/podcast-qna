@@ -119,7 +119,7 @@ class PodcastTwoTierSearch:
 
     def setup_database(self):
         """Create database schema for text content and metadata."""
-        self.conn = sqlite3.connect(self.db_path)
+        self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
         cursor = self.conn.cursor()
 
         cursor.execute('''
