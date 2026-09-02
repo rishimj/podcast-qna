@@ -217,12 +217,9 @@ cd frontend && npm start   # Frontend on port 8080
 │   ├── bm25_params.json                   # Fitted BM25 encoder parameters
 │   └── exports/saved_podcasts.json        # Spotify episode export
 │
-├── eval/
-│   ├── generate_eval_set.py               # Build eval queries from transcripts
-│   ├── run_evaluation.py                  # Run retrieval eval, compute metrics
-│   ├── eval_set.json                      # 120 generated queries with ground truth
-│   └── eval_results.json                  # Latest eval run results
-│
-└── docs/
-    └── interview_prep.md                  # Detailed technical deep dive
+└── eval/
+    ├── generate_eval_set.py               # Build eval queries from transcripts
+    ├── run_evaluation.py                  # Run retrieval eval, compute metrics
+    ├── eval_set.json                      # 120 generated queries with ground truth
+    └── eval_results.json                  # Latest eval run results
 ```
