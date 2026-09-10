@@ -2,7 +2,7 @@
 
 A full-stack RAG application for searching across podcast transcripts and asking natural-language questions about individual episodes. Uses hybrid retrieval (dense + sparse vectors), cross-encoder reranking, and a corrective RAG pipeline powered by Claude.
 
-Given a user's question and ~24 podcast episodes (905 text chunks), the system finds the right episode via two-stage retrieval, then produces a grounded answer with hallucination checking. Embeddings run locally via Ollama; generation uses Claude Haiku.
+Given a user's question and ~70 podcast episodes (~2,500 text chunks), the system finds the right episode via two-stage retrieval, then produces a grounded answer with hallucination checking. Embeddings run locally via Ollama; generation uses Claude Haiku.
 
 ![Podcast AI search interface](assets/screenshot.png)
 
@@ -174,6 +174,21 @@ python collect_podcasts.py --limit 10
 # Then index via the search module (run from backend/):
 # PodcastTwoTierSearch().index_all_podcasts_enhanced("transcripts")
 ```
+
+### Daily refresh (optional)
+
+`scripts/daily_refresh.sh` pulls newly saved Spotify episodes, downloads their
+transcripts, indexes them, and verifies that every transcript on disk is
+searchable. It never prompts, so it can run unattended:
+
+```bash
+python scripts/spotify_login.py   # one-time Spotify login (browser)
+bash scripts/daily_refresh.sh     # run once; log in logs/daily_refresh.log
+```
+
+To run it daily on macOS, load a LaunchAgent that runs the script. launchd
+cannot read `~/Documents` unless `/bin/bash` has Full Disk Access (System
+Settings > Privacy & Security).
 
 ### 5. Run the App
 
