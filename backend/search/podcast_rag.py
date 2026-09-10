@@ -9,26 +9,17 @@ Usage (from project root):
 import os
 import sys
 
-from langchain_ollama import OllamaLLM
-
+from search.claude_llm import ClaudeLLM
 from search.podcast_semantic_search_complete import PodcastTwoTierSearch
 
 def create_chatbot():
-    """Initialize the Llama chatbot"""
+    """Initialize the Claude chatbot"""
     try:
-        llm = OllamaLLM(
-            model="llama3",
-            temperature=0.7,
-            base_url="http://localhost:11434"
-        )
-        return llm
-    
+        return ClaudeLLM(purpose="cli_chat")
+
     except Exception as e:
         print(f"Error initializing chatbot: {e}")
-        print("\nMake sure:")
-        print("1. Ollama is installed: brew install ollama")
-        print("2. Llama 3 is downloaded: ollama pull llama3")
-        print("3. Ollama is running: ollama serve")
+        print("\nMake sure ANTHROPIC_API_KEY is set in config/env/config.env")
         sys.exit(1)
 
 def get_user_input(prompt="You: "):
@@ -77,15 +68,8 @@ def main():
     # Initialize systems
     llm = create_chatbot()
     search_system = PodcastTwoTierSearch()
-    
-    # Test connections
-    try:
-        test_response = llm.invoke("Hello")
-        print("✓ Chatbot ready!")
-    except Exception as e:
-        print(f"Connection error: {e}")
-        sys.exit(1)
-    
+    print("✓ Chatbot ready!")
+
     # Check database stats
     stats = search_system.get_stats()
     if stats['podcasts'] == 0:
@@ -228,7 +212,11 @@ def main():
             for h in conversation_history[-5:]:  # Keep last 5 exchanges
                 history_str += f"Human: {h['human']}\nAssistant: {h['assistant']}\n\n"
             
-            prompt = f"""You are a helpful assistant for answering questions about podcasts based on their transcripts.
+            # Every turn resends the full transcript, so it lives in a cached
+            # system block: follow-ups within 5 minutes read it at 0.1x price.
+            system = [{
+                "type": "text",
+                "text": f"""You are a helpful assistant for answering questions about podcasts based on their transcripts.
 
 IMPORTANT INSTRUCTIONS:
 - Answer questions based ONLY on the podcast transcript provided below
@@ -238,18 +226,19 @@ IMPORTANT INSTRUCTIONS:
 - The podcast is titled: {best_match['title']}
 
 PODCAST TRANSCRIPT:
-{current_content}
-
-CONVERSATION HISTORY:
+{current_content}""",
+                "cache_control": {"type": "ephemeral"},
+            }]
+            prompt = f"""CONVERSATION HISTORY:
 {history_str}
 
 CURRENT QUESTION: {user_input}
 
 Please answer the question based on the podcast transcript above."""
-            
+
             # Get response
             print("\n🤔 Thinking...")
-            response = llm.invoke(prompt)
+            response = llm.invoke(prompt, system=system)
             
             # Save to history
             conversation_history.append({

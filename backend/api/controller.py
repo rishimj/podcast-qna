@@ -16,9 +16,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from langchain_ollama import OllamaLLM
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from search.claude_llm import ClaudeLLM
 from search.podcast_semantic_search_complete import PodcastTwoTierSearch
 from search.summarization_service import PodcastSummarizationService
 from search.email_service import EmailService
@@ -69,13 +69,8 @@ def init_services():
 
     try:
         logger.info("Initializing LLM...")
-        llm = OllamaLLM(
-            model="llama3",
-            temperature=0.7,
-            base_url="http://localhost:11434"
-        )
-        llm.invoke("Hello")
-        logger.info("LLM initialized")
+        llm = ClaudeLLM(purpose="chat")
+        logger.info("LLM initialized (%s)", llm.model)
 
         logger.info("Initializing corrective RAG pipeline...")
         try:
@@ -115,7 +110,8 @@ def require_services(f):
             if not init_services():
                 return jsonify({
                     'error': 'Services not initialized',
-                    'message': 'Please ensure Ollama is running and database exists'
+                    'message': 'Please ensure ANTHROPIC_API_KEY is set, Ollama is running '
+                               '(embeddings), and the database exists'
                 }), 503
         return f(*args, **kwargs)
     return decorated_function
@@ -571,8 +567,9 @@ if __name__ == '__main__':
         logger.info("All services initialized successfully")
     else:
         logger.warning(
-            "Service initialization failed — ensure Ollama is running "
-            "(ollama serve) and the database exists"
+            "Service initialization failed — ensure ANTHROPIC_API_KEY is set in "
+            "config/env/config.env, Ollama is running for embeddings (ollama serve), "
+            "and the database exists"
         )
 
     app.run(debug=True, host='127.0.0.1', port=3000)

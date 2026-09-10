@@ -14,9 +14,9 @@ Flow:
 import logging
 from typing import TypedDict
 
-from langchain_ollama import OllamaLLM
 from langgraph.graph import StateGraph, START, END
 
+from search.claude_llm import ClaudeLLM
 from search.podcast_semantic_search_complete import PodcastTwoTierSearch
 
 logger = logging.getLogger(__name__)
@@ -45,10 +45,10 @@ class RAGState(TypedDict):
 # ---------------------------------------------------------------------------
 
 _search: PodcastTwoTierSearch | None = None
-_llm: OllamaLLM | None = None
+_llm: ClaudeLLM | None = None
 
 
-def init_rag_resources(search: PodcastTwoTierSearch, llm: OllamaLLM):
+def init_rag_resources(search: PodcastTwoTierSearch, llm: ClaudeLLM):
     global _search, _llm
     _search = search
     _llm = llm
@@ -60,7 +60,7 @@ def _get_search() -> PodcastTwoTierSearch:
     return _search
 
 
-def _get_llm() -> OllamaLLM:
+def _get_llm() -> ClaudeLLM:
     if _llm is None:
         raise RuntimeError("Call init_rag_resources() before running the graph")
     return _llm
@@ -107,7 +107,9 @@ def grade_documents(state: RAGState) -> dict:
         f"Question: {query}\n\n"
         f"Documents:\n{numbered}"
     )
-    verdict = llm.invoke(prompt).strip().lower()
+    verdict = llm.invoke(
+        prompt, max_tokens=50, effort="low", thinking=False, purpose="chat_grade"
+    ).strip().lower()
 
     relevant = []
     if verdict != "none":
@@ -143,7 +145,9 @@ def rewrite_query(state: RAGState) -> dict:
         f"match relevant passages. Return ONLY the rewritten query, nothing else.\n\n"
         f"Original query: {state['original_query']}"
     )
-    new_query = llm.invoke(prompt).strip().strip('"')
+    new_query = llm.invoke(
+        prompt, max_tokens=200, effort="low", thinking=False, purpose="chat_rewrite"
+    ).strip().strip('"')
     return {
         "query": new_query,
         "retries": state["retries"] + 1,
@@ -176,7 +180,7 @@ def generate(state: RAGState) -> dict:
         f"QUESTION: {state['original_query']}\n\n"
         f"Answer:"
     )
-    answer = llm.invoke(prompt)
+    answer = llm.invoke(prompt, purpose="chat_answer")
 
     return {
         "generation": answer,
@@ -200,7 +204,9 @@ def check_hallucination(state: RAGState) -> str:
         f"Answer:\n{state['generation']}\n\n"
         f"Supported?"
     )
-    verdict = llm.invoke(prompt).strip().lower()
+    verdict = llm.invoke(
+        prompt, max_tokens=20, effort="low", thinking=False, purpose="chat_check"
+    ).strip().lower()
     if verdict.startswith("yes"):
         return "accept"
     return "regenerate"
@@ -230,7 +236,7 @@ def fallback(state: RAGState) -> dict:
         f"CURRENT QUESTION: {state['original_query']}\n\n"
         f"Please answer the question based on the podcast transcript above."
     )
-    answer = llm.invoke(prompt)
+    answer = llm.invoke(prompt, purpose="chat_fallback")
 
     return {
         "generation": answer,

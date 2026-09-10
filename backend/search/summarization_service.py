@@ -12,13 +12,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from langchain_ollama import OllamaLLM
+from search.claude_llm import ClaudeLLM
 
 logger = logging.getLogger(__name__)
 
 
 class PodcastSummarizationService:
-    def __init__(self, db_path=None, model="llama3"):
+    def __init__(self, db_path=None, model=None):
         if db_path is None:
             project_root = Path(__file__).parent.parent.parent
             db_path = str((project_root / "data" / "databases" / "podcast_index_v2.db").resolve())
@@ -36,11 +36,7 @@ class PodcastSummarizationService:
     def _init_llm(self):
         """Initialize the LLM for summarization"""
         try:
-            self.llm = OllamaLLM(
-                model=self.model,
-                temperature=0.3,  # Lower temperature for more consistent summaries
-                base_url="http://localhost:11434"
-            )
+            self.llm = ClaudeLLM(model=self.model, purpose="summary")
             logger.info("✓ Summarization LLM initialized")
         except Exception as e:
             logger.error(f"Failed to initialize LLM: {e}")
@@ -128,13 +124,9 @@ class PodcastSummarizationService:
     
     def generate_detailed_summary(self, content: str, title: str) -> str:
         """Generate a detailed summary of the podcast content"""
-        
-        # For very long content, we might need to chunk it
-        max_length = 15000  # Approximate token limit consideration
-        if len(content) > max_length:
-            # Take the first portion and indicate truncation
-            content = content[:max_length] + "\n\n[Content truncated for summarization...]"
-        
+
+        # Claude's context window fits even the longest transcripts (~90K
+        # tokens), so the whole episode is summarized rather than a prefix.
         prompt = f"""Please create a comprehensive and detailed summary of this podcast episode.
 
 PODCAST TITLE: {title}
