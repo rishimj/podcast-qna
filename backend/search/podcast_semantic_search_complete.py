@@ -254,8 +254,13 @@ class PodcastTwoTierSearch:
             filename = os.path.basename(filepath)
             title = self.extract_title(filename)
 
-            with open(filepath, 'r', encoding='utf-8') as f:
-                content = f.read().strip()
+            try:
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    content = f.read().strip()
+            except UnicodeDecodeError:
+                # Some older transcripts were saved as Windows-1252.
+                with open(filepath, 'r', encoding='cp1252') as f:
+                    content = f.read().strip()
 
             if not content:
                 print(f"⚠️  Empty transcript: {filename}")
