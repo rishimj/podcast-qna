@@ -18,4 +18,9 @@ from api.controller import app
 
 if __name__ == '__main__':
     print("🚀 Starting Podcast RAG API Server from organized structure\n")
-    app.run(debug=True, host='0.0.0.0', port=3000)
+    # No reloader: it re-executes sys.argv[0] relative to the cwd, which the
+    # chdir above breaks, so the server died on startup. Bound to localhost
+    # because debug mode serves Werkzeug's interactive debugger, a remote
+    # Python console; set FLASK_DEBUG=1 to enable it.
+    app.run(host='127.0.0.1', port=3000,
+            debug=os.getenv('FLASK_DEBUG') == '1', use_reloader=False)

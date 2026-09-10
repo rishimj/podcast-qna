@@ -1,8 +1,8 @@
 # Podcast Q&A System
 
-A full-stack RAG application for searching across podcast transcripts and asking natural-language questions about individual episodes. Uses hybrid retrieval (dense + sparse vectors), cross-encoder reranking, and a corrective RAG pipeline powered by a local LLM.
+A full-stack RAG application for searching across podcast transcripts and asking natural-language questions about individual episodes. Uses hybrid retrieval (dense + sparse vectors), cross-encoder reranking, and a corrective RAG pipeline powered by Claude.
 
-Given a user's question and ~24 podcast episodes (905 text chunks), the system finds the right episode via two-stage retrieval, then produces a grounded answer with hallucination checking — all running locally via Ollama.
+Given a user's question and ~70 podcast episodes (~2,500 text chunks), the system finds the right episode via two-stage retrieval, then produces a grounded answer with hallucination checking. Embeddings run locally via Ollama; generation uses Claude Haiku.
 
 ![Podcast AI search interface](assets/screenshot.png)
 
@@ -23,7 +23,7 @@ Flask API (port 3000)
     │
     ├── Chat ──► LangGraph corrective RAG pipeline
     │                  │
-    │                  └── llama3 (Ollama) for generation, grading, hallucination checks
+    │                  └── Claude Haiku for generation, grading, hallucination checks
     │
     └── SQLite ──► Full transcripts, chunk text, podcast metadata
 ```
@@ -33,11 +33,11 @@ Flask API (port 3000)
 | Layer | Technology |
 |-------|-----------|
 | **API** | Flask 3.1, flask-cors |
-| **LLM** | Ollama — `llama3` (chat/generation), `nomic-embed-text` (768-dim dense embeddings) |
+| **LLM** | Claude `claude-haiku-4-5` (chat, grading, summaries; override with `CLAUDE_MODEL`) via the `anthropic` SDK; Ollama `nomic-embed-text` (768-dim dense embeddings) |
 | **Vector DB** | Pinecone serverless — `podcast-hybrid` index (dotproduct), `pinecone-rerank-v0` cross-encoder |
 | **Sparse vectors** | pinecone-text — `BM25Encoder`, `hybrid_convex_scale` |
 | **RAG orchestration** | LangGraph state machine with conditional branching |
-| **LLM wrapper** | LangChain (`langchain-ollama`) |
+| **LLM wrapper** | `backend/search/claude_llm.py` — logs per-call token cost to `llm_usage.db` |
 | **Text storage** | SQLite — `podcast_index_v2.db` (podcasts, chunks, summaries tables) |
 | **Frontend** | React 18, Tailwind CSS, Axios, Lucide React |
 | **Data collection** | spotipy (Spotify API), youtube-transcript-api, yt-dlp |
@@ -103,7 +103,7 @@ START → retrieve → grade → [generate | rewrite | fallback]
 
 ## Evaluation
 
-An automated eval pipeline generates 5 diverse queries per podcast (topic, person, concept, casual, vague) using `llama3`, producing 120 queries with known ground truth.
+An automated eval pipeline generates 5 diverse queries per podcast (topic, person, concept, casual, vague) using an LLM (originally `llama3`, now Claude), producing 120 queries with known ground truth.
 
 | Metric | Baseline (4-query weighted) | Hybrid + Reranker |
 |--------|---------------------------|-------------------|
@@ -154,13 +154,15 @@ echo "PINECONE_API_KEY=your-key-here" > .env
 
 # Spotify credentials (for data collection)
 cp config/env/config.env.example config/env/config.env
-# Edit config.env with your Spotify Client ID & Secret
+# Edit config.env with your Spotify Client ID & Secret, and add:
+#   ANTHROPIC_API_KEY=sk-ant-...
+#   CLAUDE_MODEL=claude-haiku-4-5       (optional; e.g. claude-sonnet-5 for higher quality)
+#   COST_ALERT_EMAIL=you@example.com    (daily spend report)
 ```
 
-### 3. Start Ollama
+### 3. Start Ollama (embeddings only)
 
 ```bash
-ollama pull llama3
 ollama pull nomic-embed-text
 ollama serve  # runs on localhost:11434
 ```
@@ -172,6 +174,21 @@ python collect_podcasts.py --limit 10
 # Then index via the search module (run from backend/):
 # PodcastTwoTierSearch().index_all_podcasts_enhanced("transcripts")
 ```
+
+### Daily refresh (optional)
+
+`scripts/daily_refresh.sh` pulls newly saved Spotify episodes, downloads their
+transcripts, indexes them, and verifies that every transcript on disk is
+searchable. It never prompts, so it can run unattended:
+
+```bash
+python scripts/spotify_login.py   # one-time Spotify login (browser)
+bash scripts/daily_refresh.sh     # run once; log in logs/daily_refresh.log
+```
+
+To run it daily on macOS, load a LaunchAgent that runs the script. launchd
+cannot read `~/Documents` unless `/bin/bash` has Full Disk Access (System
+Settings > Privacy & Security).
 
 ### 5. Run the App
 

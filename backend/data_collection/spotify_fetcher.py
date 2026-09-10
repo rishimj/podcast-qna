@@ -39,8 +39,14 @@ def get_saved_episodes(sp, limit=50):
     results = sp.current_user_saved_episodes(limit=limit)
     items = results.get('items', [])
     eps = []
+    skipped = 0
     for item in items:
-        ep = item['episode']
+        ep = item.get('episode') or {}
+        # Episodes removed from Spotify stay in the library as tombstones:
+        # id, name and show name come back null (href ends in /episodes/null).
+        if not ep.get('id') or not ep.get('name') or not (ep.get('show') or {}).get('name'):
+            skipped += 1
+            continue
         eps.append({
             'name': ep['name'],
             'show': ep['show']['name'],
@@ -49,7 +55,8 @@ def get_saved_episodes(sp, limit=50):
             'url': ep['external_urls']['spotify'],
             'id': ep['id']
         })
-    print(f"✓ Retrieved {len(eps)} episodes")
+    print(f"✓ Retrieved {len(eps)} episodes"
+          + (f" (skipped {skipped} no longer available on Spotify)" if skipped else ""))
     return eps
 
 def display_episodes(eps):

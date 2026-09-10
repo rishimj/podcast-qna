@@ -58,6 +58,18 @@ const SearchResultCard = ({ result, onSelect }) => {
 };
 
 // Message component
+// Claude answers in Markdown. Render **bold** as <strong> elements (never raw
+// HTML); everything else stays text, and whitespace-pre-wrap keeps the line
+// breaks and numbered lists readable.
+const renderBold = (text) =>
+  typeof text !== 'string'
+    ? text
+    : text.split(/(\*\*[^*\n]+\*\*)/g).map((part, i) =>
+        part.length > 4 && part.startsWith('**') && part.endsWith('**')
+          ? <strong key={i}>{part.slice(2, -2)}</strong>
+          : part
+      );
+
 const Message = ({ message, isUser }) => {
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
@@ -69,7 +81,7 @@ const Message = ({ message, isUser }) => {
               : 'bg-zinc-800 text-zinc-100 border border-zinc-700'
           }`}
         >
-          <p className="text-sm whitespace-pre-wrap">{message}</p>
+          <p className="text-sm whitespace-pre-wrap">{isUser ? message : renderBold(message)}</p>
         </div>
       </div>
     </div>

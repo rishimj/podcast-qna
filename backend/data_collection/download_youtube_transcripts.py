@@ -273,6 +273,10 @@ def process_saved_podcasts(auto_confirm: bool = False, max_episodes: Optional[in
     unverified_count = 0
 
     for i, episode in enumerate(episodes):
+        # A stale export can still hold tombstones for episodes Spotify removed.
+        if not episode.get('name') or not episode.get('show'):
+            print(f"\n📍 Episode {i+1}/{len(episodes)}: skipped (no longer available on Spotify)")
+            continue
         print(f"\n📍 Episode {i+1}/{len(episodes)}: {episode['name'][:50]}...")
         print(f"   Show: {episode['show']}")
         

@@ -7,8 +7,10 @@ Provides REST endpoints for search and chat functionality
 import logging
 import os
 import re
+import sqlite3
 import sys
 import time
+import uuid
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
@@ -16,9 +18,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from langchain_ollama import OllamaLLM
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from search.claude_llm import ClaudeLLM
 from search.podcast_semantic_search_complete import PodcastTwoTierSearch
 from search.summarization_service import PodcastSummarizationService
 from search.email_service import EmailService
@@ -69,13 +71,8 @@ def init_services():
 
     try:
         logger.info("Initializing LLM...")
-        llm = OllamaLLM(
-            model="llama3",
-            temperature=0.7,
-            base_url="http://localhost:11434"
-        )
-        llm.invoke("Hello")
-        logger.info("LLM initialized")
+        llm = ClaudeLLM(purpose="chat")
+        logger.info("LLM initialized (%s)", llm.model)
 
         logger.info("Initializing corrective RAG pipeline...")
         try:
@@ -100,6 +97,32 @@ def init_services():
         logger.error("Failed to initialize services: %s", e, exc_info=True)
         return False
 
+DB_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "databases" / "podcast_index_v2.db"
+
+
+def get_json_body():
+    """The request's JSON object, or None if the body is missing, malformed, or not an object.
+
+    request.get_json() raises a 400 on malformed JSON, but every handler wraps
+    its body in `except Exception -> 500`, which turned client errors into 500s.
+    """
+    data = request.get_json(silent=True)
+    return data if isinstance(data, dict) else None
+
+
+def get_podcast_title(podcast_id):
+    """Title of an indexed podcast, or None if it doesn't exist.
+
+    Read-only connection: a wrong path raises instead of creating an empty DB.
+    """
+    conn = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+    try:
+        row = conn.execute("SELECT title FROM podcasts WHERE id = ?", (podcast_id,)).fetchone()
+    finally:
+        conn.close()
+    return row[0] if row else None
+
+
 def get_search_system():
     """Create a new search system instance (one per request)."""
     return PodcastTwoTierSearch()
@@ -115,7 +138,8 @@ def require_services(f):
             if not init_services():
                 return jsonify({
                     'error': 'Services not initialized',
-                    'message': 'Please ensure Ollama is running and database exists'
+                    'message': 'Please ensure ANTHROPIC_API_KEY is set, Ollama is running '
+                               '(embeddings), and the database exists'
                 }), 503
         return f(*args, **kwargs)
     return decorated_function
@@ -181,7 +205,9 @@ def search_podcasts():
     }
     """
     try:
-        data = request.get_json()
+        data = get_json_body()
+        if data is None:
+            return jsonify({'error': 'Request body must be a JSON object'}), 400
         query = data.get('query', '').strip()
         top_k = data.get('top_k', 5)
         
@@ -322,22 +348,26 @@ def chat():
     }
     """
     try:
-        data = request.get_json()
+        data = get_json_body()
+        if data is None:
+            return jsonify({'error': 'Request body must be a JSON object'}), 400
         podcast_id = data.get('podcast_id')
         message = data.get('message', '').strip()
-        session_id = data.get('session_id', f'session_{int(time.time())}')
+        # time-based ids collided for chats started in the same second
+        session_id = data.get('session_id') or f'session_{uuid.uuid4().hex}'
         
         if not podcast_id or not message:
             return jsonify({'error': 'podcast_id and message are required'}), 400
+
+        # Unknown ids used to run the whole RAG graph (and bill Claude) against nothing.
+        title = get_podcast_title(podcast_id)
+        if title is None:
+            return jsonify({'error': 'Podcast not found', 'podcast_id': podcast_id}), 404
         
-        # Get or create session
-        if session_id not in current_sessions:
-            current_sessions[session_id] = {
-                'podcast_id': podcast_id,
-                'history': []
-            }
-        
-        session = current_sessions[session_id]
+        # A session belongs to one podcast; never carry another episode's history over.
+        session = current_sessions.get(session_id)
+        if session is None or session['podcast_id'] != podcast_id:
+            session = current_sessions[session_id] = {'podcast_id': podcast_id, 'history': []}
         
         # Run corrective RAG graph
         start_time = time.time()
@@ -359,7 +389,7 @@ def chat():
             'response': response,
             'session_id': session_id,
             'podcast_id': podcast_id,
-            'podcast_title': rag_result.get('podcast_title', ''),
+            'podcast_title': rag_result.get('podcast_title') or title,
             'response_time_ms': round(response_time * 1000, 2),
             'rag_info': {
                 'used_fallback': rag_result.get('used_fallback', False),
@@ -434,12 +464,17 @@ def generate_summary():
     }
     """
     try:
-        data = request.get_json()
+        data = get_json_body()
+        if data is None:
+            return jsonify({'error': 'Request body must be a JSON object'}), 400
         podcast_id = data.get('podcast_id')
         force_regenerate = data.get('force_regenerate', False)
         
         if not podcast_id:
             return jsonify({'error': 'podcast_id is required'}), 400
+
+        if get_podcast_title(podcast_id) is None:
+            return jsonify({'error': 'Podcast not found', 'podcast_id': podcast_id}), 404
         
         # Generate summary
         start_time = time.time()
@@ -480,7 +515,9 @@ def email_summary():
     }
     """
     try:
-        data = request.get_json()
+        data = get_json_body()
+        if data is None:
+            return jsonify({'error': 'Request body must be a JSON object'}), 400
         podcast_id = data.get('podcast_id')
         user_email = data.get('email', '').strip()
         force_regenerate = data.get('force_regenerate', False)
@@ -571,8 +608,9 @@ if __name__ == '__main__':
         logger.info("All services initialized successfully")
     else:
         logger.warning(
-            "Service initialization failed — ensure Ollama is running "
-            "(ollama serve) and the database exists"
+            "Service initialization failed — ensure ANTHROPIC_API_KEY is set in "
+            "config/env/config.env, Ollama is running for embeddings (ollama serve), "
+            "and the database exists"
         )
 
     app.run(debug=True, host='127.0.0.1', port=3000)

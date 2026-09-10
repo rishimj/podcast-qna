@@ -2,7 +2,7 @@
 """
 Generate an evaluation dataset for retrieval testing.
 
-For each podcast in the database, uses llama3 via Ollama to generate
+For each podcast in the database, uses Claude to generate
 3-5 realistic search queries a user might type to find that episode.
 Writes the result to eval_set.json.
 
@@ -16,7 +16,8 @@ import sqlite3
 import sys
 from pathlib import Path
 
-from langchain_ollama import OllamaLLM
+sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
+from search.claude_llm import ClaudeLLM  # noqa: E402
 
 PROJECT_ROOT = Path(__file__).parent.parent
 DB_PATH = PROJECT_ROOT / "data" / "databases" / "podcast_index_v2.db"
@@ -65,11 +66,7 @@ def main():
         print(f"Database not found at {DB_PATH}")
         sys.exit(1)
 
-    llm = OllamaLLM(
-        model="llama3",
-        temperature=0.8,
-        base_url="http://localhost:11434",
-    )
+    llm = ClaudeLLM(purpose="eval_generation")
 
     conn = sqlite3.connect(str(DB_PATH))
     cursor = conn.cursor()
@@ -89,7 +86,7 @@ def main():
         print(f"  [{pid:2d}/{len(podcasts)}] {title[:70]}...", end=" ", flush=True)
 
         try:
-            response = llm.invoke(prompt)
+            response = llm.invoke(prompt, max_tokens=1000, effort="low", thinking=False)
             queries = extract_json_array(response)
 
             for q in queries:
