@@ -166,7 +166,7 @@ def main():
     
     # Test API health
     if not test_api_health():
-        print("❌ API health test failed - make sure Flask server is running")
+        print("❌ API health test failed - make sure the API server is running")
         sys.exit(1)
     
     # Test search to get a valid podcast

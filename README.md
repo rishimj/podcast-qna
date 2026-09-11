@@ -49,4 +49,4 @@ To keep your library current, `scripts/daily_refresh.sh` collects and indexes ne
 
 ## Built with
 
-React · Flask · Claude · Pinecone · Ollama · SQLite
+React · FastAPI · Claude · Pinecone · Ollama · SQLite

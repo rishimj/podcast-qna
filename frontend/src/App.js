@@ -239,7 +239,7 @@ function App() {
       setStats(response.data);
     } catch (error) {
       console.error('Failed to fetch stats:', error);
-      setError('Failed to connect to server. Make sure the Flask API is running.');
+      setError('Failed to connect to server. Make sure the API server is running (python run_server.py).');
     }
   };
 

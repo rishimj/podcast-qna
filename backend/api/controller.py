@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Flask Backend API for Podcast RAG Chatbot
-Provides REST endpoints for search and chat functionality
+FastAPI backend for the Podcast RAG chatbot.
+Provides REST endpoints for search, chat and summaries.
 """
 
 import logging
@@ -12,12 +12,15 @@ import sys
 import time
 import uuid
 from datetime import datetime
-from functools import wraps
 from pathlib import Path
 
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from fastapi import Depends, FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from search.claude_llm import ClaudeLLM
@@ -31,8 +34,13 @@ load_dotenv(Path(__file__).parent.parent.parent / '.env')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
-CORS(app)
+app = FastAPI(title="Podcast Q&A API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def _load_config():
@@ -100,16 +108,6 @@ def init_services():
 DB_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "databases" / "podcast_index_v2.db"
 
 
-def get_json_body():
-    """The request's JSON object, or None if the body is missing, malformed, or not an object.
-
-    request.get_json() raises a 400 on malformed JSON, but every handler wraps
-    its body in `except Exception -> 500`, which turned client errors into 500s.
-    """
-    data = request.get_json(silent=True)
-    return data if isinstance(data, dict) else None
-
-
 def get_podcast_title(podcast_id):
     """Title of an indexed podcast, or None if it doesn't exist.
 
@@ -128,26 +126,96 @@ def get_search_system():
     return PodcastTwoTierSearch()
 
 
-def require_services(f):
-    """Decorator to ensure services are initialized before handling a request."""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        global llm, summarization_service, email_service
-        if llm is None or summarization_service is None or email_service is None:
-            logger.info("Services not initialized, reinitializing...")
-            if not init_services():
-                return jsonify({
-                    'error': 'Services not initialized',
-                    'message': 'Please ensure ANTHROPIC_API_KEY is set, Ollama is running '
-                               '(embeddings), and the database exists'
-                }), 503
-        return f(*args, **kwargs)
-    return decorated_function
+def error(status_code: int, detail: str, **extra) -> JSONResponse:
+    """An error response in this API's shape: {"error": detail, **extra}.
+
+    Extra keys pass through as-is, including `message` (used by the 503 body).
+    """
+    return JSONResponse({'error': detail, **extra}, status_code=status_code)
+
+
+class ServicesUnavailable(Exception):
+    """The LLM, summarization or email service could not be started."""
+
+
+def require_services():
+    """Start services on first use; respond 503 if they can't start."""
+    if llm is None or summarization_service is None or email_service is None:
+        logger.info("Services not initialized, reinitializing...")
+        if not init_services():
+            raise ServicesUnavailable()
+
+
+SERVICES = [Depends(require_services)]
+
+
+# ──────────────────────────── Request bodies ────────────────────
+# Fields default to empty values so each handler's own checks still produce
+# their specific 400 messages; a wrong type fails validation (also a 400).
+
+class SearchRequest(BaseModel):
+    query: str = ''
+    top_k: int = 5
+
+
+class ChatRequest(BaseModel):
+    podcast_id: int | None = None
+    message: str = ''
+    session_id: str | None = None
+
+
+class SummaryRequest(BaseModel):
+    podcast_id: int | None = None
+    force_regenerate: bool = False
+
+
+class EmailSummaryRequest(BaseModel):
+    podcast_id: int | None = None
+    email: str = ''
+    force_regenerate: bool = False
+
+
+# ──────────────────────────── Error Handlers ────────────────────
+
+@app.exception_handler(ServicesUnavailable)
+async def services_unavailable(request: Request, exc: ServicesUnavailable):
+    return error(503, 'Services not initialized',
+                 message='Please ensure ANTHROPIC_API_KEY is set, Ollama is running '
+                         '(embeddings), and the database exists')
+
+
+@app.exception_handler(RequestValidationError)
+async def invalid_request(request: Request, exc: RequestValidationError):
+    """Report bad input as 400 {"error": ...} rather than FastAPI's 422 {"detail": [...]}."""
+    errors = exc.errors()
+    # A non-integer /api/podcast/<id> was an unmatched route under Flask.
+    if any(tuple(e.get('loc', ()))[:1] == ('path',) for e in errors):
+        return error(404, 'Endpoint not found')
+    whole_body = [e for e in errors if e.get('type') == 'json_invalid'
+                  or tuple(e.get('loc', ())) == ('body',)]
+    if whole_body:
+        return error(400, 'Request body must be a JSON object')
+    first = errors[0]
+    field = '.'.join(str(part) for part in tuple(first.get('loc', ()))[1:]) or 'request'
+    return error(400, f"Invalid {field}: {first.get('msg')}")
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_error(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        return error(404, 'Endpoint not found')
+    return error(exc.status_code, str(exc.detail))
+
+
+@app.exception_handler(Exception)
+async def server_error(request: Request, exc: Exception):
+    logger.error("Unhandled error on %s: %s", request.url.path, exc, exc_info=True)
+    return error(500, 'Internal server error')
 
 
 # ──────────────────────────── Health ────────────────────────────
 
-@app.route('/api/health', methods=['GET'])
+@app.get('/api/health')
 def health_check():
     """Check if all services are running"""
     status = {
@@ -160,7 +228,7 @@ def health_check():
             'email_service': email_service is not None
         }
     }
-    
+
     # Test database + Pinecone connection
     try:
         search_system = get_search_system()
@@ -187,33 +255,21 @@ def health_check():
             'connected': False,
             'error': str(e)
         }
-    
-    return jsonify(status)
+
+    return status
 
 # ──────────────────────────── Search ────────────────────────────
 
-@app.route('/api/search', methods=['POST'])
-@require_services
-def search_podcasts():
-    """
-    Search for podcasts using two-tiered semantic search
-    
-    Request body:
-    {
-        "query": "consciousness and AI",
-        "top_k": 5
-    }
-    """
+@app.post('/api/search', dependencies=SERVICES)
+def search_podcasts(body: SearchRequest):
+    """Search for podcasts using two-tiered semantic search"""
     try:
-        data = get_json_body()
-        if data is None:
-            return jsonify({'error': 'Request body must be a JSON object'}), 400
-        query = data.get('query', '').strip()
-        top_k = data.get('top_k', 5)
-        
+        query = body.query.strip()
+        top_k = body.top_k
+
         if not query:
-            return jsonify({'error': 'Query is required'}), 400
-        
+            return error(400, 'Query is required')
+
         # Perform search
         start_time = time.time()
         search_system = get_search_system()
@@ -222,7 +278,7 @@ def search_podcasts():
         finally:
             search_system.close()
         search_time = time.time() - start_time
-        
+
         # Format results
         formatted_results = []
         for result in results:
@@ -240,22 +296,21 @@ def search_podcasts():
                     'outro': round(result['outro_similarity'], 3)
                 }
             })
-        
-        return jsonify({
+
+        return {
             'query': query,
             'results': formatted_results,
             'count': len(formatted_results),
             'search_time_ms': round(search_time * 1000, 2)
-        })
-        
+        }
+
     except Exception as e:
         logger.error("Search error: %s", e)
-        return jsonify({'error': str(e)}), 500
+        return error(500, str(e))
 
 # ──────────────────────────── Podcasts ──────────────────────────
 
-@app.route('/api/podcasts', methods=['GET'])
-@require_services
+@app.get('/api/podcasts', dependencies=SERVICES)
 def list_podcasts():
     """Get list of all indexed podcasts"""
     try:
@@ -267,7 +322,7 @@ def list_podcasts():
                 FROM podcasts
                 ORDER BY indexed_at DESC
             ''')
-            
+
             podcasts = []
             for row in cursor.fetchall():
                 podcasts.append({
@@ -279,21 +334,20 @@ def list_podcasts():
                     'has_embeddings': True,
                     'duration_estimate': f"{row[3] // 150} min"
                 })
-            
-            return jsonify({
+
+            return {
                 'podcasts': podcasts,
                 'count': len(podcasts)
-            })
+            }
         finally:
             search_system.close()
-        
+
     except Exception as e:
         logger.error("List podcasts error: %s", e)
-        return jsonify({'error': str(e)}), 500
+        return error(500, str(e))
 
-@app.route('/api/podcast/<int:podcast_id>', methods=['GET'])
-@require_services
-def get_podcast(podcast_id):
+@app.get('/api/podcast/{podcast_id}', dependencies=SERVICES)
+def get_podcast(podcast_id: int):
     """Get details of a specific podcast"""
     try:
         search_system = get_search_system()
@@ -304,16 +358,16 @@ def get_podcast(podcast_id):
                 FROM podcasts
                 WHERE id = ?
             ''', (podcast_id,))
-            
+
             row = cursor.fetchone()
             if not row:
-                return jsonify({'error': 'Podcast not found'}), 404
-            
+                return error(404, 'Podcast not found')
+
             # Get chunk count
             cursor.execute('SELECT COUNT(*) FROM chunks WHERE podcast_id = ?', (podcast_id,))
             chunk_count = cursor.fetchone()[0]
-            
-            podcast = {
+
+            return {
                 'id': row[0],
                 'filename': row[1],
                 'title': row[2],
@@ -323,52 +377,37 @@ def get_podcast(podcast_id):
                 'chunk_count': chunk_count,
                 'duration_estimate': f"{row[4] // 150} min"
             }
-            
-            return jsonify(podcast)
         finally:
             search_system.close()
-        
+
     except Exception as e:
         logger.error("Get podcast error: %s", e)
-        return jsonify({'error': str(e)}), 500
+        return error(500, str(e))
 
 # ──────────────────────────── Chat ──────────────────────────────
 
-@app.route('/api/chat', methods=['POST'])
-@require_services
-def chat():
-    """
-    Chat with selected podcast
-    
-    Request body:
-    {
-        "podcast_id": 1,
-        "message": "What did they discuss about AI?",
-        "session_id": "optional-session-id"
-    }
-    """
+@app.post('/api/chat', dependencies=SERVICES)
+def chat(body: ChatRequest):
+    """Chat with the selected podcast"""
     try:
-        data = get_json_body()
-        if data is None:
-            return jsonify({'error': 'Request body must be a JSON object'}), 400
-        podcast_id = data.get('podcast_id')
-        message = data.get('message', '').strip()
+        podcast_id = body.podcast_id
+        message = body.message.strip()
         # time-based ids collided for chats started in the same second
-        session_id = data.get('session_id') or f'session_{uuid.uuid4().hex}'
-        
+        session_id = body.session_id or f'session_{uuid.uuid4().hex}'
+
         if not podcast_id or not message:
-            return jsonify({'error': 'podcast_id and message are required'}), 400
+            return error(400, 'podcast_id and message are required')
 
         # Unknown ids used to run the whole RAG graph (and bill Claude) against nothing.
         title = get_podcast_title(podcast_id)
         if title is None:
-            return jsonify({'error': 'Podcast not found', 'podcast_id': podcast_id}), 404
-        
+            return error(404, 'Podcast not found', podcast_id=podcast_id)
+
         # A session belongs to one podcast; never carry another episode's history over.
         session = current_sessions.get(session_id)
         if session is None or session['podcast_id'] != podcast_id:
             session = current_sessions[session_id] = {'podcast_id': podcast_id, 'history': []}
-        
+
         # Run corrective RAG graph
         start_time = time.time()
         rag_result = run_corrective_rag(
@@ -378,14 +417,14 @@ def chat():
         )
         response = rag_result["generation"]
         response_time = time.time() - start_time
-        
+
         # Save to history
         session['history'].append({
             'human': message,
             'assistant': response
         })
-        
-        return jsonify({
+
+        return {
             'response': response,
             'session_id': session_id,
             'podcast_id': podcast_id,
@@ -396,29 +435,28 @@ def chat():
                 'nodes_visited': rag_result.get('nodes_visited', []),
                 'relevant_chunks': len(rag_result.get('relevant_docs', [])),
             }
-        })
-        
+        }
+
     except Exception as e:
         logger.error("Chat error: %s", e)
-        return jsonify({'error': str(e)}), 500
+        return error(500, str(e))
 
-@app.route('/api/chat/session/<session_id>', methods=['GET'])
-def get_session(session_id):
+@app.get('/api/chat/session/{session_id}')
+def get_session(session_id: str):
     """Get chat session history"""
     if session_id not in current_sessions:
-        return jsonify({'error': 'Session not found'}), 404
-    
+        return error(404, 'Session not found')
+
     session = current_sessions[session_id]
-    return jsonify({
+    return {
         'session_id': session_id,
         'podcast_id': session['podcast_id'],
         'history': session['history']
-    })
+    }
 
 # ──────────────────────────── Statistics ────────────────────────
 
-@app.route('/api/stats', methods=['GET'])
-@require_services
+@app.get('/api/stats', dependencies=SERVICES)
 def get_stats():
     """Get system statistics"""
     try:
@@ -427,8 +465,8 @@ def get_stats():
             stats = search_system.get_stats()
         finally:
             search_system.close()
-        
-        return jsonify({
+
+        return {
             'database': {
                 'total_podcasts': stats['podcasts'],
                 'total_chunks': stats['chunks'],
@@ -443,93 +481,63 @@ def get_stats():
             'system': {
                 'search_ready': stats.get('pinecone_vectors', 0) > 0,
             }
-        })
-        
+        }
+
     except Exception as e:
         logger.error("Stats error: %s", e)
-        return jsonify({'error': str(e)}), 500
+        return error(500, str(e))
 
 # ──────────────────────────── Summaries ─────────────────────────
 
-@app.route('/api/summary/generate', methods=['POST'])
-@require_services
-def generate_summary():
-    """
-    Generate summary for a podcast
-    
-    Request body:
-    {
-        "podcast_id": 1,
-        "force_regenerate": false
-    }
-    """
+@app.post('/api/summary/generate', dependencies=SERVICES)
+def generate_summary(body: SummaryRequest):
+    """Generate a summary for a podcast"""
     try:
-        data = get_json_body()
-        if data is None:
-            return jsonify({'error': 'Request body must be a JSON object'}), 400
-        podcast_id = data.get('podcast_id')
-        force_regenerate = data.get('force_regenerate', False)
-        
+        podcast_id = body.podcast_id
+        force_regenerate = body.force_regenerate
+
         if not podcast_id:
-            return jsonify({'error': 'podcast_id is required'}), 400
+            return error(400, 'podcast_id is required')
 
         if get_podcast_title(podcast_id) is None:
-            return jsonify({'error': 'Podcast not found', 'podcast_id': podcast_id}), 404
-        
+            return error(404, 'Podcast not found', podcast_id=podcast_id)
+
         # Generate summary
         start_time = time.time()
         result = summarization_service.get_or_generate_summary(podcast_id, force_regenerate)
         generation_time = time.time() - start_time
-        
+
         if result['success']:
-            return jsonify({
+            return {
                 'success': True,
                 'podcast_id': podcast_id,
                 'summary': result['summary'],
                 'cached': result.get('cached', False),
                 'podcast_title': result.get('podcast_title', ''),
                 'generation_time_ms': round(generation_time * 1000, 2)
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'error': result.get('error', 'Failed to generate summary'),
-                'podcast_id': podcast_id
-            }), 500
-            
+            }
+        return error(500, result.get('error', 'Failed to generate summary'),
+                     success=False, podcast_id=podcast_id)
+
     except Exception as e:
         logger.error("Summary generation error: %s", e)
-        return jsonify({'error': str(e)}), 500
+        return error(500, str(e))
 
-@app.route('/api/summary/email', methods=['POST'])
-@require_services
-def email_summary():
-    """
-    Generate and email summary for a podcast
-    
-    Request body:
-    {
-        "podcast_id": 1,
-        "email": "user@example.com",
-        "force_regenerate": false
-    }
-    """
+@app.post('/api/summary/email', dependencies=SERVICES)
+def email_summary(body: EmailSummaryRequest):
+    """Generate and email a summary for a podcast"""
     try:
-        data = get_json_body()
-        if data is None:
-            return jsonify({'error': 'Request body must be a JSON object'}), 400
-        podcast_id = data.get('podcast_id')
-        user_email = data.get('email', '').strip()
-        force_regenerate = data.get('force_regenerate', False)
-        
+        podcast_id = body.podcast_id
+        user_email = body.email.strip()
+
         logger.info("Email summary request - Podcast ID: %s, Email: %s", podcast_id, user_email)
 
         if not podcast_id or not user_email:
-            return jsonify({'error': 'podcast_id and email are required'}), 400
+            return error(400, 'podcast_id and email are required')
 
         email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(email_pattern, user_email):
-            return jsonify({'error': 'Invalid email format'}), 400
+            return error(400, 'Invalid email format')
 
         search_system = get_search_system()
         try:
@@ -540,10 +548,8 @@ def email_summary():
             if not podcast_check:
                 cursor.execute('SELECT id, title FROM podcasts LIMIT 5')
                 available = cursor.fetchall()
-                return jsonify({
-                    'error': f'Podcast with ID {podcast_id} not found',
-                    'available_podcasts': [{'id': p[0], 'title': p[1]} for p in available]
-                }), 404
+                return error(404, f'Podcast with ID {podcast_id} not found',
+                             available_podcasts=[{'id': p[0], 'title': p[1]} for p in available])
         finally:
             search_system.close()
 
@@ -551,11 +557,8 @@ def email_summary():
         summary_result = summarization_service.generate_summary_for_email(podcast_id)
 
         if not summary_result['success']:
-            return jsonify({
-                'success': False,
-                'error': summary_result.get('error', 'Failed to generate summary'),
-                'podcast_id': podcast_id
-            }), 500
+            return error(500, summary_result.get('error', 'Failed to generate summary'),
+                         success=False, podcast_id=podcast_id)
 
         email_result = email_service.send_summary_email(
             to_email=user_email,
@@ -567,7 +570,7 @@ def email_summary():
         total_time = time.time() - start_time
 
         if email_result['success']:
-            return jsonify({
+            return {
                 'success': True,
                 'message': f'Summary sent to {user_email}',
                 'podcast_id': podcast_id,
@@ -576,32 +579,19 @@ def email_summary():
                 'cached': summary_result.get('cached', False),
                 'sent_at': email_result.get('sent_at'),
                 'total_time_ms': round(total_time * 1000, 2)
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'error': email_result.get('error', 'Failed to send email'),
-                'podcast_id': podcast_id,
-                'email': user_email
-            }), 500
+            }
+        return error(500, email_result.get('error', 'Failed to send email'),
+                     success=False, podcast_id=podcast_id, email=user_email)
 
     except Exception as e:
         logger.error("Email summary error: %s", e, exc_info=True)
-        return jsonify({'error': str(e)}), 500
-
-# ──────────────────────────── Error Handlers ────────────────────
-
-@app.errorhandler(404)
-def not_found(e):
-    return jsonify({'error': 'Endpoint not found'}), 404
-
-@app.errorhandler(500)
-def server_error(e):
-    return jsonify({'error': 'Internal server error'}), 500
+        return error(500, str(e))
 
 # ──────────────────────────── Main ──────────────────────────────
 
 if __name__ == '__main__':
+    import uvicorn
+
     services_ready = init_services()
 
     if services_ready:
@@ -613,4 +603,4 @@ if __name__ == '__main__':
             "and the database exists"
         )
 
-    app.run(debug=True, host='127.0.0.1', port=3000)
+    uvicorn.run(app, host='127.0.0.1', port=3000)

@@ -20,7 +20,7 @@ jobs:
           cache-dependency-path: backend/requirements.txt
 
       - name: Install dependencies
-        run: pip install -r backend/requirements.txt pytest
+        run: pip install -r backend/requirements.txt pytest httpx
 
       - name: Compile every Python file
         run: python -m compileall -q -x 'node_modules|frontend' .
