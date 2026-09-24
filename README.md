@@ -4,7 +4,7 @@ Search across your podcast library and ask questions about any episode, answered
 
 ![Podcast Q&A search interface](assets/screenshot.png)
 
-**Live site:** https://temporary-fast-sirocco-v22awhz.vercel.app (frontend on Vercel; the API runs on a home machine behind an ngrok tunnel, so it is up only when that machine is).
+**Live site:** https://frontend-lemon-theta-t9ee45vajt.vercel.app (frontend on Vercel; the API runs on a home machine behind an ngrok tunnel, so it is up only when that machine is).
 
 ## What it does
 

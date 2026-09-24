@@ -654,13 +654,16 @@ function App() {
                   <h3 className="font-display text-3xl leading-tight text-white">{episode.title}</h3>
                   <EpisodeMeta show={episode.show} date={episode.date} className="text-sm text-ink-500 mt-1.5" />
                 </div>
-                <button
-                  onClick={handleShowSummary}
-                  className="shrink-0 self-start sm:self-center px-4 py-2 text-sm rounded-xl btn-ghost hover:border-amber-400/30 hover:text-amber-100 flex items-center gap-2"
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>Email summary</span>
-                </button>
+                {/* Hidden when the server has emailing turned off (EMAIL_ENABLED=0). */}
+                {stats?.features?.email_summary !== false && (
+                  <button
+                    onClick={handleShowSummary}
+                    className="shrink-0 self-start sm:self-center px-4 py-2 text-sm rounded-xl btn-ghost hover:border-amber-400/30 hover:text-amber-100 flex items-center gap-2"
+                  >
+                    <Mail className="w-4 h-4" />
+                    <span>Email summary</span>
+                  </button>
+                )}
               </div>
             </div>
 

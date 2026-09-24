@@ -52,6 +52,10 @@ def client(monkeypatch, tmp_path):
         monkeypatch.setattr(controller, name, object())
     monkeypatch.setattr(controller, "run_corrective_rag",
                         lambda **kwargs: pytest.fail("RAG graph must not run"))
+    # Default limits regardless of the local config.env (which may turn email off).
+    from api.safeguards import Settings
+    monkeypatch.setattr(controller.guard, "settings", Settings())
+    monkeypatch.setattr(controller.guard, "_burst", {})
     return ASGIClient(controller.app)
 
 

@@ -200,9 +200,37 @@ def test_forwarded_headers_only_trusted_behind_a_proxy():
     headers = {"x-forwarded-for": "203.0.113.5, 10.0.0.1", "cf-connecting-ip": "203.0.113.9"}
     assert untrusting.client_ip(headers, "10.0.0.1") == "10.0.0.1"
     trusting, _ = make_guard(trust_proxy=True)
-    assert trusting.client_ip(headers, "10.0.0.1") == "203.0.113.9"
-    assert trusting.client_ip({"x-forwarded-for": "203.0.113.5, 10.0.0.1"}, "10.0.0.1") == "203.0.113.5"
+    # Only the entry the proxy appended counts; the rest came from the client.
+    assert trusting.client_ip(headers, "10.0.0.1") == "10.0.0.1"
+    assert trusting.client_ip({"x-forwarded-for": "198.51.100.7"}, "127.0.0.1") == "198.51.100.7"
+    assert trusting.client_ip({}, "127.0.0.1") == "127.0.0.1"
     assert trusting.client_ip({}, None) == "unknown"
+
+
+def test_forged_forwarding_headers_do_not_dodge_per_ip_limits():
+    guard, _ = make_guard(trust_proxy=True)
+    real = "198.51.100.7"
+    for i in range(10):
+        # A bot varies every header it controls; the proxy still appends its real address.
+        headers = {"x-forwarded-for": f"10.9.{i}.1, {real}", "x-real-ip": f"10.8.{i}.1",
+                   "cf-connecting-ip": f"10.7.{i}.1"}
+        assert guard.client_ip(headers, "127.0.0.1") == real
+
+
+def test_repeated_forwarded_headers_use_the_proxys_copy():
+    # ngrok forwards the client's X-Forwarded-For and appends its own as a second header.
+    from starlette.datastructures import Headers
+    headers = Headers(raw=[(b"x-forwarded-for", b"6.6.6.6"),
+                           (b"x-forwarded-for", b"198.51.100.7")])
+    guard, _ = make_guard(trust_proxy=True)
+    assert guard.client_ip(headers, "127.0.0.1") == "198.51.100.7"
+
+
+def test_email_can_be_turned_off():
+    guard, _ = make_guard(email_enabled=False)
+    rejection = chat(guard, path="/api/summary/email")
+    assert rejection.status == 403 and rejection.code == "email_disabled"
+    assert chat(guard) is None  # chat still works
 
 
 def test_settings_read_the_environment(monkeypatch):
@@ -211,7 +239,9 @@ def test_settings_read_the_environment(monkeypatch):
     monkeypatch.setenv("ACCESS_CODE", " friends ")
     monkeypatch.setenv("TRUST_PROXY", "true")
     monkeypatch.setenv("IP_BURST_LIMIT", "garbage")
+    monkeypatch.setenv("EMAIL_ENABLED", "0")
     settings = Settings.from_env()
+    assert settings.email_enabled is False
     assert settings.daily_model_requests == 12
     assert settings.daily_budget_usd == 2.5
     assert settings.access_code == "friends"

@@ -1,7 +1,7 @@
 {
   "build": {
     "env": {
-      "REACT_APP_API_BASE": "https://406d-4-71-27-146.ngrok-free.app"
+      "REACT_APP_API_BASE": "https://0d27-2610-148-205a-0-2cc2-9ef0-3f94-a4ef.ngrok-free.app"
     }
   }
 }

@@ -493,6 +493,9 @@ def get_stats():
             },
             'system': {
                 'search_ready': stats.get('pinecone_vectors', 0) > 0,
+            },
+            'features': {
+                'email_summary': guard.settings.email_enabled,
             }
         }
 

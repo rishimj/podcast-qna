@@ -10,7 +10,8 @@ reaches a handler, Guard.check() applies, in order:
   2. Optional access code     -> 401 (ACCESS_CODE; off by default)
   3. Per-IP burst limit       -> 429 (any endpoint)
   4. Daily caps on model calls, per IP and site-wide            -> 429
-  5. Daily caps on summary emails, per IP and site-wide         -> 429
+  5. Summary emails: off entirely (EMAIL_ENABLED=0)             -> 403
+     otherwise daily caps, per IP and site-wide                  -> 429
   6. Spend caps from the recorded Claude usage (day/week/month) -> 429
 
 Model requests are logged to the `api_requests` table in llm_usage.db at
@@ -66,6 +67,13 @@ def _env_float(name: str, default: float) -> float:
         return default
 
 
+def _env_bool(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None or not value.strip():
+        return default
+    return value.strip().lower() in ("1", "true", "yes", "on")
+
+
 @dataclass
 class Settings:
     """Limits, read from the environment. 0 disables a limit."""
@@ -82,6 +90,7 @@ class Settings:
     max_sessions: int = 500               # chat sessions kept in memory
     access_code: str = ""                 # required X-Access-Code header when set
     trust_proxy: bool = False             # take client IP from X-Forwarded-For
+    email_enabled: bool = True            # False refuses /api/summary/email outright
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -98,7 +107,8 @@ class Settings:
             max_body_bytes=_env_int("MAX_BODY_BYTES", cls.max_body_bytes),
             max_sessions=_env_int("MAX_SESSIONS", cls.max_sessions),
             access_code=os.getenv("ACCESS_CODE", "").strip(),
-            trust_proxy=os.getenv("TRUST_PROXY", "0").strip().lower() in ("1", "true", "yes"),
+            trust_proxy=_env_bool("TRUST_PROXY", False),
+            email_enabled=_env_bool("EMAIL_ENABLED", True),
         )
 
 
@@ -153,9 +163,9 @@ class Guard:
         s = self.settings
         logger.info(
             "Safeguards: %d model requests/day (%d per IP), %d requests/min per IP, "
-            "%d emails/day (%d per IP), budget $%.2f/day, access code %s, trust proxy %s",
+            "emails %s (%d/day, %d per IP), budget $%.2f/day, access code %s, trust proxy %s",
             s.daily_model_requests, s.ip_daily_model_requests, s.ip_burst_per_minute,
-            s.daily_emails, s.ip_daily_emails, s.daily_budget_usd,
+            "on" if s.email_enabled else "off", s.daily_emails, s.ip_daily_emails, s.daily_budget_usd,
             "on" if s.access_code else "off", "on" if s.trust_proxy else "off",
         )
 
@@ -165,16 +175,22 @@ class Guard:
         """The address to rate-limit on.
 
         X-Forwarded-For is only honoured with TRUST_PROXY=1: without a proxy
-        in front, any client could set it and pick its own quota bucket.
+        in front, any client could set it and pick its own quota bucket. Even
+        behind a proxy only the last entry is used. The proxy (ngrok, nginx,
+        Cloudflare) appends the address it saw, while everything before it,
+        and headers like X-Real-IP, came from the client and can be forged
+        to dodge the per-IP limits.
         """
         if self.settings.trust_proxy:
-            for header in ("cf-connecting-ip", "x-real-ip"):
-                value = headers.get(header)
-                if value:
-                    return value.strip()
-            forwarded = headers.get("x-forwarded-for")
-            if forwarded:
-                return forwarded.split(",")[0].strip()
+            # ngrok sends the client's value and its own as separate headers,
+            # so read every copy (Starlette's .get() only returns the first).
+            if hasattr(headers, "getlist"):
+                values = headers.getlist("x-forwarded-for")
+            else:
+                values = [headers.get("x-forwarded-for") or ""]
+            entries = [e.strip() for v in values for e in v.split(",") if e.strip()]
+            if entries:
+                return entries[-1]
         return remote_addr or "unknown"
 
     # ── the decision ─────────────────────────────────────────────────
@@ -209,6 +225,10 @@ class Guard:
 
         if path not in MODEL_PATHS or method not in PROTECTED_METHODS:
             return None
+
+        if path in EMAIL_PATHS and not s.email_enabled:
+            return Rejection(403, "Emailing summaries is turned off on this site",
+                             code="email_disabled")
 
         now = self._now()
         today = now.date()
