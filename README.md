@@ -4,6 +4,8 @@ Search across your podcast library and ask questions about any episode, answered
 
 ![Podcast Q&A search interface](assets/screenshot.png)
 
+**Live site:** https://temporary-fast-sirocco-v22awhz.vercel.app (frontend on Vercel; the API runs on a home machine behind an ngrok tunnel, so it is up only when that machine is).
+
 ## What it does
 
 - **Find the right episode.** Describe a topic, a guest, or a half-remembered idea, and get the most relevant episodes back.
@@ -46,6 +48,28 @@ cd frontend && npm start        # App on http://localhost:8080
 ```
 
 To keep your library current, `scripts/daily_refresh.sh` collects and indexes new episodes in one step and can run on a schedule.
+
+## Publishing a link
+
+The API is safe to expose because every request that costs money is capped. Defaults (all set in `config/env/config.env`, see `config.env.example`):
+
+| Limit | Default |
+| --- | --- |
+| Chat and summary requests per day, site-wide | 300 |
+| Chat and summary requests per day, per visitor IP | 40 |
+| Requests per minute, per visitor IP | 30 |
+| Summary emails per day, site-wide / per IP | 20 / 3 |
+| Claude spend per day (from the recorded usage) | $5 |
+
+Past a limit the API answers 429 with a plain explanation, which the app shows in place of the result. Counts are stored in `data/databases/llm_usage.db`, so restarting the server does not reset them. Chat messages are capped at 2,000 characters and search queries at 500. Set any limit to 0 to turn it off.
+
+Optional extras:
+
+- **Access code.** Set `ACCESS_CODE=something` to require a shared password. The app asks for it once and remembers it.
+- **Behind a tunnel or proxy** (Cloudflare Tunnel, ngrok, nginx): set `TRUST_PROXY=1` so per-IP limits use the visitor's real address, and `ALLOWED_ORIGINS=https://your-site.example` so only your frontend can call the API from a browser.
+- **Frontend.** Build it with `REACT_APP_API_BASE=https://api.your-site.example npm run build` so it talks to the public API instead of localhost.
+
+The daily cost report (`scripts/daily_cost_report.py`) emails what was actually spent, so you can raise or lower the caps with real numbers.
 
 ## Built with
 

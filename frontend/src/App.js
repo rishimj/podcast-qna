@@ -2,7 +2,41 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, Send, Mic, Loader2, ChevronRight, Clock, BarChart3, Podcast, Mail, FileText, X } from 'lucide-react';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:3000/api';
+// Point REACT_APP_API_BASE at the public API URL when publishing the site.
+const API_BASE = `${(process.env.REACT_APP_API_BASE || 'http://localhost:3000').replace(/\/$/, '')}/api`;
+
+// The API may require a shared access code (ACCESS_CODE on the server). It is
+// asked for once, kept in localStorage, and sent with every request.
+const ACCESS_CODE_KEY = 'podcastQaAccessCode';
+const api = axios.create();
+api.interceptors.request.use((config) => {
+  const code = localStorage.getItem(ACCESS_CODE_KEY);
+  if (code) config.headers['X-Access-Code'] = code;
+  // Free ngrok tunnels answer browser requests with an interstitial page unless
+  // this header is present; it is harmless for any other host.
+  config.headers['ngrok-skip-browser-warning'] = '1';
+  return config;
+});
+api.interceptors.response.use(undefined, async (error) => {
+  const { response, config } = error;
+  if (response?.status === 401 && response.data?.code === 'access_code_required' && !config._retried) {
+    const code = window.prompt('This site needs an access code. Enter it to continue:');
+    if (code && code.trim()) {
+      localStorage.setItem(ACCESS_CODE_KEY, code.trim());
+      return api({ ...config, _retried: true });
+    }
+  }
+  return Promise.reject(error);
+});
+
+// A user-facing message for a failed request: the server's own explanation
+// when it sent one (rate limits, budget, access code), otherwise the fallback.
+const describeError = (error, fallback) => {
+  const status = error.response?.status;
+  const message = error.response?.data?.error;
+  if (message && (status === 429 || status === 401 || status === 413 || status === 400)) return message;
+  return fallback;
+};
 
 // Confidence badge component
 const ConfidenceBadge = ({ score }) => {
@@ -235,7 +269,7 @@ function App() {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/stats`);
+      const response = await api.get(`${API_BASE}/stats`);
       setStats(response.data);
     } catch (error) {
       console.error('Failed to fetch stats:', error);
@@ -250,7 +284,7 @@ function App() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.post(`${API_BASE}/search`, {
+      const response = await api.post(`${API_BASE}/search`, {
         query: searchQuery,
         top_k: 5
       });
@@ -261,7 +295,7 @@ function App() {
       }
     } catch (error) {
       console.error('Search failed:', error);
-      setError('Search failed. Please check your connection.');
+      setError(describeError(error, 'Search failed. Please check your connection.'));
     } finally {
       setIsLoading(false);
     }
@@ -286,7 +320,7 @@ function App() {
     setError(null);
 
     try {
-      const response = await axios.post(`${API_BASE}/chat`, {
+      const response = await api.post(`${API_BASE}/chat`, {
         podcast_id: selectedPodcast.podcast_id,
         message: userMessage,
         session_id: sessionId
@@ -295,9 +329,9 @@ function App() {
       setMessages(prev => [...prev, { text: response.data.response, isUser: false }]);
     } catch (error) {
       console.error('Chat failed:', error);
-      setMessages(prev => [...prev, { 
-        text: 'Sorry, I encountered an error. Please try again.', 
-        isUser: false 
+      setMessages(prev => [...prev, {
+        text: describeError(error, 'Sorry, I encountered an error. Please try again.'),
+        isUser: false
       }]);
     } finally {
       setIsLoading(false);
@@ -322,7 +356,7 @@ function App() {
     setSuccessMessage('');
     
     try {
-      const response = await axios.post(`${API_BASE}/summary/email`, {
+      const response = await api.post(`${API_BASE}/summary/email`, {
         podcast_id: selectedPodcast.podcast_id,
         email: email
       });

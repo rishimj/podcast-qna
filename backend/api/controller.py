@@ -19,7 +19,7 @@ from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -28,6 +28,8 @@ from search.podcast_semantic_search_complete import PodcastTwoTierSearch
 from search.summarization_service import PodcastSummarizationService
 from search.email_service import EmailService
 from search.corrective_rag import run_corrective_rag, init_rag_resources
+from api.safeguards import (MAX_MESSAGE_CHARS, MAX_QUERY_CHARS, MAX_SESSION_ID_CHARS,
+                            MAX_TOP_K, install_fastapi, remember_session)
 
 load_dotenv(Path(__file__).parent.parent.parent / '.env')
 
@@ -35,12 +37,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Podcast Q&A API")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 
 def _load_config():
@@ -67,6 +63,19 @@ def _load_config():
 
 
 _load_config()
+
+# Rate limits, spend caps, body-size cap and the optional access code; see
+# api/safeguards.py. Added before CORS so that CORS wraps it and the browser
+# can read a 429/401 body instead of seeing a blocked cross-origin response.
+guard = install_fastapi(app)
+
+# Browser origins allowed to call the API (ALLOWED_ORIGINS, comma-separated; * = any).
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[o.strip() for o in os.getenv('ALLOWED_ORIGINS', '*').split(',') if o.strip()],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 llm = None
 summarization_service = None
@@ -153,15 +162,17 @@ SERVICES = [Depends(require_services)]
 # Fields default to empty values so each handler's own checks still produce
 # their specific 400 messages; a wrong type fails validation (also a 400).
 
+# Length caps keep a single request from burning a large token budget.
+
 class SearchRequest(BaseModel):
-    query: str = ''
-    top_k: int = 5
+    query: str = Field('', max_length=MAX_QUERY_CHARS)
+    top_k: int = Field(5, ge=1, le=MAX_TOP_K)
 
 
 class ChatRequest(BaseModel):
     podcast_id: int | None = None
-    message: str = ''
-    session_id: str | None = None
+    message: str = Field('', max_length=MAX_MESSAGE_CHARS)
+    session_id: str | None = Field(None, max_length=MAX_SESSION_ID_CHARS)
 
 
 class SummaryRequest(BaseModel):
@@ -171,7 +182,7 @@ class SummaryRequest(BaseModel):
 
 class EmailSummaryRequest(BaseModel):
     podcast_id: int | None = None
-    email: str = ''
+    email: str = Field('', max_length=254)
     force_regenerate: bool = False
 
 
@@ -406,7 +417,9 @@ def chat(body: ChatRequest):
         # A session belongs to one podcast; never carry another episode's history over.
         session = current_sessions.get(session_id)
         if session is None or session['podcast_id'] != podcast_id:
-            session = current_sessions[session_id] = {'podcast_id': podcast_id, 'history': []}
+            session = remember_session(current_sessions, session_id,
+                                       {'podcast_id': podcast_id, 'history': []},
+                                       guard.settings.max_sessions)
 
         # Run corrective RAG graph
         start_time = time.time()

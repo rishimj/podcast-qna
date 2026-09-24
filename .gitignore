@@ -52,6 +52,8 @@ env/
 ENV/
 env.bak/
 venv.bak/
+# `env/` above also matched config/env/, which hid the config example from git.
+!/config/env/
 
 # IDE
 .vscode/
@@ -105,6 +107,7 @@ transcripts/
 config.env
 .env*
 *.env*
+!config/env/config.env.example
 
 # Spotify Auth
 .spotifycache

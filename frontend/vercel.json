@@ -1,0 +1,7 @@
+{
+  "build": {
+    "env": {
+      "REACT_APP_API_BASE": "https://406d-4-71-27-146.ngrok-free.app"
+    }
+  }
+}
