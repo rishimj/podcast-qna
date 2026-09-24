@@ -297,14 +297,17 @@ def search_podcasts(body: SearchRequest):
                 'podcast_id': result['podcast_id'],
                 'title': result['title'],
                 'filename': result['filename'],
-                'confidence': round(result['final_score'], 3),
-                'confidence_percent': round(result['final_score'] * 100, 1),
+                # Display-friendly rescaling of the reranker score; see
+                # rerank_to_match_score. The raw score stays under 'scoring'.
+                'confidence': round(result['match_score'], 3),
+                'confidence_percent': round(result['match_score'] * 100, 1),
                 'content_preview': result['content_preview'],
                 'scoring': {
                     'title': round(result['title_similarity'], 3),
                     'intro': round(result['intro_similarity'], 3),
                     'content': round(result['chunks_similarity'], 3),
-                    'outro': round(result['outro_similarity'], 3)
+                    'outro': round(result['outro_similarity'], 3),
+                    'rerank': round(result['final_score'], 4)
                 }
             })
 

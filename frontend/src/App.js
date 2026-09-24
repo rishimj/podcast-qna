@@ -41,7 +41,7 @@ const describeError = (error, fallback) => {
   return fallback;
 };
 
-const SEARCH_EXAMPLES = ['consciousness', 'AI and the future of work', 'sleep science', 'startup advice'];
+const SEARCH_EXAMPLES = ['prompt engineering', 'Elon Musk on DOGE', 'AI and the future of work', 'startup advice'];
 const QUESTION_STARTERS = [
   'Summarize the key ideas',
   'Who is the guest and what do they do?',
@@ -571,7 +571,7 @@ function App() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="consciousness, a guest's name, that episode about sleep…"
+                  placeholder="a topic, a guest's name, that episode about AI agents…"
                   className="flex-1 min-w-0 bg-transparent px-4 py-4 sm:py-5 text-base sm:text-lg text-white placeholder-ink-500 focus:outline-none"
                 />
                 <button

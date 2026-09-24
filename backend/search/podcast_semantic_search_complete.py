@@ -37,6 +37,22 @@ PINECONE_CLOUD = "aws"
 PINECONE_REGION = "us-east-1"
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
+
+# pinecone-rerank-v0 returns a sigmoid probability that a passage directly
+# answers the query. Conversational transcript chunks rarely do, so even the
+# right episode for a topic query usually scores 0.01-0.1, which reads as a
+# 0-9% "match". For display, undo the sigmoid and re-apply a gentler one: the
+# order is unchanged, but a 5% reranker score maps to a 50% match, 0.1% to
+# about 12%, and 90% to about 93%.
+MATCH_SCORE_SHIFT = 3.0
+MATCH_SCORE_TEMPERATURE = 2.0
+
+
+def rerank_to_match_score(score: float) -> float:
+    """Map a reranker probability to a 0-1 match score for display."""
+    p = min(max(score, 1e-6), 1 - 1e-6)
+    logit = np.log(p / (1 - p))
+    return float(1 / (1 + np.exp(-(logit + MATCH_SCORE_SHIFT) / MATCH_SCORE_TEMPERATURE)))
 BM25_PARAMS_PATH = PROJECT_ROOT / "data" / "bm25_params.json"
 
 
@@ -408,10 +424,11 @@ class PodcastTwoTierSearch:
             reranked = []
             for item in rerank_result.data:
                 meta = chunk_meta[item.index]
-                reranked.append({**meta, "rerank_score": item.score})
+                reranked.append({**meta, "rerank_score": item.score,
+                                 "match_score": rerank_to_match_score(item.score)})
         except Exception as e:
             print(f"⚠️  Reranker failed ({e}), falling back to hybrid scores")
-            reranked = [{**m, "rerank_score": m["hybrid_score"]}
+            reranked = [{**m, "rerank_score": m["hybrid_score"], "match_score": m["hybrid_score"]}
                         for m in chunk_meta[:self.rerank_top_n]]
 
         # Stage 3: Aggregate to podcast level (best score per podcast)
@@ -440,6 +457,7 @@ class PodcastTwoTierSearch:
                 'chunks_similarity': item.get('hybrid_score', 0.0),
                 'outro_similarity': 0.0,
                 'final_score': item['rerank_score'],
+                'match_score': item['match_score'],
                 'content_preview': content_preview,
             })
 

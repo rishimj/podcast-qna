@@ -47,7 +47,7 @@ def display_search_results(results, query):
     print(f"\n🔍 Search results for: '{query}'\n")
     
     for i, result in enumerate(results[:3], 1):
-        print(f"{i}. {result['title']} (confidence: {result['final_score']:.2%})")
+        print(f"{i}. {result['title']} (confidence: {result['match_score']:.2%})")
         print(f"   File: {result['filename']}")
         
         # Show what matched
@@ -112,7 +112,7 @@ def main():
     best_match = results[0]
     
     # If confidence is low or multiple good matches, let user choose
-    if best_match['final_score'] < 0.5 or (len(results) > 1 and results[1]['final_score'] > 0.4):
+    if best_match['match_score'] < 0.5 or (len(results) > 1 and results[1]['match_score'] > 0.4):
         print("Multiple possible matches found.")
         choice = input("Select podcast (1-3) or press Enter for best match: ").strip()
         
@@ -200,7 +200,7 @@ def main():
                 # Show current podcast info
                 print(f"\n📎 Current Podcast: {best_match['title']}")
                 print(f"   File: {best_match['filename']}")
-                print(f"   Match confidence: {best_match['final_score']:.2%}")
+                print(f"   Match confidence: {best_match['match_score']:.2%}")
                 print(f"   Content length: {len(current_content)} characters")
                 continue
             
