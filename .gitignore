@@ -189,3 +189,6 @@ docs/
 
 # requirements.txt is a dependency manifest, not data: keep it tracked
 !backend/requirements.txt
+
+# Public benchmark datasets (downloaded by eval/benchmarks/download.sh)
+data/benchmarks/

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 FastAPI backend for the Podcast RAG chatbot.
-Provides REST endpoints for search, chat and summaries.
+Provides REST endpoints for search, chat, summaries and Notion export.
 """
 
 import logging
@@ -27,6 +27,7 @@ from search.claude_llm import ClaudeLLM
 from search.podcast_semantic_search_complete import PodcastTwoTierSearch
 from search.summarization_service import PodcastSummarizationService
 from search.email_service import EmailService
+from search.notion_service import NotionError, NotionService
 from search.corrective_rag import run_corrective_rag, init_rag_resources
 from api.safeguards import (MAX_MESSAGE_CHARS, MAX_QUERY_CHARS, MAX_SESSION_ID_CHARS,
                             MAX_TOP_K, install_fastapi, remember_session)
@@ -81,6 +82,9 @@ llm = None
 summarization_service = None
 email_service = None
 current_sessions = {}
+# No network calls at construction, so it is built once here; exports are
+# refused with a 503 until NOTION_TOKEN and NOTION_PARENT_PAGE_ID are set.
+notion_service = NotionService()
 
 def init_services():
     """Initialize LLM, summarization, and email services."""
@@ -184,6 +188,14 @@ class EmailSummaryRequest(BaseModel):
     podcast_id: int | None = None
     email: str = Field('', max_length=254)
     force_regenerate: bool = False
+
+
+class NotionSummaryRequest(BaseModel):
+    podcast_id: int | None = None
+
+
+class NotionConversationRequest(BaseModel):
+    session_id: str = Field('', max_length=MAX_SESSION_ID_CHARS)
 
 
 # ──────────────────────────── Error Handlers ────────────────────
@@ -499,6 +511,7 @@ def get_stats():
             },
             'features': {
                 'email_summary': guard.settings.email_enabled,
+                'notion_export': guard.settings.notion_enabled and notion_service.configured,
             }
         }
 
@@ -604,6 +617,80 @@ def email_summary(body: EmailSummaryRequest):
 
     except Exception as e:
         logger.error("Email summary error: %s", e, exc_info=True)
+        return error(500, str(e))
+
+# ──────────────────────────── Notion export ─────────────────────
+
+NOTION_NOT_CONFIGURED = ('Notion export is not configured on this server '
+                         '(set NOTION_TOKEN and NOTION_PARENT_PAGE_ID)')
+
+
+@app.post('/api/notion/summary', dependencies=SERVICES)
+def notion_summary(body: NotionSummaryRequest):
+    """Save an episode's summary (generating it if needed) as a Notion page"""
+    try:
+        podcast_id = body.podcast_id
+        if not podcast_id:
+            return error(400, 'podcast_id is required')
+        if not notion_service.configured:
+            return error(503, NOTION_NOT_CONFIGURED)
+
+        title = get_podcast_title(podcast_id)
+        if title is None:
+            return error(404, 'Podcast not found', podcast_id=podcast_id)
+
+        result = summarization_service.get_or_generate_summary(podcast_id)
+        if not result['success']:
+            return error(500, result.get('error', 'Failed to generate summary'),
+                         success=False, podcast_id=podcast_id)
+
+        page = notion_service.export_summary(title, result['summary'])
+        return {
+            'success': True,
+            'podcast_id': podcast_id,
+            'podcast_title': title,
+            'cached': result.get('cached', False),
+            'notion_page_id': page['id'],
+            'notion_url': page['url'],
+        }
+
+    except NotionError as e:
+        return error(502, str(e))
+    except Exception as e:
+        logger.error("Notion summary export error: %s", e, exc_info=True)
+        return error(500, str(e))
+
+
+@app.post('/api/notion/conversation')
+def notion_conversation(body: NotionConversationRequest):
+    """Save a chat session's questions and answers as a Notion page"""
+    try:
+        session_id = body.session_id.strip()
+        if not session_id:
+            return error(400, 'session_id is required')
+        if not notion_service.configured:
+            return error(503, NOTION_NOT_CONFIGURED)
+
+        session = current_sessions.get(session_id)
+        if not session or not session['history']:
+            return error(404, 'No conversation found for this session')
+
+        title = get_podcast_title(session['podcast_id']) or f"Podcast {session['podcast_id']}"
+        page = notion_service.export_conversation(title, session['history'])
+        return {
+            'success': True,
+            'session_id': session_id,
+            'podcast_id': session['podcast_id'],
+            'podcast_title': title,
+            'messages': len(session['history']),
+            'notion_page_id': page['id'],
+            'notion_url': page['url'],
+        }
+
+    except NotionError as e:
+        return error(502, str(e))
+    except Exception as e:
+        logger.error("Notion conversation export error: %s", e, exc_info=True)
         return error(500, str(e))
 
 # ──────────────────────────── Main ──────────────────────────────

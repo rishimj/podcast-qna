@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Search, Send, Loader2, ArrowLeft, ArrowUpRight, Clock, Layers, Library,
   Headphones, Mail, X, Sparkles, CheckCircle2, AlertCircle,
+  BookMarked, ChevronDown, FileText, MessagesSquare, ExternalLink,
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -288,6 +289,68 @@ const EmailSummaryModal = ({ isOpen, onClose, podcast, onSendEmail, isLoading })
   );
 };
 
+// "Save to Notion" button with a menu: the episode summary, or this conversation.
+const NotionMenu = ({ onExport, busy, hasConversation }) => {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const close = (e) => {
+      if (e.type === 'keydown' ? e.key === 'Escape' : !menuRef.current?.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    document.addEventListener('keydown', close);
+    return () => {
+      document.removeEventListener('mousedown', close);
+      document.removeEventListener('keydown', close);
+    };
+  }, [open]);
+
+  const choose = (kind) => {
+    setOpen(false);
+    onExport(kind);
+  };
+
+  const itemClass = 'w-full flex items-start gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-white/[0.05] disabled:opacity-40 disabled:hover:bg-transparent transition-colors';
+
+  return (
+    <div ref={menuRef} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        disabled={!!busy}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="px-4 py-2 text-sm rounded-xl btn-ghost hover:border-amber-400/30 hover:text-amber-100 flex items-center gap-2"
+      >
+        {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <BookMarked className="w-4 h-4" />}
+        <span>{busy ? 'Saving…' : 'Save to Notion'}</span>
+        {!busy && <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />}
+      </button>
+      {open && (
+        <div role="menu" className="absolute left-0 sm:left-auto sm:right-0 mt-2 w-64 z-30 p-1.5 rounded-2xl glass bg-ink-900/95 shadow-2xl shadow-black/50 animate-scale-in">
+          <button role="menuitem" onClick={() => choose('summary')} className={itemClass}>
+            <FileText className="w-4 h-4 mt-0.5 shrink-0 text-amber-300" />
+            <span>
+              <span className="block text-sm text-ink-100">Episode summary</span>
+              <span className="block text-xs text-ink-500 mt-0.5">A detailed write-up of the whole episode</span>
+            </span>
+          </button>
+          <button role="menuitem" onClick={() => choose('conversation')} disabled={!hasConversation} className={itemClass}>
+            <MessagesSquare className="w-4 h-4 mt-0.5 shrink-0 text-amber-300" />
+            <span>
+              <span className="block text-sm text-ink-100">This conversation</span>
+              <span className="block text-xs text-ink-500 mt-0.5">
+                {hasConversation ? 'Your questions and the answers' : 'Ask a question first'}
+              </span>
+            </span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Floating notice for errors and confirmations.
 const Toast = ({ tone, children, onDismiss }) => {
   const isError = tone === 'error';
@@ -335,6 +398,7 @@ function App() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [notionExport, setNotionExport] = useState(null); // 'summary' | 'conversation' while saving
 
   const messagesEndRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -500,6 +564,40 @@ function App() {
     }
   };
 
+  const handleNotionExport = async (kind) => {
+    if (!selectedPodcast || notionExport) return;
+
+    setNotionExport(kind);
+    setError(null);
+    setSuccessMessage('');
+
+    try {
+      const response = kind === 'summary'
+        ? await api.post(`${API_BASE}/notion/summary`, { podcast_id: selectedPodcast.podcast_id })
+        : await api.post(`${API_BASE}/notion/conversation`, { session_id: sessionId });
+
+      const { notion_url: url } = response.data;
+      setSuccessMessage(
+        <>
+          {kind === 'summary' ? 'Summary' : 'Conversation'} saved to Notion.{' '}
+          {url && (
+            <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 underline underline-offset-2 hover:text-white">
+              Open page <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
+        </>
+      );
+      setTimeout(() => setSuccessMessage(''), 8000);
+    } catch (error) {
+      const status = error.response?.status;
+      // Notion's own explanation (502) and "not configured" (503) are worth showing as-is.
+      const detail = (status === 502 || status === 503 || status === 404) && error.response?.data?.error;
+      setError(detail || describeError(error, 'Could not save to Notion. Please try again.'));
+    } finally {
+      setNotionExport(null);
+    }
+  };
+
   const handleShowSummary = () => {
     setShowEmailModal(true);
     setError(null);
@@ -654,16 +752,26 @@ function App() {
                   <h3 className="font-display text-3xl leading-tight text-white">{episode.title}</h3>
                   <EpisodeMeta show={episode.show} date={episode.date} className="text-sm text-ink-500 mt-1.5" />
                 </div>
-                {/* Hidden when the server has emailing turned off (EMAIL_ENABLED=0). */}
-                {stats?.features?.email_summary !== false && (
-                  <button
-                    onClick={handleShowSummary}
-                    className="shrink-0 self-start sm:self-center px-4 py-2 text-sm rounded-xl btn-ghost hover:border-amber-400/30 hover:text-amber-100 flex items-center gap-2"
-                  >
-                    <Mail className="w-4 h-4" />
-                    <span>Email summary</span>
-                  </button>
-                )}
+                <div className="shrink-0 self-start sm:self-center flex flex-wrap gap-2">
+                  {/* Hidden when the server has emailing turned off (EMAIL_ENABLED=0). */}
+                  {stats?.features?.email_summary !== false && (
+                    <button
+                      onClick={handleShowSummary}
+                      className="px-4 py-2 text-sm rounded-xl btn-ghost hover:border-amber-400/30 hover:text-amber-100 flex items-center gap-2"
+                    >
+                      <Mail className="w-4 h-4" />
+                      <span>Email summary</span>
+                    </button>
+                  )}
+                  {/* Shown only when the server has Notion set up (NOTION_TOKEN) and enabled. */}
+                  {stats?.features?.notion_export && (
+                    <NotionMenu
+                      onExport={handleNotionExport}
+                      busy={notionExport}
+                      hasConversation={messages.some((m) => !m.isUser) && !isLoading}
+                    />
+                  )}
+                </div>
               </div>
             </div>
 

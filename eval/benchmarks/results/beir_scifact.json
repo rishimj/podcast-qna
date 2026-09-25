@@ -1,0 +1,26 @@
+{
+  "dataset": "BEIR/scifact",
+  "documents": 5183,
+  "queries": 300,
+  "published_bm25_ndcg@10": 0.665,
+  "systems": {
+    "BM25 only": {
+      "ndcg@10": 0.6736,
+      "recall@10": 0.8072
+    },
+    "Dense only (nomic-embed-text)": {
+      "ndcg@10": 0.6691,
+      "recall@10": 0.8077
+    },
+    "Hybrid (alpha=0.7)": {
+      "ndcg@10": 0.7166,
+      "recall@10": 0.8502
+    },
+    "Full pipeline (hybrid + rerank)": {
+      "ndcg@10": 0.7738,
+      "recall@10": 0.8834
+    }
+  },
+  "rerank_failures": 0,
+  "elapsed_seconds": 397.7
+}

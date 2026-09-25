@@ -233,6 +233,23 @@ def test_email_can_be_turned_off():
     assert chat(guard) is None  # chat still works
 
 
+def test_notion_export_can_be_turned_off():
+    guard, _ = make_guard(notion_enabled=False)
+    for path in ("/api/notion/summary", "/api/notion/conversation"):
+        rejection = chat(guard, path=path)
+        assert rejection.status == 403 and rejection.code == "notion_disabled"
+    assert chat(guard) is None
+
+
+def test_notion_summary_export_counts_as_a_model_request():
+    guard, _ = make_guard()
+    for _ in range(3):
+        assert chat(guard, path="/api/notion/summary") is None
+    assert chat(guard, path="/api/notion/summary").code == "ip_daily_limit"
+    # Exporting a conversation calls no model, so it isn't capped with them.
+    assert chat(guard, path="/api/notion/conversation") is None
+
+
 def test_settings_read_the_environment(monkeypatch):
     monkeypatch.setenv("DAILY_REQUEST_LIMIT", "12")
     monkeypatch.setenv("DAILY_BUDGET_LIMIT", "2.5")

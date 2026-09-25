@@ -9,10 +9,11 @@ reaches a handler, Guard.check() applies, in order:
   1. Body size cap            -> 413
   2. Optional access code     -> 401 (ACCESS_CODE; off by default)
   3. Per-IP burst limit       -> 429 (any endpoint)
-  4. Daily caps on model calls, per IP and site-wide            -> 429
-  5. Summary emails: off entirely (EMAIL_ENABLED=0)             -> 403
+  4. Notion export: off entirely (NOTION_ENABLED=0)             -> 403
+  5. Daily caps on model calls, per IP and site-wide            -> 429
+  6. Summary emails: off entirely (EMAIL_ENABLED=0)             -> 403
      otherwise daily caps, per IP and site-wide                  -> 429
-  6. Spend caps from the recorded Claude usage (day/week/month) -> 429
+  7. Spend caps from the recorded Claude usage (day/week/month) -> 429
 
 Model requests are logged to the `api_requests` table in llm_usage.db at
 admission, so daily counts survive server restarts and a bot can't reset its
@@ -38,8 +39,11 @@ logger = logging.getLogger(__name__)
 
 # Endpoints that call Claude. The email endpoint also sends mail, so it has
 # its own, tighter caps on top of the model caps.
-MODEL_PATHS = frozenset({"/api/chat", "/api/summary/generate", "/api/summary/email"})
+MODEL_PATHS = frozenset({"/api/chat", "/api/summary/generate", "/api/summary/email",
+                         "/api/notion/summary"})
 EMAIL_PATHS = frozenset({"/api/summary/email"})
+# Endpoints that write pages into the site owner's Notion workspace.
+NOTION_PATHS = frozenset({"/api/notion/summary", "/api/notion/conversation"})
 # Only these paths cost anything; GET endpoints and health only get the burst limit.
 PROTECTED_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})
 
@@ -91,6 +95,7 @@ class Settings:
     access_code: str = ""                 # required X-Access-Code header when set
     trust_proxy: bool = False             # take client IP from X-Forwarded-For
     email_enabled: bool = True            # False refuses /api/summary/email outright
+    notion_enabled: bool = True           # False refuses the /api/notion/* exports outright
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -109,6 +114,7 @@ class Settings:
             access_code=os.getenv("ACCESS_CODE", "").strip(),
             trust_proxy=_env_bool("TRUST_PROXY", False),
             email_enabled=_env_bool("EMAIL_ENABLED", True),
+            notion_enabled=_env_bool("NOTION_ENABLED", True),
         )
 
 
@@ -222,6 +228,10 @@ class Guard:
             logger.warning("Burst limit hit by %s on %s", ip, path)
             return Rejection(429, "Too many requests, slow down and try again in a minute",
                              retry_after=60, code="burst")
+
+        if path in NOTION_PATHS and method in PROTECTED_METHODS and not s.notion_enabled:
+            return Rejection(403, "Saving to Notion is turned off on this site",
+                             code="notion_disabled")
 
         if path not in MODEL_PATHS or method not in PROTECTED_METHODS:
             return None
